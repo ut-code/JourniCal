@@ -28,6 +28,8 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <a href='../page1/index.html'>ページ1</a>
+      <a href='../page2/index.html'>ページ2</a>
     </>
   )
 }
