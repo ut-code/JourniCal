@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// this struct is a sample.
 type api_root_res struct {
 	// structs must start with capital letters to allow JSON stringify (called JSON.Marshal) to access the property
 	// in Golang, all fields that start with lower-case letters are considered private.
