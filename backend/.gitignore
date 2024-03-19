@@ -1,0 +1,6 @@
+# secrets
+credentials.json
+
+# generated files
+JourniCalBackend
+token.json
