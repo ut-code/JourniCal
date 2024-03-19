@@ -24,6 +24,7 @@ func SendToAuth(c echo.Context, config *oauth2.Config) {
 	c.Redirect(http.StatusFound, authURL)
 }
 
+// TODO: make this a long-lifetime map[authCode, *oauth2.Token] by using DB or something
 func SaveToken(code authCode, token *oauth2.Token) {
 	file := "./token.json"
 	fmt.Printf("Saving token file to: %s\n", file)
@@ -42,7 +43,8 @@ func SaveToken(code authCode, token *oauth2.Token) {
 func ReadToken(ctx context.Context, code authCode, cfg *oauth2.Config) (*oauth2.Token, error) {
 	var tok oauth2.Token
 
-	b, err := os.ReadFile("./token.json") // TODO: read tok from database where code = $code
+	// TODO: read tok from database where code = $code
+	b, err := os.ReadFile("./token.json")
 	if err != nil {
 		// couldn't read from token.json
 		goto exchange_token
@@ -53,8 +55,8 @@ func ReadToken(ctx context.Context, code authCode, cfg *oauth2.Config) (*oauth2.
 		goto exchange_token
 	}
 	if !tok.Valid() {
-		// invalid token. (expired?) ~~TODO: get another token via RefreshToken~~
-		// Client constructor will automatically refresh this. so nothing to do here.
+		// invalid token. (expired?)
+		// Client constructor (oauth2.Config#Client) will automatically refresh this, so nothing to do here.
 		return &tok, nil
 	}
 	return &tok, nil
