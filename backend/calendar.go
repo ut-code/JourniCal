@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -20,15 +19,31 @@ func CalendarSample() {
 	ctx := context.Background()
 	cfg := ReadCredentials()
 
-	cachedToken := readTokenCache()
-	// Authenticate will do:
-	// if cache == nil,
-	//    call askForToken to get token.
-	//    call saveToken to save token for future use.
-	// authenticate.
-	client := Authenticate(ctx, cfg, cachedToken, askForToken, saveToken)
+	code, err := ReadFile("./saved-code.txt") // read token from cookie in the product code.
+	if err != nil || code == "" {
+		authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+		fmt.Println("Go go the link and get token (token will appear in the query) and paste to terminal", authURL)
 
-	// if there is any way to keep the context of a connection between client, (or maybe a map[user_id, service]?)
+		var code string
+		_, err := fmt.Scan(&code)
+		ErrorLog(err, "unable to read authorization code")
+
+		f, err := os.Create("./saved-code.txt")
+		ErrorLog(err)
+		_, err = f.Write([]byte(code))
+		ErrorLog(err)
+
+		tok, err := cfg.Exchange(ctx, code)
+		ErrorLog(err, "Unable to retrieve token from web")
+
+		SaveToken(code, tok)
+	}
+
+	tok, err := ReadToken(ctx, code, cfg)
+	ErrorLog(err)
+	client := cfg.Client(ctx, tok)
+
+	// if there is any way to keep the context of a connection between client, (maybe a map[user_id, service]?)
 	// service can be cached there.
 	service, err := calendar.NewService(ctx, option.WithHTTPClient(client))
 	ErrorLog(err, "Failed to create service")
@@ -40,13 +55,18 @@ func CalendarSample() {
 		Start:    DateTime("2024-03-16", "13:00:00", timezoneTokyo),
 		End:      DateTime("2024-03-16", "17:00:00", timezoneTokyo),
 	}) */
-	now := time.Now().Format(time.RFC3339)
+
+	now := RFC3339(time.Now().Format(time.RFC3339))
 	evs := GetNEventsForward(service, "primary", now, 20)
 	for _, ev := range evs {
 		fmt.Println(prettyFormatEvent(ev))
 	}
 }
 func prettyFormatEvent(e *calendar.Event) string {
+	var attachments_urls []string
+	for _, a := range e.Attachments {
+		attachments_urls = append(attachments_urls, a.FileUrl)
+	}
 	return strings.Join([]string{
 		e.Summary,
 		e.Description,
@@ -54,7 +74,8 @@ func prettyFormatEvent(e *calendar.Event) string {
 		e.Start.DateTime,
 		e.End.Date,
 		e.End.DateTime,
-	}, "/")
+		"attachments: " + strings.Join(attachments_urls, " , "),
+	}, "|")
 }
 
 // this operation halts the app if there is no credentials.json found.
@@ -66,39 +87,6 @@ func ReadCredentials() *oauth2.Config {
 	ErrorLog(err, "Unable to parse client secret file to config")
 
 	return cfg
-}
-
-func askForToken(url authUrl) authCode {
-	fmt.Println("Go go the link and get token (token will appear in the query) and paste to terminal", url)
-
-	var code string
-	_, err := fmt.Scan(&code)
-	ErrorLog(err, "unable to read authorization code")
-	return code
-}
-
-func saveToken(token *oauth2.Token) {
-	file := "./token.json"
-	fmt.Printf("Saving credential file to: %s\n", file)
-	f, err := os.Create(file)
-	ErrorLog(err, "Unable to cache oauth token")
-
-	defer f.Close()
-	json.NewEncoder(f).Encode(token)
-}
-
-func readTokenCache() *oauth2.Token {
-	f, err := os.Open("./token.json")
-	if err != nil {
-		return nil
-	}
-	t := &oauth2.Token{}
-	err = json.NewDecoder(f).Decode(t)
-	defer f.Close()
-	if err != nil {
-		return nil
-	}
-	return t
 }
 
 type Timezone struct {
@@ -114,11 +102,11 @@ func CreateEvent(service *calendar.Service, calendar_id calendar_id, evt *calend
 	ErrorLog(err, "Unable to create event")
 }
 
-type RFC3339 = string
+type RFC3339 string
 
 func GetNEventsForward(service *calendar.Service, calendar_id calendar_id, start RFC3339, count int) []*calendar.Event {
-	events, err := service.Events.List(calendar_id).ShowDeleted(false).SingleEvents(true).TimeMin(start).MaxResults(int64(count)).Do()
-	ErrorLog(err, "Getting Calendar Events Failed in function GetNEvents()")
+	events, err := service.Events.List(calendar_id).ShowDeleted(false).SingleEvents(true).TimeMin(string(start)).MaxResults(int64(count)).Do()
+	ErrorLog(err, "Getting Calendar Events Failed in function GetNEventsForward()")
 	return events.Items
 }
 

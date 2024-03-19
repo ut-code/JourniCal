@@ -1,6 +1,7 @@
 # secrets
 credentials.json
+token.json
+saved-code.txt
 
 # generated files
 JourniCalBackend
-token.json

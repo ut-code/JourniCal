@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
@@ -27,28 +29,30 @@ func HTTPServerSample() {
 	// Doc: https://echo.labstack.com/
 	e := echo.New()
 
+	// google auth stuff
+	ctx := context.Background()
+	cfg := ReadCredentials()
+
 	// ミドルウェアを設定
 	// e.Use(middleware.Logger())
 	// e.Use(middleware.Recover())
+	readAuthCode := func(c echo.Context) authCode {
+		code, err := c.Cookie("code")
+		if err != nil || code.Value == "" {
+			SendToAuth(c, cfg)
+			return ""
+		}
+		fmt.Println(code)
+		return code.Value
+	}
+	Use(readAuthCode)
 
 	// static (directory-based) serving
-	e.Static("/", "./static")
-
-	// file-based serving
-	e.File("/", "index.html")
-	// or more verbosely, (replace POST with GET for the same result)
-	e.POST("/", func(c echo.Context) error {
-		err := c.String(http.StatusOK, "Alternative Text (because reading file in Go is a pain)")
-		// normal error handling example for beginners.
-		if err != nil {
-			// handle err here
-			return err
-		}
-		return nil // returning nil as error means the operation was successful.
-
-		// OR, you can also just do return c.String(...) to return error directly.
+	e.GET("/", func(c echo.Context) error {
+		readAuthCode(c)
+		c.File("./index.html")
+		return nil
 	})
-
 	// this will create a sub-route under /api/
 	api := e.Group("/api")
 	// for example, this will handle a GET request to /api (careful, it won't handle a request to /api/ )
@@ -77,9 +81,53 @@ func HTTPServerSample() {
 		return nil
 	})
 
+	e.GET("/auth/code", func(c echo.Context) error {
+		code := c.QueryParam("code")
+		if code == "" {
+			c.String(http.StatusBadRequest, "empty authorization code")
+			return nil // anyone can freely send a request to /auth/code so it's not an actual error
+		}
+		if ck, err := c.Cookie("code"); err == nil && ck.Value == code {
+			c.Redirect(http.StatusOK, "/")
+			return nil
+		}
+
+		tok, err := cfg.Exchange(ctx, code)
+		SaveToken(code, tok)
+		ErrorLog(err, "Unable to retrieve token from web")
+
+		const MaxAge = 12 * 30 * 24 * 60 * 60 // about 3 months.
+		c.SetCookie(&http.Cookie{
+			Path:     "/",
+			Name:     "code",
+			Value:    code,
+			MaxAge:   MaxAge,
+			HttpOnly: true, // reduces XSS risk via disallowing access from browser JS
+		})
+		c.Redirect(http.StatusFound, "/")
+		return nil
+	})
+
+	e.GET("/auth/check", func(c echo.Context) error {
+		code, err := c.Cookie("code")
+		if err != nil {
+			c.String(200, "You are not authenticated.")
+		} else {
+			c.String(200, "You are authenticated. the code is: "+code.Value)
+		}
+		return nil
+	})
 	// write any code here
 
 	// listen + serve
 	err := e.Start(":3000")
 	fmt.Println(err.Error())
+}
+
+func ReadFile(path string) (content string, err error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }
