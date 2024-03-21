@@ -54,7 +54,7 @@ func HTTPServerSample() {
 		c.File("./index.html")
 		return nil
 	})
-	// this will create a sub-route under /api/
+	// this will create a sub-route under /api
 	api := e.Group("/api")
 	// for example, this will handle a GET request to /api (careful, it won't handle a request to /api/ )
 	api.GET("", func(c echo.Context) error {
