@@ -22,7 +22,7 @@ function App() {
 
   return (
     <>
-      <CssBaseline/>
+      <CssBaseline />
       <RouterProvider router={router} />
     </>
   );

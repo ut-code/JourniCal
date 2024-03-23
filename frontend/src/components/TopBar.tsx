@@ -16,7 +16,7 @@ const TopBar: React.FC<{
   const currentPathName = useLocation().pathname;
   const iconCommonSxProps = { mx: 1.5, color: "primary.contrastText" };
   const linkIconCommonStyleProps = { paddingTop: "3%" };
-  
+
   return (
     <Box
       width={"100%"}
