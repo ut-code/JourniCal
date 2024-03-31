@@ -2,6 +2,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import Page1 from "./pages/page1";
 import Page2 from "./pages/page2";
+import { CssBaseline } from "@mui/material";
 
 function App() {
   const router = createBrowserRouter([
@@ -21,6 +22,7 @@ function App() {
 
   return (
     <>
+      <CssBaseline />
       <RouterProvider router={router} />
     </>
   );
