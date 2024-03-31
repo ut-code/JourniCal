@@ -2,6 +2,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import Page1 from "./pages/page1";
 import Page2 from "./pages/page2";
+import InfiniteScrollTest from "./pages/infinite_scroll_test";
 
 function App() {
   const router = createBrowserRouter([
@@ -16,6 +17,10 @@ function App() {
     {
       path: "/page2",
       element: <Page2 />,
+    },
+    {
+      path: "/infinite_scroll_test",
+      element: <InfiniteScrollTest />,
     },
   ]);
 
