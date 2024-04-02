@@ -13,39 +13,13 @@ import (
 	"google.golang.org/api/option"
 )
 
-func CalendarSample() {
-	// do this at top-level initialization in main (or, copy & paste from inside the function)
-	ctx := context.Background()
-	cfg := ReadCredentials()
-
-	code, err := ReadFile("./saved-code.txt") // read token from cookie in the product code.
-	if err != nil || code == "" {
-		authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-		fmt.Println("Go go the link and get token (token will appear in the query) and paste to terminal", authURL)
-
-		var code string
-		_, err := fmt.Scan(&code)
-		ErrorLog(err, "unable to read authorization code")
-
-		f, err := os.Create("./saved-code.txt")
-		ErrorLog(err)
-		_, err = f.Write([]byte(code))
-		ErrorLog(err)
-
-		tok, err := cfg.Exchange(ctx, code)
-		ErrorLog(err, "Unable to retrieve token from web")
-
-		SaveToken(code, tok)
-	}
-
-	tok, err := ReadToken(ctx, code, cfg)
-	ErrorLog(err)
-	client := cfg.Client(ctx, tok)
+func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token) {
+	client := config.Client(ctx, tok)
 
 	// if there is any way to keep the context of a connection between client, (maybe a map[user_id, service]?)
 	// service can be cached there.
 	service, err := calendar.NewService(ctx, option.WithHTTPClient(client))
-	ErrorLog(err, "Failed to create service")
+	ErrorLog(err)
 
 	// timezoneTokyo := Timezone{Offset: "+09:00", Area: "Asia/Tokyo"}
 	/* CreateEvent(service, "primary", &calendar.Event{
@@ -65,6 +39,7 @@ func CalendarSample() {
 		fmt.Println(prettyFormatEvent(ev))
 	}
 }
+
 func prettyFormatEvent(e *calendar.Event) string {
 	var attachments_urls []string
 	for _, a := range e.Attachments {

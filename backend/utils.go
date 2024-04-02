@@ -16,6 +16,7 @@ func ErrorLog(err error, msgs ...string) {
 		log.Fatalln(": "+strings.Join(msgs, " "), err)
 	}
 }
+
 func writeFile(path string, b []byte) error {
 	f, err := os.Create(path)
 	if err != nil {
@@ -23,4 +24,12 @@ func writeFile(path string, b []byte) error {
 	}
 	_, err = f.Write(b)
 	return err
+}
+
+func ReadFile(path string) (content string, err error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

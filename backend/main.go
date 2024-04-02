@@ -1,14 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/oauth2"
 )
 
 // this struct is a sample.
@@ -20,7 +24,46 @@ type api_root_res struct {
 }
 
 func main() {
-	CalendarSample()
+	// do this at top-level initialization in main (or, copy & paste from inside the function)
+	ctx := context.Background()
+	cfg := ReadCredentials()
+	token, err := tokenFromFile("./token.json")
+	
+	if err != nil || !token.Valid() {
+		if err != nil {
+			fmt.Println("failed to parse JSON")
+		} else {
+			fmt.Println("Invalid token")
+		}
+		// token isn't there, therefore ask for token (TODO: improve this functionality in prod with long-term token)
+		authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+		fmt.Println("go to the link below and paste the `code` prop in the terminal:")
+		fmt.Println(authURL)
+		var b []byte
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			b = append(b, scanner.Bytes()...)
+			if scanner.Text() != "" {
+				break
+			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			log.Println(err)
+		}
+
+		code := string(b)
+		var err error
+		token, err = cfg.Exchange(ctx, code)
+		ErrorLog(err, "Unable to retrieve token from web")
+
+		b, err = json.Marshal(token)
+		ErrorLog(err)
+		writeFile("./token.json", b)
+	}
+
+	CalendarSample(ctx, *cfg, token)
+	// GDriveSample(ctx, *token)
 	// HTTPServerSample()
 }
 
@@ -125,10 +168,14 @@ func HTTPServerSample() {
 	fmt.Println(err.Error())
 }
 
-func ReadFile(path string) (content string, err error) {
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
+func tokenFromFile(file string) (*oauth2.Token, error) {
+        f, err := os.Open(file)
+        if err != nil {
+                return nil, err
+        }
+        defer f.Close()
+        tok := &oauth2.Token{}
+        err = json.NewDecoder(f).Decode(tok)
+        return tok, err
 }
+
