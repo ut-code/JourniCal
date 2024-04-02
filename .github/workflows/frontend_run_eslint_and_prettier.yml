@@ -1,0 +1,25 @@
+name: Frontend ESLint and Prettier Check
+
+on: [push]
+
+jobs:
+  eslint-prettier-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18.17.0"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint and Prettier check
+        run: cd frontend && npm run lint && npm run format-check
