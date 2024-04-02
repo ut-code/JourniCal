@@ -21,6 +21,11 @@ const diaries = [
     title: 'Forth Entry',
     content: 'あいうえお'
   },
+  {
+    date: new Date('2024-04-03'),
+    title: 'Fifth Entry',
+    content: 'かきくけこ'
+  },
   // Add more diary entries here
 ];
 
