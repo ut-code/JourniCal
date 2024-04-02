@@ -32,7 +32,7 @@ const diaries = [
   // Add more diary entries here
 ];
 
-function DiaryApp() {
+function Diary() {
   return (
     <div className="diary-app">
       <div className="diary-entries">
@@ -44,4 +44,4 @@ function DiaryApp() {
   );
 }
 
-export default DiaryApp;
+export default Diary;
