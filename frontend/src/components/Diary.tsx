@@ -1,5 +1,3 @@
-import React from 'react';
-
 const diaries = [
   {
     date: new Date('2024-03-30'),
@@ -30,13 +28,9 @@ const diaries = [
 ];
 
 function DiaryEntry({date, title, content} : {date: Date; title: string; content: string}) {
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }as const;
-  const dateString = date.toLocaleDateString('en-US', options);
-
   return (
     <div className="diary-entry" style= {{display: "flex"}}>
       <div className="date" style={{ flexBasis: "15%", textAlign: "center", marginRight: "10px" , marginLeft: "10px" }}>
-        {/* {dateString} */}
         <h3 style={{marginBottom: "0%", fontSize: "2em" }}>
           {date.getDate()}
         </h3>
