@@ -4,6 +4,7 @@ import Page1 from "./pages/page1";
 import Page2 from "./pages/page2";
 import InfiniteScrollTest from "./pages/infinite_scroll_test";
 import { CssBaseline } from "@mui/material";
+import Diary from "./pages/diary";
 
 function App() {
   const router = createBrowserRouter([
@@ -22,6 +23,10 @@ function App() {
     {
       path: "/infinite_scroll_test",
       element: <InfiniteScrollTest />,
+    },
+    {
+      path: "/diary",
+      element: <Diary />,
     },
   ]);
 
