@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import TimelineView from "../components/TimelineVIew";
 import { add, sub } from "date-fns";
-import { Box, Button } from "@mui/material";
+import { Box, Button, MenuItem, Select } from "@mui/material";
 import TopBar from "../components/TopBar";
 import TimelineRowName from "../components/TimelineRowName";
 import { schedule } from "../components/TimelineSchedule";
+
+type modeVariant = "day" | "3days" | "week";
 
 const isEqualDay = (day1: Date, day2: Date) => {
   return (
@@ -19,11 +21,18 @@ const WeekViewTest: React.FC = () => {
   const [baseDate, setBaseDate] = useState(
     sub(today, { days: today.getDay() }),
   );
+
+  const [mode, setMode] = useState<modeVariant>("day");
+
+  const [threeDays, setThreeDays] = useState(
+    [...Array(3).keys()].map((i) => add(baseDate, { days: i })),
+  );
   const [week, setWeek] = useState(
     [...Array(7).keys()].map((i) => add(baseDate, { days: i })),
   );
   useEffect(() => {
     setWeek([...Array(7).keys()].map((i) => add(baseDate, { days: i })));
+    setThreeDays([...Array(3).keys()].map((i) => add(baseDate, { days: i })));
   }, [baseDate]);
 
   // 一週間の予定を格納
@@ -136,29 +145,89 @@ const WeekViewTest: React.FC = () => {
       end: new Date("2024-04-09T22:00"),
       color: "dodgerblue",
     },
+    {
+      title: "長い名前の予定長い名前の予定",
+      start: new Date("2024-04-10T21:00"),
+      end: new Date("2024-04-10T21:01"),
+      color: "dodgerblue",
+    },
   ];
 
   return (
     <Box>
       <TopBar journalPathName="/page1" calendarPathName="/page2" />
-      <Button onClick={() => setBaseDate(sub(baseDate, { days: 7 }))}>
-        前の週
-      </Button>
-      <Button onClick={() => setBaseDate(add(baseDate, { days: 7 }))}>
-        次の週
-      </Button>
+      {mode === "day" ? (
+        <>
+          <Button onClick={() => setBaseDate(sub(baseDate, { days: 1 }))}>
+            前の日
+          </Button>
+          <Button onClick={() => setBaseDate(add(baseDate, { days: 1 }))}>
+            次の日
+          </Button>
+        </>
+      ) : mode === "3days" ? (
+        <>
+          <Button onClick={() => setBaseDate(sub(baseDate, { days: 3 }))}>
+            前の3日間
+          </Button>
+          <Button onClick={() => setBaseDate(add(baseDate, { days: 3 }))}>
+            次の3日間
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button onClick={() => setBaseDate(sub(baseDate, { days: 7 }))}>
+            前の週
+          </Button>
+          <Button onClick={() => setBaseDate(add(baseDate, { days: 7 }))}>
+            次の週
+          </Button>
+        </>
+      )}
+
+      <Select
+        value={mode}
+        onChange={(e) => setMode(e.target.value as modeVariant)}
+      >
+        <MenuItem value={"day"}>日</MenuItem>
+        <MenuItem value={"3days"}>3日間</MenuItem>
+        <MenuItem value={"week"}>一週間</MenuItem>
+      </Select>
+
       <Box display={"flex"}>
         <TimelineRowName />
-        {week.map((day) => (
+        {mode === "day" ? (
           <TimelineView
-            key={day.getTime()}
-            day={day}
+            key={baseDate.getTime()}
+            day={baseDate}
             today={today}
             daySchedules={weekSchedules.filter((schedule) =>
-              isEqualDay(day, schedule.start),
+              isEqualDay(baseDate, schedule.start),
             )}
           />
-        ))}
+        ) : mode === "3days" ? (
+          threeDays.map((day) => (
+            <TimelineView
+              key={day.getTime()}
+              day={day}
+              today={today}
+              daySchedules={weekSchedules.filter((schedule) =>
+                isEqualDay(day, schedule.start),
+              )}
+            />
+          ))
+        ) : (
+          week.map((day) => (
+            <TimelineView
+              key={day.getTime()}
+              day={day}
+              today={today}
+              daySchedules={weekSchedules.filter((schedule) =>
+                isEqualDay(day, schedule.start),
+              )}
+            />
+          ))
+        )}
       </Box>
     </Box>
   );
