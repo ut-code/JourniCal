@@ -1,24 +1,36 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import path, { resolve } from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: resolve(__dirname, "./"),
-  plugins: [react()],
-  build: {
-    outDir: resolve(__dirname, "dist"),
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, "index.html"),
-        page1: resolve(__dirname, "page1/index.html"),
-        page2: resolve(__dirname, "page2/index.html"),
-      },
+  plugins: [react(), VitePWA({
+    registerType: 'autoUpdate',
+    devOptions: {
+      enabled: true
     },
-  },
+    injectRegister: 'auto',
+    manifest: {
+      name: 'JourniCal',
+      short_name: 'JourniCal',
+      description: 'カレンダーとジャーナルを組み合わせたアプリ',
+      start_url: '.',
+      display: "standalone",
+      orientation: "portrait",
+      theme_color: '#00D372',
+      background_color: "#aaaaaa",
+      icons: [
+        {
+          src: '192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+    }
+  })],
 })

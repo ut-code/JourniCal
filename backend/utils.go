@@ -26,7 +26,7 @@ func writeFile(path string, b []byte) error {
 	return err
 }
 
-func ReadFile(path string) (content string, err error) {
+func readFile(path string) (content string, err error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return "", err

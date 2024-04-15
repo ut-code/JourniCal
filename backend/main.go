@@ -28,14 +28,9 @@ func main() {
 	ctx := context.Background()
 	cfg := ReadCredentials()
 	token, err := tokenFromFile("./token.json")
-	
-	if err != nil || !token.Valid() {
-		if err != nil {
-			fmt.Println("failed to parse JSON")
-		} else {
-			fmt.Println("Invalid token")
-		}
-		// token isn't there, therefore ask for token (TODO: improve this functionality in prod with long-term token)
+
+	if err != nil {
+		// token isn't there, therefore ask for token
 		authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 		fmt.Println("go to the link below and paste the `code` prop in the terminal:")
 		fmt.Println(authURL)
@@ -61,9 +56,18 @@ func main() {
 		ErrorLog(err)
 		writeFile("./token.json", b)
 	}
+	if !token.Valid() {
+		// expired token
+		fmt.Println("Expired token. refreshing...")
+		cfg.Client(ctx, token)
+		b, err := json.Marshal(token)
+		ErrorLog(err)
+		writeFile("./token.json", b)
+	}
 
 	CalendarSample(ctx, *cfg, token)
-	// GDriveSample(ctx, *token)
+	url, _ := readFile("./sample.url")
+	GDriveSample(ctx, *cfg, token, url)
 	// HTTPServerSample()
 }
 
@@ -169,13 +173,12 @@ func HTTPServerSample() {
 }
 
 func tokenFromFile(file string) (*oauth2.Token, error) {
-        f, err := os.Open(file)
-        if err != nil {
-                return nil, err
-        }
-        defer f.Close()
-        tok := &oauth2.Token{}
-        err = json.NewDecoder(f).Decode(tok)
-        return tok, err
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	tok := &oauth2.Token{}
+	err = json.NewDecoder(f).Decode(tok)
+	return tok, err
 }
-

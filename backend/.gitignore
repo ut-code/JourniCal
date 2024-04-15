@@ -3,5 +3,8 @@ credentials.json
 token.json
 saved-code.txt
 
+# temporary samples
+sample.id
+
 # generated files
 JourniCalBackend

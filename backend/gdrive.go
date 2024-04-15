@@ -5,18 +5,20 @@ import (
 
 	"golang.org/x/oauth2"
 	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/option"
 )
 
-func GDriveSample(ctx context.Context, token oauth2.Token) {
-	dSvc, err := drive.NewService(ctx)
+func GDriveSample(ctx context.Context, config oauth2.Config, token *oauth2.Token, id string) {
+	client := config.Client(ctx, token)
+	dSvc, err := drive.NewService(ctx, option.WithHTTPClient(client))
 	ErrorLog(err)
-	url := "GET URL FROM SOMEWHERE"
-	content, err := GetContent(*dSvc, url)
+	file, err := GetContent(*dSvc, id)
 	ErrorLog(err)
-	ErrorLog(writeFile("sample.jpg", content))
+	link := file.WebContentLink
+	writeFile("./sample.link", []byte(link))
 }
 
-func GetContent(s drive.Service, url string) ([]byte, error) {
-
-	return []byte{}, nil
+func GetContent(s drive.Service, id string) (*drive.File, error) {
+	b, err := s.Files.Get(id).Do()
+	return b, err
 }

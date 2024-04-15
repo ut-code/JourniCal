@@ -43,7 +43,7 @@ func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token
 func prettyFormatEvent(e *calendar.Event) string {
 	var attachments_urls []string
 	for _, a := range e.Attachments {
-		attachments_urls = append(attachments_urls, a.FileUrl)
+		attachments_urls = append(attachments_urls, a.FileUrl+" | "+a.FileId)
 	}
 	return strings.Join([]string{
 		e.Summary,
