@@ -29,27 +29,34 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
     start: schedule.start,
     end: schedule.end,
   });
+
+  // const modifiedTitle =
+  //   schedule.title.length > 7
+  //     ? schedule.title.substring(0, 7)
+  //     : schedule.title;
+
   const scheduleDurationHours = durationToHours(scheduleDuration);
   //TODO 期間が短いと文字がはみ出るのをなんとかする
   return (
     <Box
       sx={{
         position: "absolute",
-        padding: "5px",
+        paddingLeft: "10px",
         top: `${4 * (hoursBeforeStart + 1)}%`,
         width: "90%",
         height: `${4 * scheduleDurationHours}%`,
+        minHeight: "25px",
         borderRadius: "5px",
         backgroundColor: schedule.color,
       }}
     >
-      <Typography variant="caption">{schedule.title}</Typography>
+      <Typography variant="caption">{schedule.title}</Typography>{" "}
       <Typography variant="caption">
         {schedule.start.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         })}
-        ~
+        {" ~ "}
         {schedule.end.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
