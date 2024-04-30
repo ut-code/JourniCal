@@ -6,9 +6,9 @@ interface Entry {
   content: string;
 }
 
-async function fetchEntries(): Promise<Entry[]>{
+async function fetchEntries(): Promise<Entry[]> {
   const response = await fetch("http://localhost:3000/api/diaries");
-  const data = await response.json() as Entry[];
+  const data = (await response.json()) as Entry[];
   console.log(data);
   return data;
 }
