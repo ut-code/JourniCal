@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type api_root_res struct {
@@ -17,8 +18,8 @@ type api_root_res struct {
 }
 
 func main() {
-	CalendarSample()
-	// HTTPServerSample()
+	// CalendarSample()
+	HTTPServerSample()
 }
 
 // HTTPServer is top-level because it is an interface between client and has to be able to run every function.
@@ -30,7 +31,9 @@ func HTTPServerSample() {
 	// ミドルウェアを設定
 	// e.Use(middleware.Logger())
 	// e.Use(middleware.Recover())
-
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:5173"},
+	}))
 	// static (directory-based) serving
 	e.Static("/", "./static")
 
@@ -61,6 +64,11 @@ func HTTPServerSample() {
 			Query: q,
 		})
 		return err
+	})
+	api.GET("/diaries", func(c echo.Context) error {
+		diaries := GetDiary()
+		c.JSON(http.StatusOK, diaries)
+		return nil
 	})
 	// and this will handle a POST request to /api/ping (pong!)
 	// try this in console: $ curl -X POST http://localhost:3000/api/ping -d "Hello there!"

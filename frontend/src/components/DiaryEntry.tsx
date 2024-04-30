@@ -3,10 +3,11 @@ export default function DiaryEntry({
   title,
   content,
 }: {
-  date: Date;
+  date: string;
   title: string;
   content: string;
 }) {
+  const parsedDate = new Date(date);
   return (
     <div className="diary-entry" style={{ display: "flex" }}>
       <div
@@ -19,20 +20,20 @@ export default function DiaryEntry({
         }}
       >
         <h3 style={{ marginBottom: "0%", fontSize: "2em" }}>
-          {date.getDate()}
+          {parsedDate.getDate()}
         </h3>
         <div>
-          {date.getDay() == 0
+          {parsedDate.getDay() == 0
             ? "Sun"
-            : date.getDay() == 1
+            : parsedDate.getDay() == 1
               ? "Mon"
-              : date.getDay() == 2
+              : parsedDate.getDay() == 2
                 ? "Tue"
-                : date.getDay() == 3
+                : parsedDate.getDay() == 3
                   ? "Wed"
-                  : date.getDay() == 4
+                  : parsedDate.getDay() == 4
                     ? "Thu"
-                    : date.getDay() == 5
+                    : parsedDate.getDay() == 5
                       ? "Fri"
                       : "Sat"}
         </div>
