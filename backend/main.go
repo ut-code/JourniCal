@@ -32,7 +32,9 @@ func main() {
 		return
 	}
 
-	routes.RegisterDiaryRoutes(e, db)
+	api := e.Group("/api")
+
+	routes.RegisterDiaryRoutes(api, db)
 
 	// サーバの起動
 	if err := e.Start(":3000"); err != nil {

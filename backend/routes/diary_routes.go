@@ -7,16 +7,16 @@ import (
 	"JourniCalBackend/helpers"
 )
 
-func RegisterDiaryRoutes(e *echo.Echo, db *gorm.DB) {
-	e.GET("/diaries", func(c echo.Context) error {
+func RegisterDiaryRoutes(api *echo.Group, db *gorm.DB) {
+	api.GET("/diaries", func(c echo.Context) error {
 		return helpers.GetAllDiaries(c, db)
 	})
 
-	e.GET("/diaries/:id", func(c echo.Context) error {
+	api.GET("/diaries/:id", func(c echo.Context) error {
 		return helpers.GetDiaryByID(c, db)
 	})
 
-	e.POST("/diaries", func(c echo.Context) error {
+	api.POST("/diaries", func(c echo.Context) error {
 		return helpers.CreateDiary(c, db)
 	})
 }
