@@ -4,6 +4,7 @@ import Page1 from "./pages/page1";
 import Page2 from "./pages/page2";
 import { CssBaseline } from "@mui/material";
 import WeekViewTest from "./pages/WeekViewTest";
+import Diary from "./pages/diary";
 
 function App() {
   const router = createBrowserRouter([
@@ -22,6 +23,10 @@ function App() {
     {
       path: "/week_view_test",
       element: <WeekViewTest />,
+    },
+    {
+      path: "/diary",
+      element: <Diary />,
     },
   ]);
 
