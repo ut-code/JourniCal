@@ -7,10 +7,10 @@ const Home: React.FC = () => {
       <ul>
         <li>Home (Here)</li>
         <li>
-          <Link to="/page1">Page1</Link>
+          <Link to="/calendar">Calendar</Link>
         </li>
         <li>
-          <Link to="/page2">Page2</Link>
+          <Link to="/diary">Diary</Link>
         </li>
       </ul>
     </>

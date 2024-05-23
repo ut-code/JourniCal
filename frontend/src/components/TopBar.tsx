@@ -8,11 +8,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import { useLocation } from "react-router-dom";
+import { CALENDAR_PATH_NAME, DIARY_PATH_NAME } from "../consts/consts";
 
-const TopBar: React.FC<{
-  journalPathName: string;
-  calendarPathName: string;
-}> = (props) => {
+const TopBar: React.FC = () => {
   const currentPathName = useLocation().pathname;
   const iconCommonSxProps = { mx: 1.5, color: "primary.contrastText" };
   const linkIconCommonStyleProps = { paddingTop: "3%" };
@@ -37,13 +35,13 @@ const TopBar: React.FC<{
         <CalendarMonthIcon sx={iconCommonSxProps} />
         <SearchIcon sx={iconCommonSxProps} />
         <CheckCircleOutlineIcon sx={iconCommonSxProps} />
-        {currentPathName === props.journalPathName ? (
-          <Link to={props.calendarPathName} style={linkIconCommonStyleProps}>
+        {currentPathName === DIARY_PATH_NAME ? (
+          <Link to={DIARY_PATH_NAME} style={linkIconCommonStyleProps}>
             <DateRangeIcon sx={iconCommonSxProps} />
           </Link>
         ) : (
-          currentPathName === props.calendarPathName && (
-            <Link to={props.journalPathName} style={linkIconCommonStyleProps}>
+          currentPathName === CALENDAR_PATH_NAME && (
+            <Link to={CALENDAR_PATH_NAME} style={linkIconCommonStyleProps}>
               <AutoStoriesIcon sx={iconCommonSxProps} />
             </Link>
           )

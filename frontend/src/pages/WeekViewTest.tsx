@@ -6,7 +6,7 @@ import TopBar from "../components/TopBar";
 import TimelineRowName from "../components/TimelineRowName";
 import { schedule } from "../components/TimelineSchedule";
 
-type modeVariant = "day" | "3days" | "week";
+type modeVariant = "schedule" | "day" | "3days" | "week";
 
 const isEqualDay = (day1: Date, day2: Date) => {
   return (
@@ -16,7 +16,7 @@ const isEqualDay = (day1: Date, day2: Date) => {
   );
 };
 
-const WeekViewTest: React.FC = () => {
+const Calendar: React.FC = () => {
   const today = new Date();
   const [baseDate, setBaseDate] = useState(
     sub(today, { days: today.getDay() }),
@@ -155,7 +155,7 @@ const WeekViewTest: React.FC = () => {
 
   return (
     <Box>
-      <TopBar journalPathName="/page1" calendarPathName="/page2" />
+      <TopBar/>
       {mode === "day" ? (
         <>
           <Button onClick={() => setBaseDate(sub(baseDate, { days: 1 }))}>
@@ -175,62 +175,69 @@ const WeekViewTest: React.FC = () => {
           </Button>
         </>
       ) : (
-        <>
-          <Button onClick={() => setBaseDate(sub(baseDate, { days: 7 }))}>
-            前の週
-          </Button>
-          <Button onClick={() => setBaseDate(add(baseDate, { days: 7 }))}>
-            次の週
-          </Button>
-        </>
+        mode === "week" && (
+          <>
+            <Button onClick={() => setBaseDate(sub(baseDate, { days: 7 }))}>
+              前の週
+            </Button>
+            <Button onClick={() => setBaseDate(add(baseDate, { days: 7 }))}>
+              次の週
+            </Button>
+          </>
+        )
       )}
 
       <Select
         value={mode}
         onChange={(e) => setMode(e.target.value as modeVariant)}
       >
+        <MenuItem value={"schedule"}>スケジュール</MenuItem>
         <MenuItem value={"day"}>日</MenuItem>
         <MenuItem value={"3days"}>3日間</MenuItem>
         <MenuItem value={"week"}>一週間</MenuItem>
       </Select>
 
-      <Box display={"flex"}>
-        <TimelineRowName />
-        {mode === "day" ? (
-          <TimelineView
-            key={baseDate.getTime()}
-            day={baseDate}
-            today={today}
-            daySchedules={weekSchedules.filter((schedule) =>
-              isEqualDay(baseDate, schedule.start),
-            )}
-          />
-        ) : mode === "3days" ? (
-          threeDays.map((day) => (
+      {mode === "schedule" ? (
+        <>ここにスケジュールビューを配置</>
+      ) : (
+        <Box display={"flex"}>
+          <TimelineRowName />
+          {mode === "day" ? (
             <TimelineView
-              key={day.getTime()}
-              day={day}
+              key={baseDate.getTime()}
+              day={baseDate}
               today={today}
               daySchedules={weekSchedules.filter((schedule) =>
-                isEqualDay(day, schedule.start),
+                isEqualDay(baseDate, schedule.start),
               )}
             />
-          ))
-        ) : (
-          week.map((day) => (
-            <TimelineView
-              key={day.getTime()}
-              day={day}
-              today={today}
-              daySchedules={weekSchedules.filter((schedule) =>
-                isEqualDay(day, schedule.start),
-              )}
-            />
-          ))
-        )}
-      </Box>
+          ) : mode === "3days" ? (
+            threeDays.map((day) => (
+              <TimelineView
+                key={day.getTime()}
+                day={day}
+                today={today}
+                daySchedules={weekSchedules.filter((schedule) =>
+                  isEqualDay(day, schedule.start),
+                )}
+              />
+            ))
+          ) : (
+            week.map((day) => (
+              <TimelineView
+                key={day.getTime()}
+                day={day}
+                today={today}
+                daySchedules={weekSchedules.filter((schedule) =>
+                  isEqualDay(day, schedule.start),
+                )}
+              />
+            ))
+          )}
+        </Box>
+      )}
     </Box>
   );
 };
 
-export default WeekViewTest;
+export default Calendar;
