@@ -5,7 +5,11 @@ import TopBar from "../components/TopBar";
 const Page2: React.FC = () => {
   return (
     <>
-      <TopBar journalPathName="/page1" calendarPathName="/page2" />
+      <TopBar
+        baseDate={new Date()}
+        journalPathName="/page1"
+        calendarPathName="/page2"
+      />
       <ul>
         <li>
           <Link to="/">Home</Link>
