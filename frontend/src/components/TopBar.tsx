@@ -53,12 +53,12 @@ const TopBar: React.FC<{
           <SearchIcon sx={iconCommonSxProps} />
           <CheckCircleOutlineIcon sx={iconCommonSxProps} />
           {currentPathName === DIARY_PATH_NAME ? (
-            <Link to={DIARY_PATH_NAME} style={linkIconCommonStyleProps}>
+            <Link to={CALENDAR_PATH_NAME} style={linkIconCommonStyleProps}>
               <DateRangeIcon sx={iconCommonSxProps} />
             </Link>
           ) : (
             currentPathName === CALENDAR_PATH_NAME && (
-              <Link to={CALENDAR_PATH_NAME} style={linkIconCommonStyleProps}>
+              <Link to={DIARY_PATH_NAME} style={linkIconCommonStyleProps}>
                 <AutoStoriesIcon sx={iconCommonSxProps} />
               </Link>
             )
