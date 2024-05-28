@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
@@ -13,9 +15,9 @@ import (
 
 var cfg *oauth2.Config
 var ctx context.Context
+var authURL string
 
 func getAuthNew(c echo.Context) error {
-	authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusFound, authURL)
 	return nil
 }
@@ -34,15 +36,26 @@ func postApiPing(c echo.Context) error {
 }
 
 func getGet20EventsForward(c echo.Context) error {
-	srv, err := srvFromContext(c)
+	srv, err, no := srvFromContext(c)
 	if err != nil {
+		handleSrvInitializationError(c, no)
 		return err
 	}
-	return nil
+	t, err := strconv.Atoi(c.Param("start_unix"))
+	if err != nil {
+		c.String(http.StatusBadRequest, "get-20-events-forward with invalid second path: not unix time (= number)")
+	}
+	evs := GetNEventsForward(srv, "primary", time.Unix(int64(t), 0), 20)
+	return c.JSON(200, evs)
 }
 
+// TODO: make this function
 func getRoot(c echo.Context) error {
-	readToken(c)
+	_, err := readToken(c)
+	if err != nil {
+		c.Redirect(http.StatusFound, authURL)
+		return nil
+	}
 	c.File("./index.html")
 	return nil
 }
@@ -50,7 +63,7 @@ func getRoot(c echo.Context) error {
 func getAuthCheck(c echo.Context) error {
 	token, err := readToken(c)
 	if err != nil {
-		c.String(200, "You are not authenticated.")
+		c.String(200, "You are not authenticated. access /auth/new to authenticate.")
 	} else {
 		c.String(200, "You are authenticated. the code is: "+toJSON(token))
 	}

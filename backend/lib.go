@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
+	//"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
@@ -52,13 +52,13 @@ func srvFromContext(c echo.Context) (*calendar.Service, error, errno) {
 	}
 	return srv, nil, 0
 }
-func handleSrvInitializationError(c echo.Context, errno) {
-	if errno == OK {
+func handleSrvInitializationError(c echo.Context, no errno) {
+	if no == OK {
 		// ok
 		return
 	}
-	if errno == ERR_MISSING_TOKEN {
+	if no == ERR_MISSING_TOKEN {
 		TODO()
-		c.Redirect() // input url here
+		// c.Redirect() // input url here
 	}
 }

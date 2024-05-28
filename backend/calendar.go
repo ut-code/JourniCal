@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"context"
 
@@ -29,12 +30,14 @@ func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token
 		End:      DateTime("2024-03-16", "17:00:00", timezoneTokyo),
 	}) */
 
-	evs := GetNEventsForward(service, "primary", RFC3339("2024-03-01T00:00:00+09:00"), 5)
+	march1, err := time.Parse("RFC3339", "2024-03-01T00:00:00+09:00")
+	march31, err := time.Parse("RFC3339", "2024-03-31T23:59:59+09:00")
+	evs := GetNEventsForward(service, "primary", march1, 5)
 	for _, ev := range evs {
 		fmt.Println(prettyFormatEvent(ev))
 	}
 	fmt.Println("--------------------------")
-	evs2 := GetEventsInRange(service, "primary", RFC3339("2024-03-01T00:00:00+09:00"), RFC3339("2024-03-31T23:59:59+09:00"))
+	evs2 := GetEventsInRange(service, "primary", march1, march31)
 	for _, ev := range evs2 {
 		fmt.Println(prettyFormatEvent(ev))
 	}
@@ -80,16 +83,18 @@ func CreateEvent(service *calendar.Service, calendar_id calendar_id, evt *calend
 	ErrorLog(err, "Unable to create event")
 }
 
-type RFC3339 string
+func RFC3339(t time.Time) string {
+	return t.Format(time.RFC3339)
+}
 
-func GetNEventsForward(service *calendar.Service, calendar_id calendar_id, start RFC3339, count int) []*calendar.Event {
-	events, err := service.Events.List(calendar_id).ShowDeleted(false).SingleEvents(false).TimeMin(string(start)).MaxResults(int64(count) + 1).Do()
+func GetNEventsForward(service *calendar.Service, calendar_id calendar_id, start time.Time, count int) []*calendar.Event {
+	events, err := service.Events.List(calendar_id).ShowDeleted(false).SingleEvents(false).TimeMin(start.Format(time.RFC3339)).MaxResults(int64(count) + 1).Do()
 	ErrorLog(err, "Getting Calendar Events Failed in function GetNEventsForward()")
 	return events.Items
 }
 
-func GetEventsInRange(service *calendar.Service, calendar_id calendar_id, start RFC3339, end RFC3339) []*calendar.Event {
-	events, err := service.Events.List(calendar_id).SingleEvents(false).TimeMin(string(start)).TimeMax(string(end)).Do()
+func GetEventsInRange(service *calendar.Service, calendar_id calendar_id, start time.Time, end time.Time) []*calendar.Event {
+	events, err := service.Events.List(calendar_id).SingleEvents(false).TimeMin(start.Format(time.RFC3339)).TimeMax(end.Format(time.RFC3339)).Do()
 	ErrorLog(err, "Getting Calendar Events Failed in function GetEventsInRange()")
 	return events.Items
 }

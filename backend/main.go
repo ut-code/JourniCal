@@ -3,15 +3,20 @@ package main
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/oauth2"
 	"log"
 )
 
 // HTTPServer is top-level because it is an interface between client and has to be able to run every function.
+func init() {
+	ctx = context.Background()
+	cfg = ReadCredentials()
+	authURL = cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+}
+
 func main() {
 	// Doc: https://echo.labstack.com/
 	e := echo.New()
-	ctx = context.Background()
-	cfg = ReadCredentials()
 
 	// ミドルウェアを設定
 	// e.Use(middleware.Logger())
@@ -21,7 +26,9 @@ func main() {
 	api := e.Group("/api")
 	api.POST("/ping", postApiPing)
 
-	api.GET("/get-20-events-forward/", getGet20EventsForward)
+	// spec:
+	// specify time as unix time.
+	api.GET("/get-20-events-forward/:start_unix", getGet20EventsForward)
 
 	e.GET("/auth/new", getAuthNew)
 	e.GET("/auth/code", getAuthCode)
