@@ -46,3 +46,36 @@ func CreateDiary(c echo.Context, db *gorm.DB) error {
 	}
 	return c.JSON(http.StatusCreated, diary)
 }
+
+func UpdateDiary(c echo.Context, db *gorm.DB) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid diary ID"})
+	}
+	diary := &Diary{}
+	if err := db.First(diary, id).Error; err != nil {
+		return c.JSON(http.StatusNotFound, echo.Map{"error": "Diary not found"})
+	}
+	if err := c.Bind(diary); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Failed to bind diary data"})
+	}
+	if err := db.Save(diary).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to update diary"})
+	}
+	return c.JSON(http.StatusOK, diary)
+}
+
+func DeleteDiary(c echo.Context, db *gorm.DB) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid diary ID"})
+	}
+	diary := &Diary{}
+	if err := db.First(diary, id).Error; err != nil {
+		return c.JSON(http.StatusNotFound, echo.Map{"error": "Diary not found"})
+	}
+	if err := db.Delete(diary).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to delete diary"})
+	}
+	return c.NoContent(http.StatusNoContent)
+}

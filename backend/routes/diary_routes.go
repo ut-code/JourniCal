@@ -19,4 +19,12 @@ func RegisterDiaryRoutes(api *echo.Group, db *gorm.DB) {
 	api.POST("/diaries", func(c echo.Context) error {
 		return helpers.CreateDiary(c, db)
 	})
+
+	api.PUT("/diaries/:id", func(c echo.Context) error {
+		return helpers.UpdateDiary(c, db)
+	})
+
+	api.DELETE("/diaries/:id", func(c echo.Context) error {
+		return helpers.DeleteDiary(c, db)
+	})
 }
