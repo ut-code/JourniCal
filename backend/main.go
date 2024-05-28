@@ -23,56 +23,8 @@ type api_root_res struct {
 	Query url.Values
 }
 
-func main() {
-	// do this at top-level initialization in main (or, copy & paste from inside the function)
-	ctx := context.Background()
-	cfg := ReadCredentials()
-	token, err := tokenFromFile("./token.json")
-
-	if err != nil {
-		// token isn't there, therefore ask for token
-		authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-		fmt.Println("go to the link below and paste the `code` prop in the terminal:")
-		fmt.Println(authURL)
-		var b []byte
-		scanner := bufio.NewScanner(os.Stdin)
-		for scanner.Scan() {
-			b = append(b, scanner.Bytes()...)
-			if scanner.Text() != "" {
-				break
-			}
-		}
-
-		if err := scanner.Err(); err != nil {
-			log.Println(err)
-		}
-
-		code := string(b)
-		var err error
-		token, err = cfg.Exchange(ctx, code)
-		ErrorLog(err, "Unable to retrieve token from web")
-
-		b, err = json.Marshal(token)
-		ErrorLog(err)
-		writeFile("./token.json", b)
-	}
-	if !token.Valid() {
-		// expired token
-		fmt.Println("Expired token. refreshing...")
-		cfg.Client(ctx, token)
-		b, err := json.Marshal(token)
-		ErrorLog(err)
-		writeFile("./token.json", b)
-	}
-
-	CalendarSample(ctx, *cfg, token)
-	url, _ := readFile("./sample.url")
-	GDriveSample(ctx, *cfg, token, url)
-	// HTTPServerSample()
-}
-
 // HTTPServer is top-level because it is an interface between client and has to be able to run every function.
-func HTTPServerSample() {
+func main() {
 	// I chose to use Echo.
 	// Doc: https://echo.labstack.com/
 	e := echo.New()
@@ -129,26 +81,30 @@ func HTTPServerSample() {
 		return nil
 	})
 
+	e.GET("/auth/new", func(c echo.Context) error {
+		authURL := cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+		fmt.Println(authURL)
+		c.Redirect(http.StatusFound, authURL)
+		return nil
+	})
+
 	e.GET("/auth/code", func(c echo.Context) error {
 		code := c.QueryParam("code")
 		if code == "" {
 			c.String(http.StatusBadRequest, "empty authorization code")
 			return nil // anyone can freely send a request to /auth/code so it's not an actual error
 		}
-		if ck, err := c.Cookie("code"); err == nil && ck.Value == code {
-			c.Redirect(http.StatusOK, "/")
-			return nil
-		}
 
-		tok, err := cfg.Exchange(ctx, code)
-		SaveToken(code, tok)
+		token, err := cfg.Exchange(ctx, code)
 		ErrorLog(err, "Unable to retrieve token from web")
+		b, err := json.Marshal(token)
+		ErrorLog(err)
 
 		const MaxAge = 12 * 30 * 24 * 60 * 60 // about 3 months.
 		c.SetCookie(&http.Cookie{
 			Path:     "/",
-			Name:     "code",
-			Value:    code,
+			Name:     "token",
+			Value:    string(b),
 			MaxAge:   MaxAge,
 			HttpOnly: true, // reduces XSS risk via disallowing access from browser JS
 		})
@@ -157,11 +113,11 @@ func HTTPServerSample() {
 	})
 
 	e.GET("/auth/check", func(c echo.Context) error {
-		code, err := c.Cookie("code")
+		token, err := getToken(c)
 		if err != nil {
 			c.String(200, "You are not authenticated.")
 		} else {
-			c.String(200, "You are authenticated. the code is: "+code.Value)
+			c.String(200, "You are authenticated. the code is: "+toJSON(token))
 		}
 		return nil
 	})
@@ -170,6 +126,22 @@ func HTTPServerSample() {
 	// listen + serve
 	err := e.Start(":3000")
 	fmt.Println(err.Error())
+}
+
+func toJSON[T any](v T) string {
+	b, err := json.Marshal(v)
+	ErrorLog(err)
+	return string(b)
+}
+
+func getToken(c echo.Context) (*oauth2.Token, error) {
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		return nil, err
+	}
+	var token oauth2.Token
+	err = json.Unmarshal([]byte(cookie.Value), token)
+	return &token, nil
 }
 
 func tokenFromFile(file string) (*oauth2.Token, error) {
