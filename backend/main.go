@@ -21,6 +21,8 @@ func main() {
 	api := e.Group("/api")
 	api.POST("/ping", postApiPing)
 
+	api.GET("/get-20-events-forward/", getGet20EventsForward)
+
 	e.GET("/auth/new", getAuthNew)
 	e.GET("/auth/code", getAuthCode)
 	e.GET("/auth/check", getAuthCheck)

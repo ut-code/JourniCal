@@ -33,9 +33,14 @@ func postApiPing(c echo.Context) error {
 	return nil
 }
 
-func getGetNEventsForward(c echo.Context) {
-	TODO()
+func getGet20EventsForward(c echo.Context) error {
+	srv, err := srvFromContext(c)
+	if err != nil {
+		return err
+	}
+	return nil
 }
+
 func getRoot(c echo.Context) error {
 	readToken(c)
 	c.File("./index.html")

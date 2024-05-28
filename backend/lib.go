@@ -32,23 +32,33 @@ func toJSON[T any](v T) string {
 	return string(b)
 }
 
-func srvFromContext(c echo.Context) (*calendar.Service, error) {
+type errno int
+
+const (
+	OK = errno(iota)
+	ERR_MISSING_TOKEN
+	ERR_NEW_SERVICE_FAILED
+)
+
+func srvFromContext(c echo.Context) (*calendar.Service, error, errno) {
 	token, err := readToken(c)
 	if err != nil {
-		return nil, err
+		return nil, err, ERR_MISSING_TOKEN
 	}
-
-	// If modifying these scopes, delete your previously saved token.json.
-	config, err := google.ConfigFromJSON(b, calendar.CalendarReadonlyScope)
+	client := cfg.Client(ctx, token)
+	srv, err := calendar.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		return nil, err, ERR_NEW_SERVICE_FAILED
 	}
-	c := newOAuthClient(ctx, config)
-
-	srv, err := calendar.NewService(ctx, option.WithHTTPClient(c))
-	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+	return srv, nil, 0
+}
+func handleSrvInitializationError(c echo.Context, errno) {
+	if errno == OK {
+		// ok
+		return
 	}
-
-	return nil, error("not implemented yet")
+	if errno == ERR_MISSING_TOKEN {
+		TODO()
+		c.Redirect() // input url here
+	}
 }
