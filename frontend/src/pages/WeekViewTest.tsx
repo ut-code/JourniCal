@@ -155,7 +155,7 @@ const Calendar: React.FC = () => {
 
   return (
     <Box>
-      <TopBar baseDate={baseDate} />
+      <TopBar baseDate={baseDate} setBaseDate={setBaseDate} />
       {mode === "day" ? (
         <>
           <Button onClick={() => setBaseDate(sub(baseDate, { days: 1 }))}>
