@@ -21,10 +21,8 @@ func TODO(text ...string) {
 }
 
 func readToken(c echo.Context) (*oauth2.Token, error) {
-	// TODO: cache token as a map<Code -> Token>
-	// reason: google api seems to block requests that are too often,
-	// json.Marshal and Unmarshal don't seem to keep tokens valid (so they cannot be stored client-side),
-	// and tokens barely change (even when the temporary token expires. they claim that it's fine).
+	// maybe this should be stored in a database?
+	// reason: getting token from same code twice doesn't seem to be possible
 	var code string
 	{
 		cookie, err := c.Cookie("code")
