@@ -28,10 +28,16 @@ const Calendar: React.FC = () => {
     [...Array(3).keys()].map((i) => add(baseDate, { days: i })),
   );
   const [week, setWeek] = useState(
-    [...Array(7).keys()].map((i) => add(baseDate, { days: i })),
+    [...Array(7).keys()].map((i) =>
+      add(sub(baseDate, { days: baseDate.getDay() }), { days: i }),
+    ),
   );
   useEffect(() => {
-    setWeek([...Array(7).keys()].map((i) => add(baseDate, { days: i })));
+    setWeek(
+      [...Array(7).keys()].map((i) =>
+        add(sub(baseDate, { days: baseDate.getDay() }), { days: i }),
+      ),
+    );
     setThreeDays([...Array(3).keys()].map((i) => add(baseDate, { days: i })));
   }, [baseDate]);
 
