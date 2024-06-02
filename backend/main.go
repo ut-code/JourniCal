@@ -1,13 +1,19 @@
 package main
 
 import (
+	"JourniCalBackend/helper"
+
 	"context"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 	"log"
 )
 
-// HTTPServer is top-level because it is an interface between client and has to be able to run every function.
+var cfg *oauth2.Config
+var ctx context.Context
+var authURL string
+var tokenCache = helper.NewMap[string, oauth2.Token]()
+
 func init() {
 	ctx = context.Background()
 	cfg = ReadCredentials()

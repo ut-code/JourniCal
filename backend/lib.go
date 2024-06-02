@@ -2,11 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
+
 	//"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
@@ -17,13 +21,46 @@ func TODO(text ...string) {
 }
 
 func readToken(c echo.Context) (*oauth2.Token, error) {
-	cookie, err := c.Cookie("token")
+	// TODO: cache token as a map<Code -> Token>
+	// reason: google api seems to block requests that are too often,
+	// json.Marshal and Unmarshal don't seem to keep tokens valid (so they cannot be stored client-side),
+	// and tokens barely change (even when the temporary token expires. they claim that it's fine).
+	var code string
+	{
+		cookie, err := c.Cookie("code")
+		if err != nil {
+			return nil, err
+		}
+		code, err = url.QueryUnescape(cookie.Value)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// read from cache here
+	if cachedToken, ok := tokenCache.Get(code); ok {
+		return &cachedToken, nil
+	}
+
+	token, err := cfg.Exchange(ctx, code)
 	if err != nil {
+		fmt.Println("Unable to retrieve token from web", err)
 		return nil, err
 	}
-	var token oauth2.Token
-	err = json.Unmarshal([]byte(cookie.Value), token)
-	return &token, nil
+	tokenCache.Set(code, *token)
+
+	return token, nil
+}
+
+func writeAuthCode(c echo.Context, code string) {
+	const MaxAge = 24 * 60 * 60 // about 1 day.
+	c.SetCookie(&http.Cookie{
+		Path:     "/",
+		Name:     "code",
+		Value:    url.QueryEscape(code),
+		MaxAge:   MaxAge,
+		HttpOnly: true, // reduces XSS risk via disallowing access from browser JS
+	})
 }
 
 func toJSON[T any](v T) string {
@@ -58,7 +95,11 @@ func handleSrvInitializationError(c echo.Context, no errno) {
 		return
 	}
 	if no == ERR_MISSING_TOKEN {
-		TODO()
-		// c.Redirect() // input url here
+		c.Redirect(http.StatusFound, authURL) // input url here
+		return
+	}
+	if no == ERR_NEW_SERVICE_FAILED {
+		c.String(500, "Internal Error: calendar.NewService failed")
+		return
 	}
 }

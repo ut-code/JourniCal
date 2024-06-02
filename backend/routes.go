@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,12 +8,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"golang.org/x/oauth2"
 )
-
-var cfg *oauth2.Config
-var ctx context.Context
-var authURL string
 
 func getAuthNew(c echo.Context) error {
 	c.Redirect(http.StatusFound, authURL)
@@ -77,19 +70,8 @@ func getAuthCode(c echo.Context) error {
 		return nil // anyone can freely send a request to /auth/code so it's not an actual error
 	}
 
-	token, err := cfg.Exchange(ctx, code)
-	ErrorLog(err, "Unable to retrieve token from web")
-	b, err := json.Marshal(token)
-	ErrorLog(err)
+	writeAuthCode(c, code)
 
-	const MaxAge = 12 * 30 * 24 * 60 * 60 // about 3 months.
-	c.SetCookie(&http.Cookie{
-		Path:     "/",
-		Name:     "token",
-		Value:    string(b),
-		MaxAge:   MaxAge,
-		HttpOnly: true, // reduces XSS risk via disallowing access from browser JS
-	})
 	c.Redirect(http.StatusFound, "/")
 	return nil
 }
