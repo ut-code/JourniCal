@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -15,23 +14,13 @@ import (
 	"google.golang.org/api/option"
 )
 
-func CalendarSample() {
-	// do this at top-level initialization in main (or, copy & paste from inside the function)
-	ctx := context.Background()
-	cfg := ReadCredentials()
+func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token) {
+	client := config.Client(ctx, tok)
 
-	cachedToken := readTokenCache()
-	// Authenticate will do:
-	// if cache == nil,
-	//    call askForToken to get token.
-	//    call saveToken to save token for future use.
-	// authenticate.
-	client := Authenticate(ctx, cfg, cachedToken, askForToken, saveToken)
-
-	// if there is any way to keep the context of a connection between client, (or maybe a map[user_id, service]?)
+	// if there is any way to keep the context of a connection between client, (maybe a map[user_id, service]?)
 	// service can be cached there.
 	service, err := calendar.NewService(ctx, option.WithHTTPClient(client))
-	ErrorLog(err, "Failed to create service")
+	ErrorLog(err)
 
 	// timezoneTokyo := Timezone{Offset: "+09:00", Area: "Asia/Tokyo"}
 	/* CreateEvent(service, "primary", &calendar.Event{
@@ -40,13 +29,25 @@ func CalendarSample() {
 		Start:    DateTime("2024-03-16", "13:00:00", timezoneTokyo),
 		End:      DateTime("2024-03-16", "17:00:00", timezoneTokyo),
 	}) */
-	now := time.Now().Format(time.RFC3339)
-	evs := GetNEventsForward(service, "primary", now, 20)
+
+	march1, err := time.Parse("RFC3339", "2024-03-01T00:00:00+09:00")
+	march31, err := time.Parse("RFC3339", "2024-03-31T23:59:59+09:00")
+	evs := GetNEventsForward(service, "primary", march1, 5)
 	for _, ev := range evs {
 		fmt.Println(prettyFormatEvent(ev))
 	}
+	fmt.Println("--------------------------")
+	evs2 := GetEventsInRange(service, "primary", march1, march31)
+	for _, ev := range evs2 {
+		fmt.Println(prettyFormatEvent(ev))
+	}
 }
+
 func prettyFormatEvent(e *calendar.Event) string {
+	var attachments_urls []string
+	for _, a := range e.Attachments {
+		attachments_urls = append(attachments_urls, a.FileUrl+" | "+a.FileId)
+	}
 	return strings.Join([]string{
 		e.Summary,
 		e.Description,
@@ -54,7 +55,8 @@ func prettyFormatEvent(e *calendar.Event) string {
 		e.Start.DateTime,
 		e.End.Date,
 		e.End.DateTime,
-	}, "/")
+		"attachments: " + strings.Join(attachments_urls, " , "),
+	}, "|")
 }
 
 // this operation halts the app if there is no credentials.json found.
@@ -66,39 +68,6 @@ func ReadCredentials() *oauth2.Config {
 	ErrorLog(err, "Unable to parse client secret file to config")
 
 	return cfg
-}
-
-func askForToken(url authUrl) authCode {
-	fmt.Println("Go go the link and get token (token will appear in the query) and paste to terminal", url)
-
-	var code string
-	_, err := fmt.Scan(&code)
-	ErrorLog(err, "unable to read authorization code")
-	return code
-}
-
-func saveToken(token *oauth2.Token) {
-	file := "./token.json"
-	fmt.Printf("Saving credential file to: %s\n", file)
-	f, err := os.Create(file)
-	ErrorLog(err, "Unable to cache oauth token")
-
-	defer f.Close()
-	json.NewEncoder(f).Encode(token)
-}
-
-func readTokenCache() *oauth2.Token {
-	f, err := os.Open("./token.json")
-	if err != nil {
-		return nil
-	}
-	t := &oauth2.Token{}
-	err = json.NewDecoder(f).Decode(t)
-	defer f.Close()
-	if err != nil {
-		return nil
-	}
-	return t
 }
 
 type Timezone struct {
@@ -114,11 +83,19 @@ func CreateEvent(service *calendar.Service, calendar_id calendar_id, evt *calend
 	ErrorLog(err, "Unable to create event")
 }
 
-type RFC3339 = string
+func RFC3339(t time.Time) string {
+	return t.Format(time.RFC3339)
+}
 
-func GetNEventsForward(service *calendar.Service, calendar_id calendar_id, start RFC3339, count int) []*calendar.Event {
-	events, err := service.Events.List(calendar_id).ShowDeleted(false).SingleEvents(true).TimeMin(start).MaxResults(int64(count)).Do()
-	ErrorLog(err, "Getting Calendar Events Failed in function GetNEvents()")
+func GetNEventsForward(service *calendar.Service, calendar_id calendar_id, start time.Time, count int) []*calendar.Event {
+	events, err := service.Events.List(calendar_id).ShowDeleted(false).SingleEvents(false).TimeMin(start.Format(time.RFC3339)).MaxResults(int64(count) + 1).Do()
+	ErrorLog(err, "Getting Calendar Events Failed in function GetNEventsForward()")
+	return events.Items
+}
+
+func GetEventsInRange(service *calendar.Service, calendar_id calendar_id, start time.Time, end time.Time) []*calendar.Event {
+	events, err := service.Events.List(calendar_id).SingleEvents(false).TimeMin(start.Format(time.RFC3339)).TimeMax(end.Format(time.RFC3339)).Do()
+	ErrorLog(err, "Getting Calendar Events Failed in function GetEventsInRange()")
 	return events.Items
 }
 
