@@ -1,0 +1,11 @@
+# secrets
+credentials.json
+token.json
+saved-code.txt
+.env
+
+# temporary samples
+sample.id
+
+# generated files
+JourniCalBackend

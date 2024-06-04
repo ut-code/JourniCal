@@ -1,85 +1,84 @@
 package main
 
 import (
+	"JourniCalBackend/helper"
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
+
+	"github.com/labstack/echo/v4/middleware"
+
+	"JourniCalBackend/helpers"
+
+	"context"
+	"log"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/oauth2"
 )
 
-type api_root_res struct {
-	// structs must start with capital letters to allow JSON stringify (called JSON.Marshal) to access the property
-	// in Golang, all fields that start with lower-case letters are considered private.
-	Hello string
-	Query url.Values
+var cfg *oauth2.Config
+var ctx context.Context
+var authURL string
+var tokenCache = helper.NewMap[string, oauth2.Token]()
+
+func init() {
+	ctx = context.Background()
+	cfg = ReadCredentials()
+	authURL = cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 }
 
 func main() {
-	CalendarSample()
-	// HTTPServerSample()
-}
-
-// HTTPServer is top-level because it is an interface between client and has to be able to run every function.
-func HTTPServerSample() {
-	// I chose to use Echo.
 	// Doc: https://echo.labstack.com/
 	e := echo.New()
 
 	// ミドルウェアを設定
-	// e.Use(middleware.Logger())
-	// e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:5173"},
+	}))
+
+	e.GET("/", getRoot)
+	api := e.Group("/api")
+	api.POST("/ping", postApiPing)
+
+	// spec:
+	// specify time as unix time.
+	api.GET("/get-20-events-forward/:start_unix", getGet20EventsForward)
+
+	e.GET("/auth/new", getAuthNew)
+	e.GET("/auth/code", getAuthCode)
+	e.GET("/auth/check", getAuthCheck)
 
 	// static (directory-based) serving
 	e.Static("/", "./static")
 
-	// file-based serving
-	e.File("/", "index.html")
-	// or more verbosely, (replace POST with GET for the same result)
-	e.POST("/", func(c echo.Context) error {
-		err := c.String(http.StatusOK, "Alternative Text (because reading file in Go is a pain)")
-		// normal error handling example for beginners.
-		if err != nil {
-			// handle err here
-			return err
-		}
-		return nil // returning nil as error means the operation was successful.
+	db, err := helpers.InitDB()
+	if err != nil {
+		fmt.Println("Failed to connect to database:", err)
+		return
+	}
 
-		// OR, you can also just do return c.String(...) to return error directly.
+	api.GET("/diaries", func(c echo.Context) error {
+		return helpers.GetAllDiaries(c, db)
 	})
 
-	// this will create a sub-route under /api/
-	api := e.Group("/api")
-	// for example, this will handle a GET request to /api (careful, it won't handle a request to /api/ )
-	api.GET("", func(c echo.Context) error {
-		q := c.QueryParams()
-		fmt.Println("request to /api was made. Query is: ", q)
-		// JSON method takes object of any class and Marshals their *public* properties into res body.
-		err := c.JSON(http.StatusOK, api_root_res{
-			Hello: "World!",
-			Query: q,
-		})
-		return err
-	})
-	// and this will handle a POST request to /api/ping (pong!)
-	// try this in console: $ curl -X POST http://localhost:3000/api/ping -d "Hello there!"
-	api.POST("/ping", func(c echo.Context) error {
-		// read request body to bytes then stringify it
-		// if you want to receive as JSON, there is a better way to do it:
-		// json_map := make(map[string]interface{})
-		// err := json.NewDecoder(c.Request().Body).Decode(&json_map)
-		buf, err := io.ReadAll(c.Request().Body)
-		ErrorLog(err)
-		body := string(buf)
-		fmt.Println(body)
-		c.String(http.StatusOK, "pong!\n Your request body was: \n"+body+"\n")
-		return nil
+	api.GET("/diaries/:id", func(c echo.Context) error {
+		return helpers.GetDiaryByID(c, db)
 	})
 
-	// write any code here
+	api.POST("/diaries", func(c echo.Context) error {
+		return helpers.CreateDiary(c, db)
+	})
+
+	api.PUT("/diaries/:id", func(c echo.Context) error {
+		return helpers.UpdateDiary(c, db)
+	})
+
+	api.DELETE("/diaries/:id", func(c echo.Context) error {
+		return helpers.DeleteDiary(c, db)
+	})
 
 	// listen + serve
-	err := e.Start(":3000")
-	fmt.Println(err.Error())
+	log.Fatal(e.Start(":3000"))
 }
