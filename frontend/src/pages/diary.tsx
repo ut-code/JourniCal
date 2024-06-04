@@ -1,39 +1,39 @@
 import { useState, useEffect } from "react";
 import DiaryEntry from "../components/DiaryEntry";
 
-interface Entry {
-  date: string;
+type Entry = {
+  date: Date;
   title: string;
   content: string;
-}
-
-async function fetchEntries(): Promise<Entry[]> {
-  const response = await fetch("http://localhost:3000/api/diaries");
-  const data = (await response.json()) as Entry[];
-  console.log(data);
-  return data;
-}
-
-const fetchedDiaries = await fetchEntries();
+};
 
 function Diary() {
   const [showPopup, setShowPopup] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [newEntry, setNewEntry] = useState({ date: "", title: "", content: "" });
-  const [diaries, setDiaries] = useState([
-    //例
-    {
-      date: new Date("2024-03-30"),
-      title: "First Entry",
-      content: "あいうえお",
-    },
-  ]);
+  const [diaries, setDiaries] = useState<Entry[] | null>(null);
 
-  //日付順にソートする
+  // 日記を取得してdiariesにセットする
   useEffect(() => {
-    const sortedDiaries = [...diaries].sort((a, b) => a.date.getTime() - b.date.getTime());
-    setDiaries(sortedDiaries);
-  }, [diaries]);
+    (async () => {
+      const response = await fetch("http://localhost:3000/api/diaries");
+      const data = await response.json();
+
+      // date を Date 型に変換
+      const entries: Entry[] = data.map((entry: Omit<Entry, "date"> & { date: string }) => ({
+        date: new Date(entry.date),
+        title: entry.title,
+        content: entry.content,
+      }));
+
+      // 日付順にソートする
+      const sortedEntries = entries.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+      setDiaries(sortedEntries);
+    })();
+  }, []);
 
   const handleInputChange = (event:any) => {
     const { name, value } = event.target;
@@ -53,6 +53,7 @@ function Diary() {
   };
 
   const handleAddEntry = () => {
+    if (!diaries) return;
     const dateObject = new Date(newEntry.date);
     
     if (editingIndex !== null) {
@@ -68,6 +69,7 @@ function Diary() {
   };
 
   const handleEditEntry = (index:any) => {
+    if (!diaries) return;
     const entryToEdit = diaries[index];
     // 日付を文字列に変換
     const dateString = entryToEdit.date.toISOString().substring(0, 10);
@@ -94,7 +96,7 @@ function Diary() {
   return (
     <div className="diary-app">
       <div className="diary-entries">
-        {diaries.map((diary, index) => (
+        {diaries && diaries.map((diary, index) => (
           <div key={index}>
             <DiaryEntry {...diary} onEdit={() => handleEditEntry(index)} />
           </div>
