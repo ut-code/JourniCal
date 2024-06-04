@@ -2,6 +2,7 @@
 credentials.json
 token.json
 saved-code.txt
+.env
 
 # temporary samples
 sample.id
