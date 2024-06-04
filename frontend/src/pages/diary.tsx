@@ -9,7 +9,7 @@ type Entry = {
 
 function Diary() {
   const [showPopup, setShowPopup] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [newEntry, setNewEntry] = useState({ date: "", title: "", content: "" });
   const [diaries, setDiaries] = useState<Entry[] | null>(null);
 
@@ -35,7 +35,7 @@ function Diary() {
     })();
   }, []);
 
-  const handleInputChange = (event:any) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     if (name === 'date') {
       // 日付が入力されていない場合、今日の日付を設定する
@@ -68,7 +68,7 @@ function Diary() {
     setNewEntry({ date: "", title: "", content: "" });
   };
 
-  const handleEditEntry = (index:any) => {
+  const handleEditEntry = (index: number) => {
     if (!diaries) return;
     const entryToEdit = diaries[index];
     // 日付を文字列に変換
