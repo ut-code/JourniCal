@@ -6,35 +6,31 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"JourniCalBackend/helpers"
-	"JourniCalBackend/routes"
+	"JourniCalBackend/helper"
+	"JourniCalBackend/router"
 )
 
+func init() {
+}
+
 func main() {
-	// I chose to use Echo.
+	db := helper.Database
+
 	// Doc: https://echo.labstack.com/
 	e := echo.New()
-
 	// ミドルウェアを設定
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:5173"},
 	}))
 
-	// static (directory-based) serving
+	e.GET("/", router.Root)
 	e.Static("/", "./static")
-
-	db, err := helpers.InitDB()
-	if err != nil {
-		fmt.Println("Failed to connect to database:", err)
-		return
-	}
-
-	api := e.Group("/api")
-
-	routes.RegisterDiaryRoutes(api, db)
+	router.Api(e.Group("/api"))
+	router.Auth(e.Group("/auth"))
+	router.Calendar(e.Group("/calendar"))
+	router.Diary(e.Group("/diaries"), db)
 
 	// サーバの起動
 	if err := e.Start(":3000"); err != nil {
