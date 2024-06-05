@@ -1,4 +1,3 @@
-# DATABASE_URL=postgres://user:password@psql:5432/database
 services:
   backend: 
     build:
@@ -10,6 +9,7 @@ services:
       - postgres
   postgres:
     image: postgres:alpine
+    hostname: postgres
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=user
