@@ -1,6 +1,7 @@
 # secrets
 credentials.json
 token.json
+.env
 saved-code.txt
 
 # temporary samples

@@ -2,9 +2,14 @@ package main
 
 import (
 	"JourniCalBackend/helper"
+	"fmt"
 
 	"context"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
+	"JourniCalBackend/helpers"
+	"JourniCalBackend/routes"
 	"golang.org/x/oauth2"
 	"log"
 )
@@ -25,8 +30,12 @@ func main() {
 	e := echo.New()
 
 	// ミドルウェアを設定
-	// e.Use(middleware.Logger())
-	// e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:5173"},
+	}))
 
 	e.GET("/", getRoot)
 	api := e.Group("/api")
@@ -42,4 +51,19 @@ func main() {
 
 	// listen + serve
 	log.Fatal(e.Start(":3000"))
+	// static (directory-based) serving
+	e.Static("/", "./static")
+
+	db, err := helpers.InitDB()
+	if err != nil {
+		fmt.Println("Failed to connect to database:", err)
+		return
+	}
+
+	routes.RegisterDiaryRoutes(api, db)
+
+	// サーバの起動
+	if err := e.Start(":3000"); err != nil {
+		fmt.Println(err.Error())
+	}
 }
