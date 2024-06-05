@@ -23,6 +23,12 @@ func (m *Map[K, V]) Set(k K, v V) {
 	m.mutex.Unlock()
 }
 
+func (m *Map[K, V]) UnSet(k K) {
+	m.mutex.Lock()
+	delete(m.internal_map, k)
+	m.mutex.Unlock()
+}
+
 func NewMap[K comparable, V any]() Map[K, V] {
 	return Map[K, V]{
 		mutex:        sync.Mutex{},

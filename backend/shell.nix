@@ -8,5 +8,4 @@
 
 # to run nix, all you need to do is:
 # 1. install nix
-# 2. run `nix-shell` in this directory 
-
+# 2. run `nix-shell` in this directory

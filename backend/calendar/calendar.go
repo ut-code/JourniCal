@@ -1,4 +1,4 @@
-package main
+package calendar
 
 import (
 	"fmt"
@@ -8,11 +8,23 @@ import (
 
 	"context"
 
+	"JourniCalBackend/helper"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
+
+var cfg *oauth2.Config
+var ctx context.Context
+var AuthURL string
+var TokenCache = helper.NewMap[string, oauth2.Token]()
+
+func init() {
+	ctx = context.Background()
+	cfg = readCredentials()
+	AuthURL = cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+}
 
 func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token) {
 	client := config.Client(ctx, tok)
@@ -20,7 +32,7 @@ func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token
 	// if there is any way to keep the context of a connection between client, (maybe a map[user_id, service]?)
 	// service can be cached there.
 	service, err := calendar.NewService(ctx, option.WithHTTPClient(client))
-	ErrorLog(err)
+	helper.ErrorLog(err)
 
 	// timezoneTokyo := Timezone{Offset: "+09:00", Area: "Asia/Tokyo"}
 	/* CreateEvent(service, "primary", &calendar.Event{
@@ -60,12 +72,12 @@ func prettyFormatEvent(e *calendar.Event) string {
 }
 
 // this operation halts the app if there is no credentials.json found.
-func ReadCredentials() *oauth2.Config {
+func readCredentials() *oauth2.Config {
 	bytes, err := os.ReadFile("credentials.json")
-	ErrorLog(err, "Failed reading credentials.json")
+	helper.ErrorLog(err, "Failed reading credentials.json")
 
 	cfg, err := google.ConfigFromJSON(bytes, calendar.CalendarScope)
-	ErrorLog(err, "Unable to parse client secret file to config")
+	helper.ErrorLog(err, "Unable to parse client secret file to config")
 
 	return cfg
 }
@@ -80,7 +92,7 @@ type calendar_id = string
 // creates event with time specified. for all-day events, use CreateAllDayEvent (might not be implemented yet).
 func CreateEvent(service *calendar.Service, calendar_id calendar_id, evt *calendar.Event) {
 	_, err := service.Events.Insert(calendar_id, evt).Do()
-	ErrorLog(err, "Unable to create event")
+	helper.ErrorLog(err, "Unable to create event")
 }
 
 func RFC3339(t time.Time) string {
@@ -89,13 +101,13 @@ func RFC3339(t time.Time) string {
 
 func GetNEventsForward(service *calendar.Service, calendar_id calendar_id, start time.Time, count int) []*calendar.Event {
 	events, err := service.Events.List(calendar_id).ShowDeleted(false).SingleEvents(false).TimeMin(start.Format(time.RFC3339)).MaxResults(int64(count) + 1).Do()
-	ErrorLog(err, "Getting Calendar Events Failed in function GetNEventsForward()")
+	helper.ErrorLog(err, "Getting Calendar Events Failed in function GetNEventsForward()")
 	return events.Items
 }
 
 func GetEventsInRange(service *calendar.Service, calendar_id calendar_id, start time.Time, end time.Time) []*calendar.Event {
 	events, err := service.Events.List(calendar_id).SingleEvents(false).TimeMin(start.Format(time.RFC3339)).TimeMax(end.Format(time.RFC3339)).Do()
-	ErrorLog(err, "Getting Calendar Events Failed in function GetEventsInRange()")
+	helper.ErrorLog(err, "Getting Calendar Events Failed in function GetEventsInRange()")
 	return events.Items
 }
 

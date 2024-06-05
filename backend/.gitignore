@@ -2,10 +2,6 @@
 credentials.json
 token.json
 .env
-saved-code.txt
-
-# temporary samples
-sample.id
 
 # generated files
 JourniCalBackend

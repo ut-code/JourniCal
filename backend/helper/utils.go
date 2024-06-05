@@ -1,13 +1,18 @@
-package main
+package helper
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"strings"
 )
 
-// I'm telling the compiler that its fine to not use it for now, by "Using" it.
-func Use(_ ...any) {
+// meta functions for programmers, not for program
+func UseLater(_ ...any) {
+}
+
+func TODO(text ...string) {
+	log.Fatal("TODO() was called: " + strings.Join(text, ", "))
 }
 
 // log.Fatalln's if err != nil. give err and describe what is expected to have happened. no ":" needed.
@@ -17,7 +22,7 @@ func ErrorLog(err error, msgs ...string) {
 	}
 }
 
-func writeFile(path string, b []byte) error {
+func WriteFile(path string, b []byte) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -26,10 +31,16 @@ func writeFile(path string, b []byte) error {
 	return err
 }
 
-func readFile(path string) (content string, err error) {
+func ReadFile(path string) (content string, err error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
 	return string(b), nil
+}
+
+func ToJSON[T any](v T) string {
+	b, err := json.Marshal(v)
+	ErrorLog(err)
+	return string(b)
 }

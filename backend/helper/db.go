@@ -1,4 +1,4 @@
-package helpers
+package helper
 
 import (
 	"log"
@@ -7,23 +7,26 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"JourniCalBackend/types"
+
 	"github.com/joho/godotenv"
 )
 
-func InitDB() (*gorm.DB, error) {
+var Database *gorm.DB
+
+func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
 	dsn := os.Getenv("DSN")
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	var err error
+	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		log.Fatalf("Error opening postgres: ", err)
 	}
-
-	if err := db.AutoMigrate(&Diary{}); err != nil {
+	// migrate Diary to database
+	if err := Database.AutoMigrate(&types.Diary{}); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
-
-	return db, nil
 }

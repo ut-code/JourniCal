@@ -1,0 +1,16 @@
+# DATABASE_URL=postgres://user:password@psql:5432/database
+services:
+  backend: 
+    build:
+      context: ./backend/
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - postgres
+  postgres:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=database
