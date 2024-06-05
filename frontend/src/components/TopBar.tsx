@@ -25,7 +25,7 @@ const TopBar: React.FC<{
   const linkIconCommonStyleProps = { paddingTop: "3%" };
 
   return (
-    <Box>
+    <Box width="100vw" sx={{ position: "fixed", zIndex: 1, top: 0 }}>
       <Box
         width={"100%"}
         display={"flex"}
