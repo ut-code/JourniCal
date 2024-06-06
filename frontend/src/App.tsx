@@ -1,7 +1,7 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import { CssBaseline } from "@mui/material";
-import Calendar from "./pages/WeekViewTest";
+import Calendar from "./pages/Calendar";
 import Diary from "./pages/diary";
 
 function App() {
