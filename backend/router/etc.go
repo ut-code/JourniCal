@@ -9,14 +9,17 @@ import (
 )
 
 // TODO: make this function
-func Root(c echo.Context) error {
-	_, err := calendar.ReadToken(c)
-	if err != nil {
-		c.Redirect(http.StatusFound, calendar.AuthURL)
+func Root(g *echo.Group) {
+
+	g.GET("/", func(c echo.Context) error {
+		_, err := calendar.ReadToken(c)
+		if err != nil {
+			c.Redirect(http.StatusFound, calendar.AuthURL)
+			return nil
+		}
+		c.File("./index.html")
 		return nil
-	}
-	c.File("./index.html")
-	return nil
+	})
 }
 
 func Api(g *echo.Group) {

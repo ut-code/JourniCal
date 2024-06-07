@@ -25,8 +25,8 @@ func main() {
 		AllowOrigins: []string{"http://localhost:5173"},
 	}))
 
-	e.GET("/", router.Root)
 	e.Static("/", "./static")
+	router.Root(e.Group(""))
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"))
 	router.Calendar(e.Group("/calendar"))
