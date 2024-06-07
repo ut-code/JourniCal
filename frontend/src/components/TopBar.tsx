@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Collapse, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -11,23 +11,27 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import { useLocation } from "react-router-dom";
 import { CALENDAR_PATH_NAME, DIARY_PATH_NAME } from "../consts/consts";
+import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 
 const TopBar: React.FC<{
   baseDate: Date;
+  setBaseDate: React.Dispatch<React.SetStateAction<Date>>;
 }> = (props) => {
-  const { baseDate } = props;
+  const { baseDate, setBaseDate } = props;
   const [isTopCalendarOpen, setIsTopCalendarOpen] = useState(false);
   const currentPathName = useLocation().pathname;
   const iconCommonSxProps = { mx: 1.5, color: "primary.contrastText" };
   const linkIconCommonStyleProps = { paddingTop: "3%" };
 
   return (
-    <Box sx={{ bgcolor: "primary.main" }}>
+    <Box width="100vw" sx={{ position: "fixed", zIndex: 1, top: 0 }}>
       <Box
         width={"100%"}
         display={"flex"}
         alignItems={"center"}
         justifyContent={"space-between"}
+        sx={{ bgcolor: "primary.main" }}
       >
         <MenuIcon sx={{ mx: 2, color: "primary.contrastText" }} />
         <Box
@@ -65,7 +69,14 @@ const TopBar: React.FC<{
           )}
         </Box>
       </Box>
-      {isTopCalendarOpen && <Box>ここに日付選択用のカレンダーを表示</Box>}
+      <Collapse in={isTopCalendarOpen} sx={{ backgroundColor: "gainsboro" }}>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DateCalendar
+            value={baseDate}
+            onChange={(value) => setBaseDate(value)}
+          />
+        </LocalizationProvider>
+      </Collapse>
     </Box>
   );
 };

@@ -160,89 +160,91 @@ const Calendar: React.FC = () => {
   ];
 
   return (
-    <Box>
-      <TopBar baseDate={baseDate} />
-      {mode === "day" ? (
-        <>
-          <Button onClick={() => setBaseDate(sub(baseDate, { days: 1 }))}>
-            前の日
-          </Button>
-          <Button onClick={() => setBaseDate(add(baseDate, { days: 1 }))}>
-            次の日
-          </Button>
-        </>
-      ) : mode === "3days" ? (
-        <>
-          <Button onClick={() => setBaseDate(sub(baseDate, { days: 3 }))}>
-            前の3日間
-          </Button>
-          <Button onClick={() => setBaseDate(add(baseDate, { days: 3 }))}>
-            次の3日間
-          </Button>
-        </>
-      ) : (
-        mode === "week" && (
+    <>
+      <TopBar baseDate={baseDate} setBaseDate={setBaseDate} />
+      <Box mt="20%">
+        {mode === "day" ? (
           <>
-            <Button onClick={() => setBaseDate(sub(baseDate, { days: 7 }))}>
-              前の週
+            <Button onClick={() => setBaseDate(sub(baseDate, { days: 1 }))}>
+              前の日
             </Button>
-            <Button onClick={() => setBaseDate(add(baseDate, { days: 7 }))}>
-              次の週
+            <Button onClick={() => setBaseDate(add(baseDate, { days: 1 }))}>
+              次の日
             </Button>
           </>
-        )
-      )}
+        ) : mode === "3days" ? (
+          <>
+            <Button onClick={() => setBaseDate(sub(baseDate, { days: 3 }))}>
+              前の3日間
+            </Button>
+            <Button onClick={() => setBaseDate(add(baseDate, { days: 3 }))}>
+              次の3日間
+            </Button>
+          </>
+        ) : (
+          mode === "week" && (
+            <>
+              <Button onClick={() => setBaseDate(sub(baseDate, { days: 7 }))}>
+                前の週
+              </Button>
+              <Button onClick={() => setBaseDate(add(baseDate, { days: 7 }))}>
+                次の週
+              </Button>
+            </>
+          )
+        )}
 
-      <Select
-        value={mode}
-        onChange={(e) => setMode(e.target.value as modeVariant)}
-      >
-        <MenuItem value={"schedule"}>スケジュール</MenuItem>
-        <MenuItem value={"day"}>日</MenuItem>
-        <MenuItem value={"3days"}>3日間</MenuItem>
-        <MenuItem value={"week"}>一週間</MenuItem>
-      </Select>
+        <Select
+          value={mode}
+          onChange={(e) => setMode(e.target.value as modeVariant)}
+        >
+          <MenuItem value={"schedule"}>スケジュール</MenuItem>
+          <MenuItem value={"day"}>日</MenuItem>
+          <MenuItem value={"3days"}>3日間</MenuItem>
+          <MenuItem value={"week"}>一週間</MenuItem>
+        </Select>
 
-      {mode === "schedule" ? (
-        <>ここにスケジュールビューを配置</>
-      ) : (
-        <Box display={"flex"}>
-          <TimelineRowName />
-          {mode === "day" ? (
-            <TimelineView
-              key={baseDate.getTime()}
-              day={baseDate}
-              today={today}
-              daySchedules={weekSchedules.filter((schedule) =>
-                isEqualDay(baseDate, schedule.start),
-              )}
-            />
-          ) : mode === "3days" ? (
-            threeDays.map((day) => (
+        {mode === "schedule" ? (
+          <>ここにスケジュールビューを配置</>
+        ) : (
+          <Box display={"flex"}>
+            <TimelineRowName />
+            {mode === "day" ? (
               <TimelineView
-                key={day.getTime()}
-                day={day}
+                key={baseDate.getTime()}
+                day={baseDate}
                 today={today}
                 daySchedules={weekSchedules.filter((schedule) =>
-                  isEqualDay(day, schedule.start),
+                  isEqualDay(baseDate, schedule.start),
                 )}
               />
-            ))
-          ) : (
-            week.map((day) => (
-              <TimelineView
-                key={day.getTime()}
-                day={day}
-                today={today}
-                daySchedules={weekSchedules.filter((schedule) =>
-                  isEqualDay(day, schedule.start),
-                )}
-              />
-            ))
-          )}
-        </Box>
-      )}
-    </Box>
+            ) : mode === "3days" ? (
+              threeDays.map((day) => (
+                <TimelineView
+                  key={day.getTime()}
+                  day={day}
+                  today={today}
+                  daySchedules={weekSchedules.filter((schedule) =>
+                    isEqualDay(day, schedule.start),
+                  )}
+                />
+              ))
+            ) : (
+              week.map((day) => (
+                <TimelineView
+                  key={day.getTime()}
+                  day={day}
+                  today={today}
+                  daySchedules={weekSchedules.filter((schedule) =>
+                    isEqualDay(day, schedule.start),
+                  )}
+                />
+              ))
+            )}
+          </Box>
+        )}
+      </Box>
+    </>
   );
 };
 
