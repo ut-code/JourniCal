@@ -23,7 +23,7 @@ func init() {
 	var err error
 	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Error opening postgres: ", err)
+		log.Fatalf("Error opening postgres: %v", err)
 	}
 	// migrate Diary to database
 	if err := Database.AutoMigrate(&types.Diary{}); err != nil {
