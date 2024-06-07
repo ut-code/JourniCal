@@ -42,8 +42,8 @@ func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token
 		End:      DateTime("2024-03-16", "17:00:00", timezoneTokyo),
 	}) */
 
-	march1, err := time.Parse("RFC3339", "2024-03-01T00:00:00+09:00")
-	march31, err := time.Parse("RFC3339", "2024-03-31T23:59:59+09:00")
+	march1 := time.Date(2024, 3, 1, 0, 0, 0, 0, time.Now().Local().Location())
+	march31 := time.Date(2024, 3, 31, 23, 59, 59, 999, time.Now().Local().Location())
 	evs := GetNEventsForward(service, "primary", march1, 5)
 	for _, ev := range evs {
 		fmt.Println(prettyFormatEvent(ev))
