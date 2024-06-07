@@ -1,0 +1,17 @@
+services:
+  backend: 
+    restart: always
+    build:
+      context: ./backend/
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - postgres
+  postgres:
+    image: postgres:alpine
+    hostname: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=database
