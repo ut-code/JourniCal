@@ -6,7 +6,7 @@ import (
 
 func TestStaticcheck(t *testing.T) {
 	err := Error()
-	UseLater(err)
+	UseLater(err) // remove this line and staticcheck will fail
 	err = Error()
 	UseLater(err)
 }
