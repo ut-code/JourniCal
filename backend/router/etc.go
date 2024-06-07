@@ -23,9 +23,8 @@ func Root(g *echo.Group) {
 }
 
 func Api(g *echo.Group) {
-	g.GET("/ping",
-		func(c echo.Context) error {
-			c.String(http.StatusOK, "pong!")
-			return nil
-		})
+	g.GET("/ping", func(c echo.Context) error {
+		c.String(http.StatusOK, "pong!")
+		return nil
+	})
 }
