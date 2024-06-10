@@ -58,3 +58,11 @@ go build .
 ```
 
 実行可能バイナリが `./JourniCalBackend` という名前で生成されます。
+
+## 開発用 database
+
+```sh
+./backend/run-postgresql-at-localhost.sh
+```
+
+で起動できます。パスワード、ユーザ名、DB 名はこのスクリプトや .env.sample に書いてあるとおりです。
