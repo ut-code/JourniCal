@@ -8,5 +8,5 @@
 **/*README.*
 **/*.sample
 
-# dependencies
-frontend/node_modules
+# local build results
+backend/JourniCalBackend
