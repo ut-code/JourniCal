@@ -1,0 +1,13 @@
+# Git and GitHub
+**/.git
+**/.github
+
+# developers' files
+**/*README.*
+**/*.sample
+
+# dependencies
+frontend/node_modules
+
+# local build results
+backend/JourniCalBackend
