@@ -1,31 +1,37 @@
 #!/usr/bin/env bash
 
 # src of this function: https://developers.wano.co.jp/1883/ (modified)
+exit_code=0
 function assert_no_change () {
   git diff --exit-code --quiet;
   if [ $? -eq 0 ];then
-    echo Go tests: $1 passed;
+    echo [Go tests] $1 passed;
   else
-    echo Go tests: $1 failed;
-    exit 1;
+    echo [Go tests] $1 failed;
+    exit_code=1;
   fi
 }
-        
-echo Starting go vet...
+function start () {
+  echo [Go tests] starting $1...
+}
+
+start vet
 go vet ./...
 assert_no_change vet
         
-echo Starting go fmt...
+start fmt
 go fmt ./...
 assert_no_change fmt
         
-echo Starting staticcheck...
+start staticcheck
 go run honnef.co/go/tools/cmd/staticcheck@latest ./...
 assert_no_change staticcheck
         
-echo Starting go test...
+start test
 go test -v ./...
 assert_no_change test
         
-echo Starting go build...
+start build
 go build -n 2&>/dev/null
+
+exit $exit_code
