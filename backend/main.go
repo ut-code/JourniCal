@@ -28,9 +28,9 @@ func main() {
 	e.Static("/", "./static")
 	router.Root(e.Group(""))
 	router.Api(e.Group("/api"))
-	router.Auth(e.Group("/auth"))
-	router.Calendar(e.Group("/calendar"))
-	router.Diary(e.Group("/diaries"), db)
+	router.Auth(e.Group("/api/auth"))
+	router.Calendar(e.Group("/api/calendar"))
+	router.Diary(e.Group("/api/diaries"), db)
 
 	// サーバの起動
 	if err := e.Start(":3000"); err != nil {
