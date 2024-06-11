@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 
-# src of this line: https://developers.wano.co.jp/1883/ (modified)
-function assert_no_change () { git diff --exit-code --quiet; if [ $? -eq 0 ]; then echo Go tests: $1 passed; else echo Go tests: $1 failed; exit 1; fi }
+# src of this function: https://developers.wano.co.jp/1883/ (modified)
+function assert_no_change () {
+  git diff --exit-code --quiet;
+  if [ $? -eq 0 ];then
+    echo Go tests: $1 passed;
+  else
+    echo Go tests: $1 failed;
+    exit 1;
+  fi
+}
         
 echo Starting go vet...
 go vet ./...
