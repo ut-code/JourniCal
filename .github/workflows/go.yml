@@ -39,4 +39,4 @@ jobs:
         assert_no_change staticcheck
         go test -v ./...
         assert_no_change test
-        go build -n >/dev/null
+        go build -n 2&>/dev/null
