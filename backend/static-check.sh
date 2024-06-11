@@ -4,11 +4,11 @@
 exit_code=0
 function assert_no_change () {
   git diff --exit-code --quiet;
-  if [ $? -eq 0 ];then
-    echo [Go tests] $1 passed;
-  else
-    echo [Go tests] $1 failed;
-    exit_code=1;
+  if [ $? -eq 0 ]; then
+    echo [Go tests] $1 passed
+  elif [ exit_code == 0 ]; then
+    echo [Go tests] failed at: $1
+    exit_code=1
   fi
 }
 function start () {
@@ -33,5 +33,6 @@ assert_no_change test
         
 start build
 go build -n 2&>/dev/null
+assert_no_change build
 
 exit $exit_code
