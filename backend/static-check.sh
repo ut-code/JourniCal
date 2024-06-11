@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# src of this function: https://developers.wano.co.jp/1883/ (modified)
 exit_code=0
 function assert_no_change () {
   git diff --exit-code --quiet;
