@@ -29,13 +29,14 @@ jobs:
     - name: Run tests
       working-directory: ./backend/
       run: |
+        # src of the code below: https://developers.wano.co.jp/1883/ (modified)
+        function assert_no_change () { git diff --exit-code --quiet; if [ $? -eq 0 ]; then echo "Go tests: $1 passed"; else echo "Go tests: $1 failed"; exit 1; }
         go vet ./...
+        assert_no_change vet
         go fmt ./...
-        # src of the code below: https://developers.wano.co.jp/1883/
-        git diff --exit-code --quiet
-        if [ $? -eq 0 ]; then echo "Go vet and fmt passed"; else echo "Go vet or fmt failed"; exit 1; 
+        assert_no_change fmt
         go run honnef.co/go/tools/cmd/staticcheck@latest ./...
+        assert_no_change staticcheck
         go test -v ./...
+        assert_no_change test
         go build -n >/dev/null
-        git diff --exit-code --quiet
-        if [ $? -eq 0 ]; then echo "ok"; else echo "git diff error"; exit 1; 
