@@ -34,3 +34,6 @@ jobs:
         go run honnef.co/go/tools/cmd/staticcheck@latest ./...
         go test -v ./...
         go build -n
+        # src of the code below: https://developers.wano.co.jp/1883/
+        git diff --exit-code --quiet
+        if [ $? -eq 0 ]; then echo "ok"; else echo "git diff error"; exit 1; 
