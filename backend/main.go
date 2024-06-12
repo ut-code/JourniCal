@@ -6,8 +6,8 @@ import (
 "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"JourniCalBackend/helper"
-	"JourniCalBackend/router"
+	"github.com/ut-code/JourniCal/backend/helper"
+	"github.com/ut-code/JourniCal/backend/router"
 )
 
 func init() {

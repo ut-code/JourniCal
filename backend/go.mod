@@ -1,4 +1,4 @@
-module JourniCalBackend
+module github.com/ut-code/JourniCal/backend
 
 go 1.22
 
