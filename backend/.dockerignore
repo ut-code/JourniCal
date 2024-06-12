@@ -7,6 +7,7 @@
 # developers' files
 **/*README.*
 **/*.sample
+/static-check.sh
 
 # local build results
 backend
