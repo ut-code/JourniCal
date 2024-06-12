@@ -5,4 +5,4 @@ COPY go.sum .
 RUN --mount=type=cache,target=/go/pkg/mod/ go mod download
 COPY . .
 RUN --mount=type=cache,target=/go/pkg/mod/ go build .
-CMD ./JourniCalBackend
+CMD ./backend

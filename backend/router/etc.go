@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"JourniCalBackend/calendar"
+	"github.com/ut-code/JourniCal/backend/calendar"
 
 	"github.com/labstack/echo/v4"
 )

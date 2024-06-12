@@ -1,7 +1,7 @@
 package diary
 
 import (
-	"JourniCalBackend/types"
+	"github.com/ut-code/JourniCal/backend/types"
 	"net/http"
 	"strconv"
 

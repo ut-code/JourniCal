@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"JourniCalBackend/types"
+	"github.com/ut-code/JourniCal/backend/types"
 
 	"github.com/joho/godotenv"
 )

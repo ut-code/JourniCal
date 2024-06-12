@@ -4,7 +4,7 @@ package main
 import (
 	"context"
 
-	"JourniCalBackend/helper"
+	"github.com/ut-code/JourniCal/backend/helper"
 
 	"golang.org/x/oauth2"
 	"google.golang.org/api/drive/v3"
