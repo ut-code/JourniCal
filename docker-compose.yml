@@ -1,3 +1,5 @@
+# docker compose for development
+
 services:
   # FIXME: write frontend here
   backend: 
@@ -9,6 +11,9 @@ services:
       - "3000:3000"
     depends_on: 
       - postgres
+    environment:
+      - CORS_ORIGIN="http://localhost:5173"
+      - DSN="host=postgres user=user database=database password=password"
   postgres:
     image: postgres:alpine
     hostname: postgres

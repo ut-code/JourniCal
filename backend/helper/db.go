@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -16,10 +17,14 @@ var Database *gorm.DB
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		fmt.Printf("Error loading .env file: %v\n", err)
+		fmt.Println("If this is not run from docker compose, this is probably not expected")
 	}
 
 	dsn := os.Getenv("DSN")
+	if dsn == "" {
+		log.Fatalln("DSN environment variable not found")
+	}
 	var err error
 	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
