@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,11 +22,15 @@ func main() {
 	// ミドルウェアを設定
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:5173"},
-	}))
 
-	e.Static("/", "./static")
+	if cors_origin := os.Getenv("CORS_ORIGIN"); cors_origin != "" {
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{cors_origin},
+		}))
+	}
+	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {
+		e.Static("/", "../frontend/dist")
+	}
 	router.Root(e.Group(""))
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/api/auth"))
