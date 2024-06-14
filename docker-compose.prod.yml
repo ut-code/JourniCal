@@ -1,16 +1,11 @@
-# TODO!
 services:
-  backend:
+  full:
     restart: always
     build:
-      context: ./backend/
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: ./Dockerfile.prod
     ports:
       - "3000:3000"
     environment:
       - ECHO_SERVES_FRONTEND_TOO=true
       - DSN # inherit
-    # FIXME: mount (or whatever it's called) frontend dist into somewhere arount here (backend/static?) 
-    # s.t. backend can see it. it currently doesn't work.
-  frontend:
-    # FIXME: just build and halt
