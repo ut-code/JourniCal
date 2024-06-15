@@ -9,6 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write src",
     "format-check": "prettier --check src",
+    "dry-build": "tsc && vite build --outDir ./dist.tmp; rm -r ./dist.tmp",
     "preview": "vite preview"
   },
   "dependencies": {

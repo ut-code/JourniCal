@@ -13,6 +13,9 @@ dist
 dist-ssr
 *.local
 
+# used for dry build (because vite doesn't support one)
+dist.tmp
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
