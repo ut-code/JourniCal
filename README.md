@@ -50,3 +50,7 @@ docker compose up --build
 
 起動時間の関係で、初回起動時は何回かサーバーが落ちてからの起動になるかもしれません。
 二回目以降の起動では落ちないので大丈夫です。(大丈夫ではない) (解決方法不明: 解決できたらしてください)
+
+## Style Guidelines as a reference
+
+- <https://rakyll.org/style-packages/>
