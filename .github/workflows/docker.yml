@@ -1,0 +1,17 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Docker tests
+
+on:
+  push
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run docker-compose.yml
+      run: HALT_AFTER_SUCCESS=true NO_CREDENTIALS_REQUIRED=true docker compose up --build --abort-on-container-exit --exit-code-from backend

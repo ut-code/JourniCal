@@ -37,8 +37,9 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 
 ### ビルドされたファイルを実行
 
-- `backend/JourniCalBackend`
-- `(cd frontend; npm run serve)` # FIXME: is it correct? fix this if not.
+- `backend/run-postgres-at-localhost.sh`
+- `cp -r ./frontend/dist ./backend/static`
+- `ECHO_SERVES_FRONTEND_TOO=true backend/JourniCalBackend`
 
 ## docker-compose
 
@@ -50,3 +51,7 @@ docker compose up --build
 
 起動時間の関係で、初回起動時は何回かサーバーが落ちてからの起動になるかもしれません。
 二回目以降の起動では落ちないので大丈夫です。(大丈夫ではない) (解決方法不明: 解決できたらしてください)
+
+## Style Guidelines as a reference
+
+- <https://rakyll.org/style-packages/>

@@ -1,28 +1,21 @@
 import DiaryEntry from "../components/DiaryEntry";
-
-interface Entry {
-  date: string;
-  title: string;
-  content: string;
-}
-
-async function fetchEntries(): Promise<Entry[]> {
-  const response = await fetch("http://localhost:3000/api/diaries");
-  const data = (await response.json()) as Entry[];
-  console.log(data);
-  return data;
-}
-
-const diaries = await fetchEntries();
+import useDiary from "../hooks/useDiary";
 
 function Diary() {
+  const { diaries, isLoading, error } = useDiary();
   return (
     <div className="diary-app">
-      <div className="diary-entries">
-        {diaries.map((diary, index) => (
-          <DiaryEntry key={index} {...diary} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div>Error: {error.message}</div>
+      ) : (
+        <div className="diary-entries">
+          {diaries?.map((diary, index) => (
+            <DiaryEntry key={index} {...diary} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
