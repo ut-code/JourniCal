@@ -1,5 +1,6 @@
-import { Box, Typography } from "@mui/material";
+import { TableCell, TableRow, Typography } from "@mui/material";
 import { Duration, intervalToDuration } from "date-fns";
+import { Schedule } from "../types/types";
 
 const durationToHours = (duration: Duration) => {
   const hours = duration.hours ? duration.hours : 0;
@@ -7,15 +8,8 @@ const durationToHours = (duration: Duration) => {
   return hours + minutes / 60;
 };
 
-export type schedule = {
-  start: Date;
-  end: Date;
-  title: string;
-  color: string;
-};
-
 type TimelineScheduleProps = {
-  schedule: schedule;
+  schedule: Schedule;
 };
 
 const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
@@ -38,7 +32,7 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
   const scheduleDurationHours = durationToHours(scheduleDuration);
   //TODO 期間が短いと文字がはみ出るのをなんとかする
   return (
-    <Box
+    <TableRow
       sx={{
         position: "absolute",
         paddingLeft: "10px",
@@ -50,19 +44,21 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
         backgroundColor: schedule.color,
       }}
     >
-      <Typography variant="caption">{schedule.title}</Typography>{" "}
-      <Typography variant="caption">
-        {schedule.start.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-        {" ~ "}
-        {schedule.end.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </Typography>
-    </Box>
+      <TableCell padding="none" sx={{ border: "none" }}>
+        <Typography variant="caption">{schedule.title}</Typography>{" "}
+        <Typography variant="caption">
+          {schedule.start.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+          {" ~ "}
+          {schedule.end.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Typography>
+      </TableCell>
+    </TableRow>
   );
 };
 
