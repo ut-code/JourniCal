@@ -25,4 +25,21 @@ func Calendar(g *echo.Group) {
 		evs := calendar.GetNEventsForward(srv, "primary", time.Unix(int64(t), 0), 20)
 		return c.JSON(200, evs)
 	})
+
+	g.GET("/get-events-in-range/:start_unix/:end_unix", func(c echo.Context) error {
+		srv, err := calendar.SrvFromContext(c)
+		if err != nil {
+			return err
+		}
+		start, err := strconv.Atoi(c.Param("start_unix"))
+		if err != nil {
+			c.String(400, "Bad request: invalid start time")
+			return err
+		}
+		end, err := strconv.Atoi(c.Param("end_unix"))
+		if err != nil {
+			c.String(400, "Bad request: invalid end time")
+		}
+		return c.JSON(http.StatusOK, calendar.GetEventsInRange(srv, "primary", time.Unix(int64(start), 0), time.Unix(int64(end), 0)))
+	})
 }
