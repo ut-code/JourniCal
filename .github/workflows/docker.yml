@@ -3,15 +3,13 @@
 
 name: Docker tests
 
-on:
-  push
+on: push
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Run docker-compose.yml
-      run: HALT_AFTER_SUCCESS=true NO_CREDENTIALS_REQUIRED=true docker compose up --build --abort-on-container-exit --exit-code-from backend
+      - name: Run docker-compose.yml
+        run: HALT_AFTER_SUCCESS=true NO_CREDENTIALS_REQUIRED=true docker compose up --build --abort-on-container-exit --exit-code-from backend

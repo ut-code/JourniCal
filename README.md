@@ -17,6 +17,7 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 - credentials.json を探してきて、 backend/credentials.json にコピーする。
 
 ---
+
 以下、 docker compose を使う場合は docker compose が代わりにやってくれます。
 
 ### 依存関係の解決

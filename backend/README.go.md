@@ -3,7 +3,7 @@
 1. install go (or use nix/docker to not pollute the environment)
 2. cd into `JourniCal/backend`
 3. run `go mod tidy`. this will install necessary packages and remove unnecessary ones automatically.
-  alternatively, you can `go mod download`. this will download necessary packages without updating go.mod (I guess).
+   alternatively, you can `go mod download`. this will download necessary packages without updating go.mod (I guess).
 4. run `go run .`
 
 you can also run `go build` to get an executable file.
