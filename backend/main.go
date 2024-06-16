@@ -25,7 +25,8 @@ func main() {
 
 	if cors_origin := os.Getenv("CORS_ORIGIN"); cors_origin != "" {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: []string{cors_origin},
+			AllowOrigins:     []string{cors_origin},
+			AllowCredentials: true,
 		}))
 	}
 	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {

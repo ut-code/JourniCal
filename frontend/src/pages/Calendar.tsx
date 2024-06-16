@@ -21,7 +21,6 @@ const Calendar: React.FC = () => {
   const [baseDate, setBaseDate] = useState(
     sub(today, { days: today.getDay() }),
   );
-
   const [mode, setMode] = useState<modeVariant>("day");
 
   const [threeDays, setThreeDays] = useState(
@@ -41,123 +40,33 @@ const Calendar: React.FC = () => {
     setThreeDays([...Array(3).keys()].map((i) => add(baseDate, { days: i })));
   }, [baseDate]);
 
-  // 一週間の予定を格納
-  const weekSchedules: schedule[] = [
-    {
-      title: "工学部ガイダンス",
-      start: new Date("2024-04-03T10:30"),
-      end: new Date("2024-04-03T17:00"),
-      color: "mediumpurple",
-    },
-    {
-      title: "サーオリ手伝い",
-      start: new Date("2024-04-04T14:00"),
-      end: new Date("2024-04-04T18:00"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "2限",
-      start: new Date("2024-04-05T10:25"),
-      end: new Date("2024-04-05T12:10"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "3限",
-      start: new Date("2024-04-05T13:00"),
-      end: new Date("2024-04-05T14:45"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "4限",
-      start: new Date("2024-04-05T14:55"),
-      end: new Date("2024-04-05T16:40"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "5限",
-      start: new Date("2024-04-05T16:50"),
-      end: new Date("2024-04-05T18:35"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "mayFes mtg",
-      start: new Date("2024-04-05T21:00"),
-      end: new Date("2024-04-05T22:00"),
-      color: "dodgerblue",
-    },
-    {
-      title: "1限",
-      start: new Date("2024-04-08T08:30"),
-      end: new Date("2024-04-08T10:15"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "2限",
-      start: new Date("2024-04-08T10:25"),
-      end: new Date("2024-04-08T12:10"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "3限",
-      start: new Date("2024-04-08T13:00"),
-      end: new Date("2024-04-08T14:45"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "4限",
-      start: new Date("2024-04-08T14:55"),
-      end: new Date("2024-04-08T16:40"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "5限",
-      start: new Date("2024-04-08T16:50"),
-      end: new Date("2024-04-08T18:35"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "braille mtg",
-      start: new Date("2024-04-08T22:00"),
-      end: new Date("2024-04-08T23:00"),
-      color: "dodgerblue",
-    },
-    {
-      title: "2限",
-      start: new Date("2024-04-09T10:25"),
-      end: new Date("2024-04-09T12:10"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "3限",
-      start: new Date("2024-04-09T13:00"),
-      end: new Date("2024-04-09T14:45"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "4限",
-      start: new Date("2024-04-09T14:55"),
-      end: new Date("2024-04-09T16:40"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "5限",
-      start: new Date("2024-04-09T16:50"),
-      end: new Date("2024-04-09T18:35"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "journal mtg",
-      start: new Date("2024-04-09T21:00"),
-      end: new Date("2024-04-09T22:00"),
-      color: "dodgerblue",
-    },
-    {
-      title: "長い名前の予定長い名前の予定",
-      start: new Date("2024-04-10T21:00"),
-      end: new Date("2024-04-10T21:01"),
-      color: "dodgerblue",
-    },
-  ];
+  const [weekSchedules, setWeekSchedules] = useState<schedule[]>([]);
+
+  // データフェッチ
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch(
+        `http://localhost:3000/api/calendar/get-20-events-forward/1717250000`,
+        {
+          method: "GET",
+          credentials: "include",
+          mode: "cors",
+        },
+      );
+      const data = await response.json();
+      console.log(data);
+      // 一週間の予定を格納
+      setWeekSchedules(
+        data.map((schedule) => ({
+          start: new Date(schedule.start.date),
+          end: new Date(schedule.end.date),
+          title: schedule.summary,
+          color: "mediumseagreen",
+        })),
+      );
+    }
+    fetchData();
+  }, []);
 
   return (
     <>
