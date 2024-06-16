@@ -3,17 +3,19 @@
 services:
   # FIXME: write frontend here
   backend: 
-    restart: always
     build:
       context: ./backend/
       dockerfile: ./Dockerfile
     ports:
       - "3000:3000"
     depends_on: 
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - CORS_ORIGIN=http://localhost:5173
       - DSN=host=postgres user=user database=database password=password port=5432
+      - HALT_AFTER_SUCCESS # inherit
+      - NO_CREDENTIALS_REQUIRED # inherit
   postgres:
     image: postgres:alpine
     hostname: postgres
@@ -21,3 +23,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=user
       - POSTGRES_DB=database
+    healthcheck:
+      test: "pg_isready -U user -d database"
+      interval: 5s
+      retries: 3
