@@ -110,7 +110,7 @@ func GetNEventsForward(service *calendar.Service, calendar_id calendar_id, start
 }
 
 func GetEventsInRange(service *calendar.Service, calendar_id calendar_id, start time.Time, end time.Time) []*calendar.Event {
-	events, err := service.Events.List(calendar_id).SingleEvents(false).TimeMin(start.Format(time.RFC3339)).TimeMax(end.Format(time.RFC3339)).Do()
+	events, err := service.Events.List(calendar_id).SingleEvents(true).TimeMin(start.Format(time.RFC3339)).TimeMax(end.Format(time.RFC3339)).Do()
 	helper.ErrorLog(err, "Getting Calendar Events Failed in function GetEventsInRange()")
 	return events.Items
 }
