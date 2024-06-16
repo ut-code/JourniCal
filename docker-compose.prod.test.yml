@@ -12,6 +12,7 @@ services:
     environment:
       - ECHO_SERVES_FRONTEND_TOO=true
       - DSN=${DSN:-host=postgres user=user database=database password=password} # inherit, or default to localhost one
+  # below is for testing
   postgres:
     image: postgres:alpine
     hostname: postgres

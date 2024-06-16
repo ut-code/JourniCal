@@ -17,6 +17,6 @@ RUN --mount=type=cache,target=/go/pkg/mod/ go build -o ./result .
 # serve with minimal dependency
 FROM busybox as runtime
 COPY --from=frontend /usr/docker/JourniCal/frontend/dist /usr/docker/JourniCal/prod/static
-COPY --from=backend /usr/docker/JourniCal/backend/result /usr/docker/JourniCal/prod/result
-COPY --from=backend /usr/docker/JourniCal/backend/credentials.json /usr/docker/JourniCal/prod/credentials.json
+COPY --from=backend /usr/docker/JourniCal/backend/result /usr/docker/JourniCal/backend/credentials.json /usr/docker/JourniCal/prod/
+ENV ECHO_SERVES_FRONTEND_TOO=true
 CMD cd /usr/docker/JourniCal/prod && ./result
