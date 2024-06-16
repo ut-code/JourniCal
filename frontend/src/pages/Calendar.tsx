@@ -7,6 +7,17 @@ import TimelineRowName from "../components/TimelineRowName";
 import { schedule } from "../components/TimelineSchedule";
 
 type modeVariant = "schedule" | "day" | "3days" | "week";
+type fetchedScheduleType = {
+  start: {
+    date?: string;
+    dateTime?: string;
+  };
+  end: {
+    date?: string;
+    dateTime?: string;
+  };
+  summary: string;
+};
 
 const isEqualDay = (day1: Date, day2: Date) => {
   return (
@@ -57,9 +68,9 @@ const Calendar: React.FC = () => {
       console.log(data);
       // 一週間の予定を格納
       setWeekSchedules(
-        data.map((schedule) => ({
-          start: new Date(schedule.start.date),
-          end: new Date(schedule.end.date),
+        data.map((schedule: fetchedScheduleType) => ({
+          start: new Date(schedule.start.dateTime ?? ""),
+          end: new Date(schedule.end.dateTime ?? ""),
           title: schedule.summary,
           color: "mediumseagreen",
         })),
