@@ -7,7 +7,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/ut-code/JourniCal/backend/helper"
+	"github.com/ut-code/JourniCal/backend/diary"
+	"github.com/ut-code/JourniCal/backend/helper/database"
 	"github.com/ut-code/JourniCal/backend/router"
 )
 
@@ -15,8 +16,7 @@ func init() {
 }
 
 func main() {
-	db := helper.Database
-
+	diaryDB := db.InitDB(&diary.Diary{})
 	// Doc: https://echo.labstack.com/
 	e := echo.New()
 	// ミドルウェアを設定
@@ -30,13 +30,13 @@ func main() {
 		}))
 	}
 	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {
-		e.Static("/", "../frontend/dist")
+		e.Static("/", "./static")
 	}
 	router.Root(e.Group(""))
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/api/auth"))
 	router.Calendar(e.Group("/api/calendar"))
-	router.Diary(e.Group("/api/diaries"), db)
+	router.Diary(e.Group("/api/diaries"), diaryDB)
 
 	// サーバの起動
 	if err := e.Start(":3000"); err != nil {

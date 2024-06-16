@@ -37,8 +37,9 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 
 ### ビルドされたファイルを実行
 
-- `backend/JourniCalBackend`
-- `(cd frontend; npm run serve)` # FIXME: is it correct? fix this if not.
+- `backend/run-postgres-at-localhost.sh`
+- `cp -r ./frontend/dist ./backend/static`
+- `ECHO_SERVES_FRONTEND_TOO=true backend/JourniCalBackend`
 
 ## docker-compose
 

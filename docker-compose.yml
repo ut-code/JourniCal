@@ -12,8 +12,8 @@ services:
     depends_on: 
       - postgres
     environment:
-      - CORS_ORIGIN="http://localhost:5173"
-      - DSN="host=postgres user=user database=database password=password"
+      - CORS_ORIGIN=http://localhost:5173
+      - DSN=host=postgres user=user database=database password=password port=5432
   postgres:
     image: postgres:alpine
     hostname: postgres
