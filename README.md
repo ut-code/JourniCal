@@ -68,7 +68,7 @@ docker build -f Dockerfile.prod -t journical-full .
 
 ```sh
 docker run \
-  -e DSN=${DSN} \ # inherit DSN from its env
+  -e DSN \ # inherit DSN from its env
   -p ${PORT:-3000}:3000 \ # run at $PORT, default to 3000 if $PORT is not set
   journical-full
 ```
