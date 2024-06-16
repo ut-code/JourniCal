@@ -64,6 +64,7 @@ docker compose up --build
 ```sh
 docker build -f Dockerfile.prod -t journical-full .
 ```
+
 ### 実行
 
 ```sh
