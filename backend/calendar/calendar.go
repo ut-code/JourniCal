@@ -22,6 +22,10 @@ var TokenCache = helper.NewMap[string, oauth2.Token]()
 
 func init() {
 	ctx = context.Background()
+	if os.Getenv("NO_CREDENTIALS_REQUIRED") == "true" {
+		return
+	}
+
 	cfg = readCredentials()
 	AuthURL = cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 }
