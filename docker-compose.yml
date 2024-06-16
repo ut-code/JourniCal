@@ -3,7 +3,7 @@
 services:
   # FIXME: write frontend here
   backend: 
-    restart: always
+    restart: on-failure
     build:
       context: ./backend/
       dockerfile: ./Dockerfile
@@ -14,6 +14,7 @@ services:
     environment:
       - CORS_ORIGIN=http://localhost:5173
       - DSN=host=postgres user=user database=database password=password port=5432
+      - HALT_AFTER_SUCCESS # inherit
   postgres:
     image: postgres:alpine
     hostname: postgres
