@@ -3,46 +3,27 @@
 
 name: Go Test, Check, and Format
 
-on:
-  push
+on: push
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22'
-        check-latest: true
-        cache-dependency-path: |
-          backend/go.sum
-          go-tools/go.sum
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22"
+          check-latest: true
+          cache-dependency-path: |
+            backend/go.sum
+            go-tools/go.sum
 
-    - name: Install staticcheck
-      working-directory: ./backend/
-      run: go install honnef.co/go/tools/cmd/staticcheck@latest
+      - name: Install staticcheck
+        working-directory: ./backend/
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-    - name: Vet
-      working-directory: ./backend/
-      run: go vet ./...
-
-    - name: Format
-      working-directory: ./backend/
-      run: go fmt ./...
-      
-    - name: Staticcheck
-      working-directory: ./backend/
-      run: $(go env GOPATH)/bin/staticcheck ./...
-      
-    - name: Test
-      working-directory: ./backend/
-      run: go test -v ./...
-      
-    - name: Dry Build
-      working-directory: ./backend/
-      run: go build -n
-
+      - name: Run tests
+        working-directory: ./backend/
+        run: ./static-check.sh

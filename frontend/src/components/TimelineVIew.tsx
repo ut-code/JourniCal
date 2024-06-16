@@ -7,20 +7,22 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import TimelineSchedule, { schedule } from "./TimelineSchedule";
+import TimelineSchedule from "./TimelineSchedule";
+import { Schedule } from "../types/types";
 
 type TimelineViewProps = {
   day: Date;
   today: Date;
-  daySchedules: schedule[];
+  daySchedules: Schedule[];
 };
 
 const TimelineView = (props: TimelineViewProps): JSX.Element => {
+  const { day, today, daySchedules } = props;
   const DAYOFWEEK = ["日", "月", "火", "水", "木", "金", "土"];
   const isToday =
-    props.day.getFullYear() === props.today.getFullYear() &&
-    props.day.getMonth() === props.today.getMonth() &&
-    props.day.getDate() === props.today.getDate();
+    day.getFullYear() === today.getFullYear() &&
+    day.getMonth() === today.getMonth() &&
+    day.getDate() === today.getDate();
 
   return (
     <Table
@@ -38,7 +40,7 @@ const TimelineView = (props: TimelineViewProps): JSX.Element => {
           alignItems={"center"}
           height={"3vh"}
         >
-          <Typography>{DAYOFWEEK[props.day.getDay()]}</Typography>
+          <Typography>{DAYOFWEEK[day.getDay()]}</Typography>
           {isToday ? (
             <Box
               display={"flex"}
@@ -51,13 +53,30 @@ const TimelineView = (props: TimelineViewProps): JSX.Element => {
               }}
             >
               <Typography variant="h5" color={"primary.contrastText"}>
-                {props.day.getDate()}
+                {day.getDate()}
               </Typography>
             </Box>
           ) : (
-            <Typography variant="h5">{props.day.getDate()}</Typography>
+            <Typography variant="h5">{day.getDate()}</Typography>
           )}
         </Box>
+        {daySchedules
+          .filter((schedule) => schedule.isAllDay)
+          .map((schedule) => (
+            <TableRow key={schedule.id}>
+              <TableCell
+                padding="none"
+                sx={{
+                  paddingLeft: "10px",
+                  border: "none",
+                  borderRadius: "5px",
+                  backgroundColor: schedule.color,
+                }}
+              >
+                {schedule.title}
+              </TableCell>
+            </TableRow>
+          ))}
       </TableHead>
       <TableBody sx={{ position: "relative" }}>
         {[...Array(25).keys()].map((i) => (
@@ -65,9 +84,11 @@ const TimelineView = (props: TimelineViewProps): JSX.Element => {
             <TableCell></TableCell>
           </TableRow>
         ))}
-        {props.daySchedules.map((schedule) => (
-          <TimelineSchedule schedule={schedule} />
-        ))}
+        {daySchedules
+          .filter((schedule) => !schedule.isAllDay)
+          .map((schedule) => (
+            <TimelineSchedule key={schedule.id} schedule={schedule} />
+          ))}
       </TableBody>
     </Table>
   );

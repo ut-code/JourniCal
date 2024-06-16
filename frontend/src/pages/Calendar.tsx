@@ -4,9 +4,83 @@ import { add, sub } from "date-fns";
 import { Box, Button, MenuItem, Select } from "@mui/material";
 import TopBar from "../components/TopBar";
 import TimelineRowName from "../components/TimelineRowName";
-import { schedule } from "../components/TimelineSchedule";
+import { Schedule } from "../types/types";
+import ScheduleView from "../components/ScheduleView";
 
-type modeVariant = "schedule" | "day" | "3days" | "week";
+type ModeVariant = "schedule" | "day" | "3days" | "week";
+type FetchedSchedule = {
+  id: string;
+  colorId?: string;
+  start: {
+    date?: string;
+    dateTime?: string;
+  };
+  end: {
+    date?: string;
+    dateTime?: string;
+  };
+  summary: string;
+};
+
+const COLOR_DICT = [
+  "#7986CB",
+  "#33B679",
+  "#8E24AA",
+  "#E67C73",
+  "#F6BF26",
+  "#F4511E",
+  "#039BE5",
+  "#616161",
+  "#3F51B5",
+  "#0B8043",
+  "#D50000",
+];
+
+const scheduleFromFetchedData = (
+  fetchedSchedule: FetchedSchedule,
+): Schedule => {
+  if (
+    fetchedSchedule.start.dateTime == undefined &&
+    fetchedSchedule.start.date != undefined &&
+    fetchedSchedule.end.dateTime == undefined &&
+    fetchedSchedule.end.date != undefined
+  ) {
+    return {
+      id: fetchedSchedule.id,
+      isAllDay: true,
+      start: new Date(fetchedSchedule.start.date),
+      end: new Date(fetchedSchedule.end.date),
+      title: fetchedSchedule.summary,
+      color:
+        COLOR_DICT[
+          Number(fetchedSchedule.colorId)
+            ? Number(fetchedSchedule.colorId) - 1
+            : 6
+        ],
+    };
+  }
+  if (
+    fetchedSchedule.start.dateTime != undefined &&
+    fetchedSchedule.start.date == undefined &&
+    fetchedSchedule.end.dateTime != undefined &&
+    fetchedSchedule.end.date == undefined
+  ) {
+    return {
+      id: fetchedSchedule.id,
+      isAllDay: false,
+      start: new Date(fetchedSchedule.start.dateTime),
+      end: new Date(fetchedSchedule.end.dateTime),
+      title: fetchedSchedule.summary,
+      color:
+        COLOR_DICT[
+          Number(fetchedSchedule.colorId)
+            ? Number(fetchedSchedule.colorId) - 1
+            : 6
+        ],
+    };
+  }
+  throw new Error("invalid schedule format.");
+};
 
 const isEqualDay = (day1: Date, day2: Date) => {
   return (
@@ -17,12 +91,11 @@ const isEqualDay = (day1: Date, day2: Date) => {
 };
 
 const Calendar: React.FC = () => {
-  const today = new Date();
+  const today = new Date(new Date().toDateString());
   const [baseDate, setBaseDate] = useState(
     sub(today, { days: today.getDay() }),
   );
-
-  const [mode, setMode] = useState<modeVariant>("day");
+  const [mode, setMode] = useState<ModeVariant>("day");
 
   const [threeDays, setThreeDays] = useState(
     [...Array(3).keys()].map((i) => add(baseDate, { days: i })),
@@ -41,123 +114,34 @@ const Calendar: React.FC = () => {
     setThreeDays([...Array(3).keys()].map((i) => add(baseDate, { days: i })));
   }, [baseDate]);
 
-  // 一週間の予定を格納
-  const weekSchedules: schedule[] = [
-    {
-      title: "工学部ガイダンス",
-      start: new Date("2024-04-03T10:30"),
-      end: new Date("2024-04-03T17:00"),
-      color: "mediumpurple",
-    },
-    {
-      title: "サーオリ手伝い",
-      start: new Date("2024-04-04T14:00"),
-      end: new Date("2024-04-04T18:00"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "2限",
-      start: new Date("2024-04-05T10:25"),
-      end: new Date("2024-04-05T12:10"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "3限",
-      start: new Date("2024-04-05T13:00"),
-      end: new Date("2024-04-05T14:45"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "4限",
-      start: new Date("2024-04-05T14:55"),
-      end: new Date("2024-04-05T16:40"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "5限",
-      start: new Date("2024-04-05T16:50"),
-      end: new Date("2024-04-05T18:35"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "mayFes mtg",
-      start: new Date("2024-04-05T21:00"),
-      end: new Date("2024-04-05T22:00"),
-      color: "dodgerblue",
-    },
-    {
-      title: "1限",
-      start: new Date("2024-04-08T08:30"),
-      end: new Date("2024-04-08T10:15"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "2限",
-      start: new Date("2024-04-08T10:25"),
-      end: new Date("2024-04-08T12:10"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "3限",
-      start: new Date("2024-04-08T13:00"),
-      end: new Date("2024-04-08T14:45"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "4限",
-      start: new Date("2024-04-08T14:55"),
-      end: new Date("2024-04-08T16:40"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "5限",
-      start: new Date("2024-04-08T16:50"),
-      end: new Date("2024-04-08T18:35"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "braille mtg",
-      start: new Date("2024-04-08T22:00"),
-      end: new Date("2024-04-08T23:00"),
-      color: "dodgerblue",
-    },
-    {
-      title: "2限",
-      start: new Date("2024-04-09T10:25"),
-      end: new Date("2024-04-09T12:10"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "3限",
-      start: new Date("2024-04-09T13:00"),
-      end: new Date("2024-04-09T14:45"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "4限",
-      start: new Date("2024-04-09T14:55"),
-      end: new Date("2024-04-09T16:40"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "5限",
-      start: new Date("2024-04-09T16:50"),
-      end: new Date("2024-04-09T18:35"),
-      color: "mediumseagreen",
-    },
-    {
-      title: "journal mtg",
-      start: new Date("2024-04-09T21:00"),
-      end: new Date("2024-04-09T22:00"),
-      color: "dodgerblue",
-    },
-    {
-      title: "長い名前の予定長い名前の予定",
-      start: new Date("2024-04-10T21:00"),
-      end: new Date("2024-04-10T21:01"),
-      color: "dodgerblue",
-    },
-  ];
+  const [weekSchedules, setWeekSchedules] = useState<Schedule[]>([]);
+
+  // データフェッチ
+  useEffect(() => {
+    async function fetchData() {
+      const startUnixTime = Math.floor(baseDate.getTime() / 1000);
+      const endUnixTime = Math.floor(
+        add(baseDate, { days: 7 }).getTime() / 1000,
+      );
+      const response = await fetch(
+        `http://localhost:3000/api/calendar/get-events-in-range/${startUnixTime}/${endUnixTime}`,
+        {
+          method: "GET",
+          credentials: "include",
+          mode: "cors",
+        },
+      );
+      const data = await response.json();
+      console.log(data);
+      // 一週間の予定を格納
+      setWeekSchedules(
+        data.map((schedule: FetchedSchedule) =>
+          scheduleFromFetchedData(schedule),
+        ),
+      );
+    }
+    fetchData();
+  }, [baseDate]);
 
   return (
     <>
@@ -196,7 +180,7 @@ const Calendar: React.FC = () => {
 
         <Select
           value={mode}
-          onChange={(e) => setMode(e.target.value as modeVariant)}
+          onChange={(e) => setMode(e.target.value as ModeVariant)}
         >
           <MenuItem value={"schedule"}>スケジュール</MenuItem>
           <MenuItem value={"day"}>日</MenuItem>
@@ -205,7 +189,7 @@ const Calendar: React.FC = () => {
         </Select>
 
         {mode === "schedule" ? (
-          <>ここにスケジュールビューを配置</>
+          <ScheduleView />
         ) : (
           <Box display={"flex"}>
             <TimelineRowName />

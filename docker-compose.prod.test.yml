@@ -1,0 +1,26 @@
+services:
+  full:
+    # restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile.prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - ECHO_SERVES_FRONTEND_TOO=true
+      - DSN=${DSN:-host=postgres user=user database=database password=password} # inherit, or default to localhost one
+  # below is for testing
+  postgres:
+    image: postgres:alpine
+    hostname: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=database
+    healthcheck:
+      test: "pg_isready -U user -d database"
+      interval: 5s
+      retries: 3

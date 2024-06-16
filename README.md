@@ -17,6 +17,7 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 - credentials.json を探してきて、 backend/credentials.json にコピーする。
 
 ---
+
 以下、 docker compose を使う場合は docker compose が代わりにやってくれます。
 
 ### 依存関係の解決
@@ -37,8 +38,9 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 
 ### ビルドされたファイルを実行
 
-- `backend/JourniCalBackend`
-- `(cd frontend; npm run serve)` # FIXME: is it correct? fix this if not.
+- `backend/run-postgres-at-localhost.sh`
+- `cp -r ./frontend/dist ./backend/static`
+- `ECHO_SERVES_FRONTEND_TOO=true backend/JourniCalBackend`
 
 ## docker-compose
 
@@ -48,5 +50,29 @@ docker compose up --build
 
 で PostgreSQL サーバー・バックエンド・(フロントエンド;TODO!)がすべて起動できます。
 
-起動時間の関係で、初回起動時は何回かサーバーが落ちてからの起動になるかもしれません。
-二回目以降の起動では落ちないので大丈夫です。(大丈夫ではない) (解決方法不明: 解決できたらしてください)
+## 本番環境
+
+本番環境で実行するには、以下のことをしてください。
+
+### 事前準備
+
+- backend/credentials.json を用意する
+- 環境変数 DSN を設定する
+
+### ビルド
+
+```sh
+docker build -f Dockerfile.prod -t journical-full .
+```
+### 実行
+
+```sh
+docker run \
+  -e DSN=${DSN} \ # inherit DSN from its env
+  -p ${PORT:-3000}:3000 \ # run at $PORT, default to 3000 if $PORT is not set
+  journical-full
+```
+
+## Style Guidelines as a reference
+
+- <https://rakyll.org/style-packages/>
