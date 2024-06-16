@@ -34,7 +34,7 @@ func main() {
 	}
 	router.Root(e.Group(""))
 	router.Api(e.Group("/api"))
-	router.Auth(e.Group("/api/auth"))
+	router.Auth(e.Group("/auth"))
 	router.Calendar(e.Group("/api/calendar"))
 	router.Diary(e.Group("/api/diaries"), diaryDB)
 
