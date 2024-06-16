@@ -6,8 +6,5 @@
     "hooks": {
       "pre-commit": "prettier"
     }
-  },
-  "dependencies": {
-    "@mui/x-date-pickers": "^7.6.2"
   }
 }
