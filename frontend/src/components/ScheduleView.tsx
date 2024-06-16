@@ -5,13 +5,13 @@ import { Box, Typography, Button, Modal, TextField } from "@mui/material";
 import TopBar from "./TopBar";
 
 const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
+  bgcolor: "background.paper",
+  border: "2px solid #000",
   boxShadow: 24,
   p: 4,
 };
@@ -35,7 +35,13 @@ const ScheduleView: React.FC = () => {
     const response = await axios.get<Post[]>(
       `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`
     );
-    setItems([...items, ...response.data.map(item => ({...item, color: getEventColor(item.title)}))]);
+    setItems([
+      ...items,
+      ...response.data.map((item) => ({
+        ...item,
+        color: getEventColor(item.title),
+      })),
+    ]);
     setPage(page + 1);
   };
 
@@ -64,7 +70,11 @@ const ScheduleView: React.FC = () => {
   const handleSaveTitle = () => {
     if (selectedEvent) {
       setSelectedEvent({ ...selectedEvent, title: editedTitle });
-      setItems(items.map(item => item.id === selectedEvent.id ? { ...item, title: editedTitle } : item));
+      setItems(
+        items.map((item) =>
+          item.id === selectedEvent.id ? { ...item, title: editedTitle } : item
+        )
+      );
       handleCloseModal();
     }
   };
@@ -108,7 +118,9 @@ const ScheduleView: React.FC = () => {
             >
               <Typography variant="caption">{item.title}</Typography>
               <Typography variant="caption">9:00 ~ 10:00</Typography>
-              <Button onClick={() => handleOpenModal(item)}>View Details</Button>
+              <Button onClick={() => handleOpenModal(item)}>
+                View Details
+              </Button>
             </Box>
           ))}
         </InfiniteScroll>
@@ -128,7 +140,11 @@ const ScheduleView: React.FC = () => {
               fullWidth
               sx={{ mb: 2 }}
             />
-            <Button onClick={handleSaveTitle} variant="contained" color="primary">
+            <Button
+              onClick={handleSaveTitle}
+              variant="contained"
+              color="primary"
+            >
               Save
             </Button>
           </Box>
