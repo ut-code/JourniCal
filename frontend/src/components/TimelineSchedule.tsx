@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { Duration, intervalToDuration } from "date-fns";
+import { Schedule } from "../types/types";
 
 const durationToHours = (duration: Duration) => {
   const hours = duration.hours ? duration.hours : 0;
@@ -7,16 +8,8 @@ const durationToHours = (duration: Duration) => {
   return hours + minutes / 60;
 };
 
-export type schedule = {
-  isAllDay: boolean;
-  start: Date;
-  end: Date;
-  title: string;
-  color: string;
-};
-
 type TimelineScheduleProps = {
-  schedule: schedule;
+  schedule: Schedule;
 };
 
 const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {

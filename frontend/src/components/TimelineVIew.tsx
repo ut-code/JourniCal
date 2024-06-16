@@ -7,12 +7,13 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import TimelineSchedule, { schedule } from "./TimelineSchedule";
+import TimelineSchedule from "./TimelineSchedule";
+import { Schedule } from "../types/types";
 
 type TimelineViewProps = {
   day: Date;
   today: Date;
-  daySchedules: schedule[];
+  daySchedules: Schedule[];
 };
 
 const TimelineView = (props: TimelineViewProps): JSX.Element => {

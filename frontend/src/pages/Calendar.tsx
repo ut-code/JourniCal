@@ -4,10 +4,10 @@ import { add, sub } from "date-fns";
 import { Box, Button, MenuItem, Select } from "@mui/material";
 import TopBar from "../components/TopBar";
 import TimelineRowName from "../components/TimelineRowName";
-import { schedule } from "../components/TimelineSchedule";
+import { Schedule } from "../types/types";
 
-type modeVariant = "schedule" | "day" | "3days" | "week";
-type fetchedSchedule = {
+type ModeVariant = "schedule" | "day" | "3days" | "week";
+type FetchedSchedule = {
   colorId?: string;
   start: {
     date?: string;
@@ -35,8 +35,8 @@ const colorDict = [
 ];
 
 const scheduleFromFetchedData = (
-  fetchedSchedule: fetchedSchedule,
-): schedule => {
+  fetchedSchedule: FetchedSchedule,
+): Schedule => {
   if (
     fetchedSchedule.start.dateTime == undefined &&
     fetchedSchedule.start.date != undefined &&
@@ -91,7 +91,7 @@ const Calendar: React.FC = () => {
   const [baseDate, setBaseDate] = useState(
     sub(today, { days: today.getDay() }),
   );
-  const [mode, setMode] = useState<modeVariant>("day");
+  const [mode, setMode] = useState<ModeVariant>("day");
 
   const [threeDays, setThreeDays] = useState(
     [...Array(3).keys()].map((i) => add(baseDate, { days: i })),
@@ -110,7 +110,7 @@ const Calendar: React.FC = () => {
     setThreeDays([...Array(3).keys()].map((i) => add(baseDate, { days: i })));
   }, [baseDate]);
 
-  const [weekSchedules, setWeekSchedules] = useState<schedule[]>([]);
+  const [weekSchedules, setWeekSchedules] = useState<Schedule[]>([]);
 
   // データフェッチ
   useEffect(() => {
@@ -127,7 +127,7 @@ const Calendar: React.FC = () => {
       console.log(data);
       // 一週間の予定を格納
       setWeekSchedules(
-        data.map((schedule: fetchedSchedule) =>
+        data.map((schedule: FetchedSchedule) =>
           scheduleFromFetchedData(schedule),
         ),
       );
@@ -172,7 +172,7 @@ const Calendar: React.FC = () => {
 
         <Select
           value={mode}
-          onChange={(e) => setMode(e.target.value as modeVariant)}
+          onChange={(e) => setMode(e.target.value as ModeVariant)}
         >
           <MenuItem value={"schedule"}>スケジュール</MenuItem>
           <MenuItem value={"day"}>日</MenuItem>
