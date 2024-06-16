@@ -28,6 +28,7 @@ const ScheduleView: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [selectedEvent, setSelectedEvent] = useState<Post | null>(null);
   const [editedTitle, setEditedTitle] = useState<string>("");
+  const [baseDate, setBaseDate] = useState<Date>(new Date());
 
   const fetchData = async (__page: number) => {
     console.log(__page);
@@ -70,7 +71,7 @@ const ScheduleView: React.FC = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <TopBar journalPathName="/page1" calendarPathName="/page2" />
+      <TopBar baseDate={baseDate} setBaseDate={setBaseDate} />
       <div style={{ display: "flex", flexGrow: 1 }}>
         <div style={{ marginRight: "20px" }}>
           <Typography variant="h6" style={{ color: "gray" }}>

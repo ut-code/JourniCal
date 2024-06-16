@@ -13,7 +13,8 @@ async function fetchEntries(): Promise<Entry[]> {
   return data;
 }
 
-const diaries = await fetchEntries();
+// const diaries = await fetchEntries();
+const diaries: Entry[] = [];
 
 function Diary() {
   return (
