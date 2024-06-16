@@ -22,4 +22,4 @@ jobs:
         run: cd frontend && npm ci
 
       - name: Run checks
-        run:  cd frontend && npm run lint && npm run format-check && npm run dry-build
+        run: cd frontend && npm run lint && npm run format-check && npm run dry-build

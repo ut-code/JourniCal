@@ -2,13 +2,13 @@
 
 services:
   # FIXME: write frontend here
-  backend: 
+  backend:
     build:
       context: ./backend/
       dockerfile: ./Dockerfile
     ports:
       - "3000:3000"
-    depends_on: 
+    depends_on:
       postgres:
         condition: service_healthy
     environment:
