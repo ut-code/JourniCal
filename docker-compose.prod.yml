@@ -1,16 +1,25 @@
-# TODO!
 services:
-  backend:
-    restart: always
+  full:
+    # restart: always
     build:
-      context: ./backend/
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: ./Dockerfile.prod
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "3000:3000"
     environment:
       - ECHO_SERVES_FRONTEND_TOO=true
-      - DSN # inherit
-    # FIXME: mount (or whatever it's called) frontend dist into somewhere arount here (backend/static?) 
-    # s.t. backend can see it. it currently doesn't work.
-  frontend:
-    # FIXME: just build and halt
+      - DSN=${DSN:-host=postgres user=user database=database password=password} # inherit, or default to localhost one
+  postgres:
+    image: postgres:alpine
+    hostname: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=database
+    healthcheck:
+      test: "pg_isready -U user -d database"
+      interval: 5s
+      retries: 3
