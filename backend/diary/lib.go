@@ -1,15 +1,20 @@
 package diary
 
 import (
-	"github.com/ut-code/JourniCal/backend/types"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
-type Diary = types.Diary
+type Diary struct {
+	gorm.Model
+	Date    time.Time `json:"date"` // Date of what?
+	Title   string    `json:"title"`
+	Content string    `json:"content"`
+}
 
 func GetAllDiaries(c echo.Context, db *gorm.DB) error {
 	diaries := []Diary{}
