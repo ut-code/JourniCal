@@ -1,4 +1,4 @@
-name: Frontend ESLint and Prettier Check
+name: Frontend checks
 
 on: [push]
 
@@ -21,5 +21,5 @@ jobs:
       - name: Install dependencies
         run: cd frontend && npm ci
 
-      - name: Run ESLint and Prettier check
-        run:  cd frontend && npm run lint && npm run format-check
+      - name: Run checks
+        run: cd frontend && npm run lint && npm run format-check && npm run dry-build

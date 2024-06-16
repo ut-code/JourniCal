@@ -91,7 +91,7 @@ const isEqualDay = (day1: Date, day2: Date) => {
 };
 
 const Calendar: React.FC = () => {
-  const today = new Date();
+  const today = new Date(new Date().toDateString());
   const [baseDate, setBaseDate] = useState(
     sub(today, { days: today.getDay() }),
   );
@@ -119,8 +119,12 @@ const Calendar: React.FC = () => {
   // データフェッチ
   useEffect(() => {
     async function fetchData() {
+      const startUnixTime = Math.floor(baseDate.getTime() / 1000);
+      const endUnixTime = Math.floor(
+        add(baseDate, { days: 7 }).getTime() / 1000,
+      );
       const response = await fetch(
-        `http://localhost:3000/api/calendar/get-20-events-forward/1717250000`,
+        `http://localhost:3000/api/calendar/get-events-in-range/${startUnixTime}/${endUnixTime}`,
         {
           method: "GET",
           credentials: "include",
@@ -137,7 +141,7 @@ const Calendar: React.FC = () => {
       );
     }
     fetchData();
-  }, []);
+  }, [baseDate]);
 
   return (
     <>

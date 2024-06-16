@@ -10,19 +10,20 @@ import (
 )
 
 func Calendar(g *echo.Group) {
-	// spec:
-	// specify time as unix time.
-	g.GET("/get-20-events-forward/:start_unix", func(c echo.Context) error {
+	g.GET("/get-events-in-range/:start_unix/:end_unix", func(c echo.Context) error {
 		srv, err := calendar.SrvFromContext(c)
 		if err != nil {
 			return err
 		}
-		t, err := strconv.Atoi(c.Param("start_unix"))
+		start, err := strconv.Atoi(c.Param("start_unix"))
 		if err != nil {
-			c.String(http.StatusBadRequest, "get-20-events-forward with invalid second path: not unix time (= number)")
+			c.String(400, "Bad request: invalid start time")
 			return err
 		}
-		evs := calendar.GetNEventsForward(srv, "primary", time.Unix(int64(t), 0), 20)
-		return c.JSON(200, evs)
+		end, err := strconv.Atoi(c.Param("end_unix"))
+		if err != nil {
+			c.String(400, "Bad request: invalid end time")
+		}
+		return c.JSON(http.StatusOK, calendar.GetEventsInRange(srv, "primary", time.Unix(int64(start), 0), time.Unix(int64(end), 0)))
 	})
 }
