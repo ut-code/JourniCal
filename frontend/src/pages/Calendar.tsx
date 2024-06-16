@@ -7,7 +7,8 @@ import TimelineRowName from "../components/TimelineRowName";
 import { schedule } from "../components/TimelineSchedule";
 
 type modeVariant = "schedule" | "day" | "3days" | "week";
-type fetchedScheduleType = {
+type fetchedSchedule = {
+  colorId?: string;
   start: {
     date?: string;
     dateTime?: string;
@@ -17,6 +18,64 @@ type fetchedScheduleType = {
     dateTime?: string;
   };
   summary: string;
+};
+
+const colorDict = [
+  "#7986CB",
+  "#33B679",
+  "#8E24AA",
+  "#E67C73",
+  "#F6BF26",
+  "#F4511E",
+  "#039BE5",
+  "#616161",
+  "#3F51B5",
+  "#0B8043",
+  "#D50000",
+];
+
+const scheduleFromFetchedData = (
+  fetchedSchedule: fetchedSchedule,
+): schedule => {
+  if (
+    fetchedSchedule.start.dateTime == undefined &&
+    fetchedSchedule.start.date != undefined &&
+    fetchedSchedule.end.dateTime == undefined &&
+    fetchedSchedule.end.date != undefined
+  ) {
+    return {
+      isAllDay: true,
+      start: new Date(fetchedSchedule.start.date),
+      end: new Date(fetchedSchedule.end.date),
+      title: fetchedSchedule.summary,
+      color:
+        colorDict[
+          Number(fetchedSchedule.colorId)
+            ? Number(fetchedSchedule.colorId) - 1
+            : 6
+        ],
+    };
+  }
+  if (
+    fetchedSchedule.start.dateTime != undefined &&
+    fetchedSchedule.start.date == undefined &&
+    fetchedSchedule.end.dateTime != undefined &&
+    fetchedSchedule.end.date == undefined
+  ) {
+    return {
+      isAllDay: false,
+      start: new Date(fetchedSchedule.start.dateTime),
+      end: new Date(fetchedSchedule.end.dateTime),
+      title: fetchedSchedule.summary,
+      color:
+        colorDict[
+          Number(fetchedSchedule.colorId)
+            ? Number(fetchedSchedule.colorId) - 1
+            : 6
+        ],
+    };
+  }
+  throw new Error("invalid schedule format.");
 };
 
 const isEqualDay = (day1: Date, day2: Date) => {
@@ -68,12 +127,9 @@ const Calendar: React.FC = () => {
       console.log(data);
       // 一週間の予定を格納
       setWeekSchedules(
-        data.map((schedule: fetchedScheduleType) => ({
-          start: new Date(schedule.start.dateTime ?? ""),
-          end: new Date(schedule.end.dateTime ?? ""),
-          title: schedule.summary,
-          color: "mediumseagreen",
-        })),
+        data.map((schedule: fetchedSchedule) =>
+          scheduleFromFetchedData(schedule),
+        ),
       );
     }
     fetchData();

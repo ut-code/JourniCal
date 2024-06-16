@@ -58,6 +58,22 @@ const TimelineView = (props: TimelineViewProps): JSX.Element => {
             <Typography variant="h5">{props.day.getDate()}</Typography>
           )}
         </Box>
+        <Box mt="10px">
+          {props.daySchedules
+            .filter((schedule) => schedule.isAllDay)
+            .map((schedule) => (
+              <Box
+                sx={{
+                  paddingLeft: "10px",
+                  width: "90%",
+                  borderRadius: "5px",
+                  backgroundColor: schedule.color,
+                }}
+              >
+                {schedule.title}
+              </Box>
+            ))}
+        </Box>
       </TableHead>
       <TableBody sx={{ position: "relative" }}>
         {[...Array(25).keys()].map((i) => (
@@ -65,9 +81,11 @@ const TimelineView = (props: TimelineViewProps): JSX.Element => {
             <TableCell></TableCell>
           </TableRow>
         ))}
-        {props.daySchedules.map((schedule) => (
-          <TimelineSchedule schedule={schedule} />
-        ))}
+        {props.daySchedules
+          .filter((schedule) => !schedule.isAllDay)
+          .map((schedule) => (
+            <TimelineSchedule schedule={schedule} />
+          ))}
       </TableBody>
     </Table>
   );

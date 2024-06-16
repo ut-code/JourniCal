@@ -8,6 +8,7 @@ const durationToHours = (duration: Duration) => {
 };
 
 export type schedule = {
+  isAllDay: boolean;
   start: Date;
   end: Date;
   title: string;
