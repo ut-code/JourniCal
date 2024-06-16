@@ -33,7 +33,7 @@ const ScheduleView: React.FC = () => {
   const fetchData = async (__page: number) => {
     console.log(__page);
     const response = await axios.get<Post[]>(
-      `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`
+      `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`,
     );
     setItems([
       ...items,
@@ -72,8 +72,8 @@ const ScheduleView: React.FC = () => {
       setSelectedEvent({ ...selectedEvent, title: editedTitle });
       setItems(
         items.map((item) =>
-          item.id === selectedEvent.id ? { ...item, title: editedTitle } : item
-        )
+          item.id === selectedEvent.id ? { ...item, title: editedTitle } : item,
+        ),
       );
       handleCloseModal();
     }
