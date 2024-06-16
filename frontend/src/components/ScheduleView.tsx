@@ -5,7 +5,7 @@ import { Box, Typography, Button, Modal, TextField } from "@mui/material";
 import TopBar from "./TopBar";
 
 const style = {
-  position: "absolute" as "absolute",
+  position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
@@ -14,7 +14,7 @@ const style = {
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
-} as const;
+};
 
 interface Post {
   id: number;
