@@ -5,6 +5,7 @@ import { Box, Button, MenuItem, Select } from "@mui/material";
 import TopBar from "../components/TopBar";
 import TimelineRowName from "../components/TimelineRowName";
 import { schedule } from "../components/TimelineSchedule";
+import ScheduleView from "../components/ScheduleView";
 
 type modeVariant = "schedule" | "day" | "3days" | "week";
 
@@ -205,7 +206,7 @@ const Calendar: React.FC = () => {
         </Select>
 
         {mode === "schedule" ? (
-          <>ここにスケジュールビューを配置</>
+          <ScheduleView />
         ) : (
           <Box display={"flex"}>
             <TimelineRowName />
