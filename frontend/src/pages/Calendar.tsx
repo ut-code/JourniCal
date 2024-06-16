@@ -20,7 +20,7 @@ type FetchedSchedule = {
   summary: string;
 };
 
-const colorDict = [
+const COLOR_DICT = [
   "#7986CB",
   "#33B679",
   "#8E24AA",
@@ -49,7 +49,7 @@ const scheduleFromFetchedData = (
       end: new Date(fetchedSchedule.end.date),
       title: fetchedSchedule.summary,
       color:
-        colorDict[
+        COLOR_DICT[
           Number(fetchedSchedule.colorId)
             ? Number(fetchedSchedule.colorId) - 1
             : 6
@@ -68,7 +68,7 @@ const scheduleFromFetchedData = (
       end: new Date(fetchedSchedule.end.dateTime),
       title: fetchedSchedule.summary,
       color:
-        colorDict[
+        COLOR_DICT[
           Number(fetchedSchedule.colorId)
             ? Number(fetchedSchedule.colorId) - 1
             : 6
