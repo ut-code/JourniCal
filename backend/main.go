@@ -29,7 +29,7 @@ func main() {
 		}))
 	}
 	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {
-		e.Static("/", "../frontend/dist")
+		e.Static("/", "./static")
 	}
 	router.Root(e.Group(""))
 	router.Api(e.Group("/api"))
