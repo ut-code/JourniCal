@@ -8,6 +8,7 @@ import { Schedule } from "../types/types";
 
 type ModeVariant = "schedule" | "day" | "3days" | "week";
 type FetchedSchedule = {
+  id: string;
   colorId?: string;
   start: {
     date?: string;
@@ -44,6 +45,7 @@ const scheduleFromFetchedData = (
     fetchedSchedule.end.date != undefined
   ) {
     return {
+      id: fetchedSchedule.id,
       isAllDay: true,
       start: new Date(fetchedSchedule.start.date),
       end: new Date(fetchedSchedule.end.date),
@@ -63,6 +65,7 @@ const scheduleFromFetchedData = (
     fetchedSchedule.end.date == undefined
   ) {
     return {
+      id: fetchedSchedule.id,
       isAllDay: false,
       start: new Date(fetchedSchedule.start.dateTime),
       end: new Date(fetchedSchedule.end.dateTime),
