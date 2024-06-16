@@ -41,7 +41,7 @@ func main() {
 	// GitHub CI 用
 	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {
 		go func() {
-			time.Sleep(15)
+			time.Sleep(15 * time.Second)
 			os.Exit(0)
 		}()
 	}
