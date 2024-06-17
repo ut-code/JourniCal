@@ -1,7 +1,18 @@
-# secrets
+# secret files
 credentials.json
 token.json
 .env
 
 # generated files
 backend
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
