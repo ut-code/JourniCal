@@ -1,8 +1,14 @@
 # docker compose for development
 
 services:
-  # FIXME: write frontend here
-  backend:
+  frontend: 
+    restart: always
+    build:
+      context: ./frontend/
+      dockerfile: ./Dockerfile
+    ports:
+      - "5173:5173"
+  backend: 
     build:
       context: ./backend/
       dockerfile: ./Dockerfile
