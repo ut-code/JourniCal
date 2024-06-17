@@ -74,8 +74,14 @@ docker run \
   journical-full
 ```
 
-## Style Guidelines as a reference
+## Guidelines
+
+### Style Guidelines
 
 - <https://google.github.io/styleguide/go/>
 - <https://google.github.io/styleguide/go/decisions>
 - <https://rakyll.org/style-packages/>
+
+### Project Layout Standard(s)
+
+- <https://github.com/golang-standards/project-layout/blob/master/README_ja.md>
