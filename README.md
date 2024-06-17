@@ -40,7 +40,7 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 
 - `backend/run-postgres-at-localhost.sh`
 - `cp -r ./frontend/dist ./backend/static`
-- `ECHO_SERVES_FRONTEND_TOO=true backend/JourniCalBackend`
+- `cd backend; ECHO_SERVES_FRONTEND_TOO=true ./backend`
 
 ## docker-compose
 
