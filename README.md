@@ -76,4 +76,6 @@ docker run \
 
 ## Style Guidelines as a reference
 
+- <https://google.github.io/styleguide/go/>
+- <https://google.github.io/styleguide/go/decisions>
 - <https://rakyll.org/style-packages/>
