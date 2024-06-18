@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 cd $(dirname -- $0)
+cd ..
 
 exit_code=0
 function assert_no_change () {

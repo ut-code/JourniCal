@@ -4,7 +4,9 @@ token.json
 .env
 
 # generated files
-backend
+/backend
+/dist/*
+!/dist/.gitkeep
 
 # Editor directories and files
 .vscode/*
