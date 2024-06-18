@@ -1,6 +1,7 @@
 # secret files
 credentials.json
 token.json
+token.cookie
 .env
 
 # generated files
