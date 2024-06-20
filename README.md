@@ -40,7 +40,7 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 
 - `backend/run-postgres-at-localhost.sh`
 - `cp -r ./frontend/dist ./backend/static`
-- `ECHO_SERVES_FRONTEND_TOO=true backend/JourniCalBackend`
+- `cd backend; ECHO_SERVES_FRONTEND_TOO=true ./backend`
 
 ## docker-compose
 
@@ -64,15 +64,24 @@ docker compose up --build
 ```sh
 docker build -f Dockerfile.prod -t journical-full .
 ```
+
 ### 実行
 
 ```sh
 docker run \
-  -e DSN=${DSN} \ # inherit DSN from its env
+  -e DSN \ # inherit DSN from its env
   -p ${PORT:-3000}:3000 \ # run at $PORT, default to 3000 if $PORT is not set
   journical-full
 ```
 
-## Style Guidelines as a reference
+## Guidelines
 
+### Style Guidelines
+
+- <https://google.github.io/styleguide/go/>
+- <https://google.github.io/styleguide/go/decisions>
 - <https://rakyll.org/style-packages/>
+
+### Project Layout Standard(s)
+
+- <https://github.com/golang-standards/project-layout/blob/master/README_ja.md>

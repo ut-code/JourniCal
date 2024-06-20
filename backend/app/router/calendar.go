@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/ut-code/JourniCal/backend/calendar"
+	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"net/http"
 	"strconv"
 	"time"

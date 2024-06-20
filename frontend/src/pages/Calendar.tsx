@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import TimelineView from "../components/TimelineVIew";
+import TimelineView from "../components/TimelineView";
 import { add, sub } from "date-fns";
 import { Box, Button, MenuItem, Select } from "@mui/material";
 import TopBar from "../components/TopBar";
@@ -132,7 +132,6 @@ const Calendar: React.FC = () => {
         },
       );
       const data = await response.json();
-      console.log(data);
       // 一週間の予定を格納
       setWeekSchedules(
         data.map((schedule: FetchedSchedule) =>

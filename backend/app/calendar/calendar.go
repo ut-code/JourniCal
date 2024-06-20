@@ -8,7 +8,7 @@ import (
 
 	"context"
 
-	"github.com/ut-code/JourniCal/backend/helper"
+	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"

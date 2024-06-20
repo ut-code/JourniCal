@@ -8,6 +8,7 @@
 **/*README.*
 **/*.sample
 /static-check.sh
+/run-postgres-at-localhost.sh
 
 # local build results
 backend

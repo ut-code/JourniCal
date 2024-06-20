@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/ut-code/JourniCal/backend/diary"
+	"github.com/ut-code/JourniCal/backend/app/diary"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
