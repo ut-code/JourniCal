@@ -18,7 +18,7 @@ const ScheduleModal = (props: ScheduleModalProps): JSX.Element => {
         </Typography>
         <Typography>
           {/*  TODO: この辺の表記を違和感がないように修正 */}
-          {`${schedule.start.getMonth()}月${schedule.start.getDate()}日・`}
+          {`${schedule.start.getMonth() + 1}月${schedule.start.getDate()}日・`}
           {schedule.isAllDay
             ? "終日"
             : `${schedule.start.toLocaleTimeString([], {
