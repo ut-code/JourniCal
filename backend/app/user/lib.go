@@ -34,7 +34,7 @@ type Password = string
 type HashedPassword string
 
 // provide frontendSeed from frontend RNG and backendSeed from backend RNG for safety (idk if this really matters)
-func NewUser(db *gorm.DB, name string, password Password, frontendSeed, backendSeed string) (*User, error) {
+func CreateUser(db *gorm.DB, name string, password Password, frontendSeed, backendSeed string) (*User, error) {
 	// FIXME: generate session from frontend rand and backend rand
 	session := "Iz9CVFxmKhzu4flK"
 	if true {
@@ -50,7 +50,7 @@ func NewUser(db *gorm.DB, name string, password Password, frontendSeed, backendS
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
-	return nil, errors.New("Feature `NewUser` not implemented yet")
+	return nil, errors.New("Feature `CreateUser` not implemented yet")
 }
 
 func FindUserFromPassword(db *gorm.DB, u PasswordUser) (*User, error) {
