@@ -10,6 +10,7 @@ require (
 	golang.org/x/oauth2 v0.17.0
 	google.golang.org/api v0.169.0
 	gorm.io/driver/postgres v1.5.7
+	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.9
 )
 
@@ -35,6 +36,7 @@ require (
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.opencensus.io v0.24.0 // indirect

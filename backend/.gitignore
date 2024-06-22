@@ -8,6 +8,7 @@ token.cookie
 /backend
 /dist/*
 !/dist/.gitkeep
+/test.db
 
 # Editor directories and files
 .vscode/*
