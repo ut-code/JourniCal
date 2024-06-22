@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 )
 
 type hash struct {
@@ -12,11 +13,16 @@ type hash struct {
 }
 
 func SHA256(a ...any) (*hash, error) {
-	j, err := json.Marshal(a)
-	if err != nil {
-		return nil, err
+	v := []byte{}
+	for _, item := range a {
+		j, err := json.Marshal(item)
+		if err != nil {
+			return nil, err
+		}
+		v = append(v, j...)
 	}
-	b := sha256.Sum256(j)
+	fmt.Println(string(v))
+	b := sha256.Sum256(v)
 	return &hash{
 		b: b[:],
 	}, nil
