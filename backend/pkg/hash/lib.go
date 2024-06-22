@@ -6,26 +6,27 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 type hash struct {
 	b []byte
 }
 
-func SHA256(a ...any) (*hash, error) {
+func SHA256(a ...any) hash {
 	v := []byte{}
 	for _, item := range a {
 		j, err := json.Marshal(item)
 		if err != nil {
-			return nil, err
+			log.Fatalln("json.Marshal failed to be called on: ", item)
 		}
 		v = append(v, j...)
 	}
 	fmt.Println(string(v))
 	b := sha256.Sum256(v)
-	return &hash{
+	return hash{
 		b: b[:],
-	}, nil
+	}
 }
 
 func (h hash) Bytes() []byte {
