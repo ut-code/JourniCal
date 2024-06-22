@@ -2,6 +2,7 @@ package assertion
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"testing"
 )
@@ -47,8 +48,15 @@ func (a asserter) Nil(e error, m ...string) {
 		}, ""))
 	}
 }
+
 func (a asserter) NotNil(e error, m ...string) {
 	if e == nil {
 		a.Error(m...)
+	}
+}
+
+func (a asserter) PanicOn(e error) {
+	if e != nil {
+		log.Fatalln("PanicOn called with non-nil error: ", e)
 	}
 }
