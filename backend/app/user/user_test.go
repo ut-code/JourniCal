@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/ut-code/JourniCal/backend/app/user"
@@ -10,25 +11,30 @@ import (
 )
 
 func TestUser(t *testing.T) {
+	os.Remove("./test.db")
 	assert := assertion.New(t)
 
 	db, err := gorm.Open(sqlite.Open("./test.db"))
+	db.AutoMigrate(&user.User{})
 	assert.PanicOn(err)
 	randomValue := "123456789"
 
 	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue)
-	assert.Nil(err)
+	assert.PanicOn(err)
 	u2, err := user.FindUserFromPassword(db, "USERNAME", "password")
-	assert.Nil(err)
-	assert.Eq(u2.Name, "USERNAME")
+	assert.PanicOn(err)
+	assert.Eq(u2.Username, "USERNAME")
 	assert.Eq(u2.ID, u.ID)
 
-	u3, err := user.FindUserFromSession(db, user.SessionUser{
-		ID:      u.ID,
-		Name:    "USERNAME",
-		Session: u.Session,
+	_, err = user.FindUserFromPassword(db, "USERNAME", "password2")
+	assert.NotNil(err)
+
+	u4, err := user.FindUserFromSession(db, user.SessionUser{
+		ID:       u.ID,
+		Username: "USERNAME",
+		Session:  u.Session,
 	})
-	assert.Nil(err)
-	assert.Eq(u3.ID, u.ID)
-	assert.Eq(u3.Name, u.Name)
+	assert.PanicOn(err)
+	assert.Eq(u4.ID, u.ID)
+	assert.Eq(u4.Username, u.Username)
 }

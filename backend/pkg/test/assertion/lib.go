@@ -51,7 +51,7 @@ func (a asserter) Nil(e error, m ...string) {
 
 func (a asserter) NotNil(e error, m ...string) {
 	if e == nil {
-		a.Error(m...)
+		a.Error("Assert Not Nil failed; got nil", strings.Join(m, " "))
 	}
 }
 
