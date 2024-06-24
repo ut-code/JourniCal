@@ -58,10 +58,17 @@ func CreateUser(db *gorm.DB, username string, password Password, frontendSeed, b
 }
 
 func FindUserFromPassword(db *gorm.DB, username string, password Password) (*User, error) {
-	var findSalt User
-	err := db.Where("username = ?", username).Find(&findSalt).Error
+	// use advanced querying: SELECT salt FROM ...
+	// read https://gorm.io/ja_JP/docs/advanced_query.html for more.
+	var findSalt = struct {
+		Salt string
+	}{}
+	err := db.Model(&User{}).Where("username = ?", username).Find(&findSalt).Error
 	if err != nil {
 		return nil, err
+	}
+	if findSalt.Salt == "" {
+		return nil, errors.New("User not found in find salt step")
 	}
 	var dest = []User{}
 	hashedPassword := HashPassword(username, password, findSalt.Salt)
