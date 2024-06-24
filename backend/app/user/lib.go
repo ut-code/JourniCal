@@ -37,7 +37,7 @@ func CreateUser(db *gorm.DB, username string, password Password, frontendSeed, b
 	if err != nil {
 		return nil, err
 	}
-	if len(us) > 1 {
+	if len(us) >= 1 {
 		return nil, errors.New("User of same username already there")
 	}
 	session := hash.SHA256(frontendSeed, backendSeed).Hex()

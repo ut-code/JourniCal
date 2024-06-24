@@ -21,13 +21,16 @@ func TestUser(t *testing.T) {
 
 	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue)
 	helper.PanicIf(err)
+
+	_, err = user.CreateUser(db, "USERNAME", "different_password", randomValue, randomValue)
+	assert.Error(err, "Creating users with same username should return error.")
 	u2, err := user.FindUserFromPassword(db, "USERNAME", "password")
 	helper.PanicIf(err)
 	assert.Equal(u2.Username, "USERNAME")
 	assert.Equal(u2.ID, u.ID)
 
 	_, err = user.FindUserFromPassword(db, "USERNAME", "password2")
-	assert.NotNil(err)
+	assert.Error(err)
 
 	u4, err := user.FindUserFromSession(db, user.SessionUser{
 		ID:       u.ID,
