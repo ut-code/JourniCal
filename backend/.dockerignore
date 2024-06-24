@@ -9,7 +9,7 @@
 **/*.sample
 /static-check.sh
 /run-postgres-at-localhost.sh
-/test.db
+test.db
 
 # local build results
 backend
