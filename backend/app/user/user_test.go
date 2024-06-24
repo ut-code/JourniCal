@@ -24,6 +24,12 @@ func TestUser(t *testing.T) {
 
 	_, err = user.CreateUser(db, "USERNAME", "different_password", randomValue, randomValue)
 	assert.Error(err, "Creating users with same username should return error.")
+
+	// is it escaped?
+	uesc, err := user.CreateUser(db, "USERNAME2\"'; --", "hashedPassword", "random", randomValue)
+	uesc2, err := user.FindUserFromPassword(db, "USERNAME2\"'; --", "hashedPassword")
+	assert.Equal(uesc.ID, uesc2.ID)
+
 	u2, err := user.FindUserFromPassword(db, "USERNAME", "password")
 	helper.PanicIf(err)
 	assert.Equal(u2.Username, "USERNAME")
