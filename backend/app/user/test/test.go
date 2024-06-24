@@ -4,27 +4,27 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/ut-code/JourniCal/backend/app/user"
-	"github.com/ut-code/JourniCal/backend/pkg/test/assertion"
+	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func TestUser(t *testing.T) {
-	os.Remove("./test.db")
-	assert := assertion.New(t)
+	assert := assert.New(t)
 
 	db, err := gorm.Open(sqlite.Open("./test.db"))
 	db.AutoMigrate(&user.User{})
-	assert.PanicOn(err)
+	helper.PanicIf(err)
 	randomValue := "123456789"
 
 	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue)
-	assert.PanicOn(err)
+	helper.PanicIf(err)
 	u2, err := user.FindUserFromPassword(db, "USERNAME", "password")
-	assert.PanicOn(err)
-	assert.Eq(u2.Username, "USERNAME")
-	assert.Eq(u2.ID, u.ID)
+	helper.PanicIf(err)
+	assert.Equal(u2.Username, "USERNAME")
+	assert.Equal(u2.ID, u.ID)
 
 	_, err = user.FindUserFromPassword(db, "USERNAME", "password2")
 	assert.NotNil(err)
@@ -34,7 +34,9 @@ func TestUser(t *testing.T) {
 		Username: "USERNAME",
 		Session:  u.Session,
 	})
-	assert.PanicOn(err)
-	assert.Eq(u4.ID, u.ID)
-	assert.Eq(u4.Username, u.Username)
+	helper.PanicIf(err)
+	assert.Equal(u4.ID, u.ID)
+	assert.Equal(u4.Username, u.Username)
+
+	os.Remove("./test.db")
 }
