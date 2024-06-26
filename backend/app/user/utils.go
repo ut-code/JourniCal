@@ -8,11 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-const hour = 60 * 60
-const day = 24 * hour
-const week = 7 * day
-const month = 30 * day
-const year = 365 * day
+type inSeconds int
+
+const (
+	hour  inSeconds = 60 * 60
+	day             = 24 * hour
+	week            = 7 * day
+	month           = 30 * day
+	year            = 365 * day
+)
 
 func SessionFromContext(c echo.Context) (string, error) {
 	return Cookie(c, "session")
