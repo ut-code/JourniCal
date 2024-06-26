@@ -13,10 +13,11 @@ import (
 
 type Diary struct {
 	gorm.Model
-	Creator user.User `json:"creator"`
-	Date    time.Time `json:"date"` // Date of what?
-	Title   string    `json:"title"`
-	Content string    `json:"content"`
+	Creator   user.User `json:"creator" gorm:"foreignKey:CreatorID;references:ID"`
+	CreatorID int
+	Date      time.Time `json:"date"` // Date of what?
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
 }
 
 func GetAllDiariesOfUser(c echo.Context, db *gorm.DB) error {

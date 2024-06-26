@@ -11,12 +11,16 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
 	"github.com/ut-code/JourniCal/backend/app/router"
+	"github.com/ut-code/JourniCal/backend/app/user"
 )
 
 var e *echo.Echo
 
 func init() {
-	diaryDB := db.InitDB(&diary.Diary{})
+	diaryDB := db.InitDB(
+		&diary.Diary{},
+		&user.User{},
+	)
 	// Doc: https://echo.labstack.com/
 	e = echo.New()
 	// ミドルウェアを設定
