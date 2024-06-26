@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type inSeconds int
+type inSeconds = int
 
 const (
 	hour  inSeconds = 60 * 60
