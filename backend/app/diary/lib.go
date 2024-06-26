@@ -26,7 +26,7 @@ func GetAllDiariesOfUser(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Authentication error"})
 	}
 	diaries, err := GetAllDiariesOfUsername(db, u.Username)
-	if err := db.Find(&diaries).Error; err != nil {
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Database error"})
 	}
 	return c.JSON(http.StatusOK, diaries)
