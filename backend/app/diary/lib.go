@@ -19,19 +19,20 @@ type Diary struct {
 	Content string    `json:"content"`
 }
 
-func GetAllDiariesOfSession(c echo.Context, db *gorm.DB) error {
+func GetAllDiariesOfUser(c echo.Context, db *gorm.DB) error {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Authentication error"})
 	}
-	diaries, err := GetAllDiariesOfUser(db, u.Username)
+	diaries, err := GetAllDiariesOfUsername(db, u.Username)
 	if err := db.Find(&diaries).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Database error"})
 	}
 	return c.JSON(http.StatusOK, diaries)
 }
 
-func GetAllDiariesOfUser(db *gorm.DB, creator string) ([]Diary, error) {
+// UNSAFE. the username is not validated here.
+func GetAllDiariesOfUsername(db *gorm.DB, creator string) ([]Diary, error) {
 	diaries := []Diary{}
 	if err := db.Where("creator = ?", creator).Find(&diaries).Error; err != nil {
 		return nil, errors.New("Database error: failed to get diaries of a user")

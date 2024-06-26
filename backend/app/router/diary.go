@@ -9,7 +9,7 @@ import (
 
 func Diary(g *echo.Group, db *gorm.DB) {
 	g.GET("/", func(c echo.Context) error {
-		return diary.GetAllDiaries(c, db)
+		return diary.GetAllDiariesOfUser(c, db)
 	})
 
 	g.GET("/:id", func(c echo.Context) error {
