@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 
+	"github.com/labstack/echo/v4"
 	"github.com/ut-code/JourniCal/backend/pkg/hash"
 	"github.com/ut-code/JourniCal/backend/pkg/random"
 	"gorm.io/gorm"

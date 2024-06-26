@@ -1,27 +1,42 @@
 package diary
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ut-code/JourniCal/backend/app/user"
 	"gorm.io/gorm"
 )
 
 type Diary struct {
 	gorm.Model
+	Creator user.User `json:"creator"`
 	Date    time.Time `json:"date"` // Date of what?
 	Title   string    `json:"title"`
 	Content string    `json:"content"`
 }
 
-func GetAllDiaries(c echo.Context, db *gorm.DB) error {
-	diaries := []Diary{}
+func GetAllDiariesOfSession(c echo.Context, db *gorm.DB) error {
+	u, err := user.FromEchoContext(db, c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Authentication error"})
+	}
+	diaries, err := GetAllDiariesOfUser(db, u.Username)
 	if err := db.Find(&diaries).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Database error"})
 	}
 	return c.JSON(http.StatusOK, diaries)
+}
+
+func GetAllDiariesOfUser(db *gorm.DB, creator string) ([]Diary, error) {
+	diaries := []Diary{}
+	if err := db.Where("creator = ?", creator).Find(&diaries).Error; err != nil {
+		return nil, errors.New("Database error: failed to get diaries of a user")
+	}
+	return diaries, nil
 }
 
 func GetDiaryByID(c echo.Context, db *gorm.DB) error {
