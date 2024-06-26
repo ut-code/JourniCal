@@ -56,6 +56,7 @@ func SessionUserFromCookie(c echo.Context) (*SessionUser, error) {
 	}, nil
 }
 
+// don't just read from cookie username, instead use this.
 func FromEchoContext(db *gorm.DB, c echo.Context) (*User, error) {
 	su, err := SessionUserFromCookie(c)
 	if err != nil {
