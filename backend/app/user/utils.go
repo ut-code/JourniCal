@@ -3,7 +3,6 @@ package user
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
