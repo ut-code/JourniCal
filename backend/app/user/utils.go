@@ -46,11 +46,11 @@ func SessionUserFromCookie(c echo.Context) (*SessionUser, error) {
 		return nil, err
 	}
 	id, err := strconv.Atoi(idString)
-	if err != nil {
+	if err != nil || id < 0 {
 		return nil, err
 	}
 	return &SessionUser{
-		ID:       id,
+		ID:       uint(id),
 		Username: username,
 		Session:  session,
 	}, nil

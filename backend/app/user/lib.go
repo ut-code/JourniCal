@@ -12,7 +12,7 @@ import (
 // DO NOT SEND THIS TO FRONDEND
 type User struct {
 	gorm.Model
-	ID             int            `json:"id"`
+	ID             uint           `json:"id"`
 	Username       string         `json:"name"`
 	HashedPassword HashedPassword `json:"hashedPassword"`
 	Salt           string         `json:"salt"`
@@ -22,7 +22,7 @@ type User struct {
 
 // data type for passing to/from frontend
 type SessionUser struct {
-	ID       int    `json:"id"`
+	ID       uint   `json:"id"`
 	Username string `json:"name"`
 	Session  string `json:"session"`
 }
