@@ -21,17 +21,18 @@ type Diary struct {
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 }
+type HTTPStatus = int
 
-func GetAllDiariesOfUser(c echo.Context, db *gorm.DB) error {
+func GetAllDiariesOfUser(c echo.Context, db *gorm.DB) (HTTPStatus, []Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Authentication error"})
+		return http.StatusBadRequest, nil, errors.New("Authentication error")
 	}
 	diaries, err := UncheckedGetAllDiariesOfUserID(db, u.ID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Database error"})
+		return http.StatusInternalServerError, nil, errors.New("database error")
 	}
-	return c.JSON(http.StatusOK, diaries)
+	return 200, diaries, nil
 }
 
 // UNSAFE: the username is not validated here.
@@ -51,65 +52,65 @@ func UncheckedGetDiaryByID(db *gorm.DB, id int) (*Diary, error) {
 	return diary, nil
 }
 
-func GetDiaryByID(c echo.Context, db *gorm.DB) error {
+func GetDiaryByID(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Authentication error"})
+		return http.StatusBadRequest, nil, errors.New("Authentication error")
 	}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid id format"})
+		return http.StatusBadRequest, nil, errors.New("Invalid id format")
 	}
 	diary, err := UncheckedGetDiaryByID(db, id)
 	if diary.CreatorID != u.ID {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "This diary is not yours"})
+		return http.StatusNotFound, nil, errors.New("This diary is not yours")
 	}
-	return c.JSON(http.StatusOK, diary)
+	return http.StatusOK, diary, nil
 }
 
-func CreateDiary(c echo.Context, db *gorm.DB) error {
+func CreateDiary(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid user. consider creating new one."})
+		return http.StatusBadRequest, nil, errors.New("Invalid user. consider creating new one.")
 	}
 	diary := new(Diary)
 	// UNTESTED: I'm not sure how this works or how this should be done. Test this function.
 	diary.Creator = *u
 	if err := c.Bind(diary); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Failed to bind diary data"})
+		return http.StatusBadRequest, nil, errors.New("Failed to bind diary data")
 	}
 	if err := db.Create(diary).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to create diary"})
+		return http.StatusInternalServerError, nil, errors.New("Failed to create diary")
 	}
-	return c.JSON(http.StatusCreated, diary)
+	return http.StatusCreated, diary, nil
 }
 
-func UpdateDiary(c echo.Context, db *gorm.DB) error {
+func UpdateDiary(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid user. create new one"})
+		return http.StatusBadRequest, nil, errors.New("Invalid user. create new one")
 	}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id < 0 {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid formating of id or negative value"})
+		return http.StatusBadRequest, nil, errors.New("Invalid formating of id or negative value")
 	}
 	diary, err := UncheckedGetDiaryByID(db, id)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "not found"})
+		return http.StatusNotFound, nil, errors.New("not found")
 	}
 	if diary.CreatorID != u.ID {
-		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "You don't own this diary"})
+		return http.StatusUnauthorized, nil, errors.New("You don't own this diary")
 	}
 
 	var newDiary Diary
 	if err := c.Bind(&newDiary); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Failde to bind diary"})
+		return http.StatusBadRequest, nil, errors.New("Failde to bind diary")
 	}
 	err = UncheckedUpdateDiary(db, uint(id), newDiary)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to update diary"})
+		return http.StatusInternalServerError, nil, errors.New("Failed to update diary")
 	}
-	return c.JSON(http.StatusOK, diary)
+	return http.StatusOK, diary, nil
 }
 
 func UncheckedUpdateDiary(db *gorm.DB, id uint, newDiary Diary) error {
@@ -126,24 +127,24 @@ func UncheckedUpdateDiary(db *gorm.DB, id uint, newDiary Diary) error {
 	return nil
 }
 
-func DeleteDiary(c echo.Context, db *gorm.DB) error {
+func DeleteDiary(c echo.Context, db *gorm.DB) (HTTPStatus, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Authentication error: user not found"})
+		return http.StatusBadRequest, errors.New("Authentication error: user not found")
 	}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid diary ID"})
+		return http.StatusBadRequest, errors.New("Invalid diary ID")
 	}
 	diary := &Diary{}
 	if err := db.First(diary, id).Error; err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "Diary not found"})
+		return http.StatusNotFound, errors.New("Diary not found")
 	}
 	if diary.CreatorID != u.ID {
-		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "You don't own this diary"})
+		return http.StatusUnauthorized, errors.New("You don't own this diary")
 	}
 	if err := db.Delete(diary).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to delete diary"})
+		return http.StatusInternalServerError, errors.New("Failed to delete diary")
 	}
-	return c.NoContent(http.StatusNoContent)
+	return http.StatusNoContent, nil
 }
