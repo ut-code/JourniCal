@@ -16,11 +16,11 @@ func TestUser(t *testing.T) {
 
 	db, err := gorm.Open(sqlite.Open("./test.db"))
 	db.AutoMigrate(&user.User{})
-	helper.PanicIf(err)
+	helper.PanicOn(err)
 	randomValue := "123456789"
 
 	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue)
-	helper.PanicIf(err)
+	helper.PanicOn(err)
 
 	_, err = user.CreateUser(db, "USERNAME", "different_password", randomValue, randomValue)
 	assert.Error(err, "Creating users with same username should return error.")
@@ -31,7 +31,7 @@ func TestUser(t *testing.T) {
 	assert.Equal(uesc.ID, uesc2.ID)
 
 	u2, err := user.FindUserFromPassword(db, "USERNAME", "password")
-	helper.PanicIf(err)
+	helper.PanicOn(err)
 	assert.Equal(u2.Username, "USERNAME")
 	assert.Equal(u2.ID, u.ID)
 
@@ -43,7 +43,7 @@ func TestUser(t *testing.T) {
 		Username: "USERNAME",
 		Session:  u.Session,
 	})
-	helper.PanicIf(err)
+	helper.PanicOn(err)
 	assert.Equal(u4.ID, u.ID)
 	assert.Equal(u4.Username, u.Username)
 

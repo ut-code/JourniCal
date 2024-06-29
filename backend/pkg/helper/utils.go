@@ -23,9 +23,16 @@ func ErrorLog(err error, msgs ...string) {
 	}
 }
 
-func PanicIf(err error, msg ...string) {
+func PanicOn(err error, msg ...string) {
 	if err != nil {
-		message := "helper.PanicIf called on error: " + fmt.Sprint(err)
+		message := "helper.PanicOn called on error: " + fmt.Sprint(err)
+		message += strings.Join(msg, " ")
+		log.Fatalln(message)
+	}
+}
+func PanicIf(b bool, msg ...string) {
+	if b {
+		message := "helper.PanicIf called on true."
 		message += strings.Join(msg, " ")
 		log.Fatalln(message)
 	}

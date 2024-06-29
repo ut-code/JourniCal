@@ -9,7 +9,7 @@ import (
 
 func Diary(g *echo.Group, db *gorm.DB) {
 	g.GET("/", func(c echo.Context) error {
-		status, json, err := diary.GetAllDiariesOfUser(c, db)
+		status, json, err := diary.GetAllOfUser(c, db)
 		if err != nil {
 			return c.JSON(status, echo.Map{"error": err.Error()})
 		}
@@ -17,7 +17,7 @@ func Diary(g *echo.Group, db *gorm.DB) {
 	})
 
 	g.GET("/:id", func(c echo.Context) error {
-		status, diary, err := diary.GetDiaryByID(c, db)
+		status, diary, err := diary.Get(c, db)
 		if err != nil {
 			return c.JSON(status, echo.Map{"error": err.Error()})
 		}
@@ -25,7 +25,7 @@ func Diary(g *echo.Group, db *gorm.DB) {
 	})
 
 	g.POST("/", func(c echo.Context) error {
-		status, diary, err := diary.CreateDiary(c, db)
+		status, diary, err := diary.Create(c, db)
 		if err != nil {
 			return c.JSON(status, echo.Map{"error": err.Error()})
 		}
@@ -33,7 +33,7 @@ func Diary(g *echo.Group, db *gorm.DB) {
 	})
 
 	g.PUT("/:id", func(c echo.Context) error {
-		status, diary, err := diary.UpdateDiary(c, db)
+		status, diary, err := diary.Update(c, db)
 		if err != nil {
 			return c.JSON(status, echo.Map{"error": err.Error()})
 		}
@@ -41,7 +41,7 @@ func Diary(g *echo.Group, db *gorm.DB) {
 	})
 
 	g.DELETE("/:id", func(c echo.Context) error {
-		status, err := diary.DeleteDiary(c, db)
+		status, err := diary.Delete(c, db)
 		if err != nil {
 			return c.JSON(status, echo.Map{"error": err.Error()})
 		}

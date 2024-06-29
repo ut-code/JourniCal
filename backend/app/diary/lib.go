@@ -15,20 +15,20 @@ import (
 
 type Diary struct {
 	gorm.Model
-	Creator   user.User `json:"creator" gorm:"foreignKey:CreatorID;references:ID"`
-	CreatorID uint
+	ID        uint      `json:"id"`
+	CreatorID uint      `json:"creatorId"`
 	Date      time.Time `json:"date"` // Date of what?
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 }
 type HTTPStatus = int
 
-func GetAllDiariesOfUser(c echo.Context, db *gorm.DB) (HTTPStatus, []Diary, error) {
+func GetAllOfUser(c echo.Context, db *gorm.DB) (HTTPStatus, []Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
 		return http.StatusBadRequest, nil, errors.New("Authentication error")
 	}
-	diaries, err := UncheckedGetAllDiariesOfUserID(db, u.ID)
+	diaries, err := GetAllUnchecked(db, u.ID)
 	if err != nil {
 		return http.StatusInternalServerError, nil, errors.New("database error")
 	}
@@ -36,15 +36,15 @@ func GetAllDiariesOfUser(c echo.Context, db *gorm.DB) (HTTPStatus, []Diary, erro
 }
 
 // UNSAFE: the username is not validated here.
-func UncheckedGetAllDiariesOfUserID(db *gorm.DB, creatorId uint) ([]Diary, error) {
+func GetAllUnchecked(db *gorm.DB, creatorId uint) ([]Diary, error) {
 	diaries := []Diary{}
-	if err := db.Where("creatorId = ?", creatorId).Find(&diaries).Error; err != nil {
+	if err := db.Where("creator_id = ?", creatorId).Find(&diaries).Error; err != nil {
 		return nil, errors.New("Database error: failed to get diaries of a user")
 	}
 	return diaries, nil
 }
 
-func UncheckedGetDiaryByID(db *gorm.DB, id int) (*Diary, error) {
+func GetUnchecked(db *gorm.DB, id uint) (*Diary, error) {
 	diary := &Diary{}
 	if err := db.First(diary, id).Error; err != nil {
 		return nil, errors.New("not found")
@@ -52,40 +52,48 @@ func UncheckedGetDiaryByID(db *gorm.DB, id int) (*Diary, error) {
 	return diary, nil
 }
 
-func GetDiaryByID(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
+func Get(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
 		return http.StatusBadRequest, nil, errors.New("Authentication error")
 	}
 	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
+	if err != nil || id < 0 {
 		return http.StatusBadRequest, nil, errors.New("Invalid id format")
 	}
-	diary, err := UncheckedGetDiaryByID(db, id)
+	diary, err := GetUnchecked(db, uint(id))
 	if diary.CreatorID != u.ID {
 		return http.StatusNotFound, nil, errors.New("This diary is not yours")
 	}
 	return http.StatusOK, diary, nil
 }
 
-func CreateDiary(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
+func Create(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
 		return http.StatusBadRequest, nil, errors.New("Invalid user. consider creating new one.")
 	}
 	diary := new(Diary)
 	// UNTESTED: I'm not sure how this works or how this should be done. Test this function.
-	diary.Creator = *u
 	if err := c.Bind(diary); err != nil {
 		return http.StatusBadRequest, nil, errors.New("Failed to bind diary data")
 	}
-	if err := db.Create(diary).Error; err != nil {
-		return http.StatusInternalServerError, nil, errors.New("Failed to create diary")
+	diary.CreatorID = u.ID
+	err = CreateUnchecked(db, diary)
+	if err != nil {
+		return http.StatusInternalServerError, nil, err
 	}
 	return http.StatusCreated, diary, nil
 }
 
-func UpdateDiary(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
+func CreateUnchecked(db *gorm.DB, diary *Diary) error {
+	if err := db.Create(diary).Error; err != nil {
+		return errors.New("Database error: Failed to create diary")
+	}
+	return nil
+}
+
+func Update(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
 		return http.StatusBadRequest, nil, errors.New("Invalid user. create new one")
@@ -94,7 +102,7 @@ func UpdateDiary(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	if err != nil || id < 0 {
 		return http.StatusBadRequest, nil, errors.New("Invalid formating of id or negative value")
 	}
-	diary, err := UncheckedGetDiaryByID(db, id)
+	diary, err := GetUnchecked(db, uint(id))
 	if err != nil {
 		return http.StatusNotFound, nil, errors.New("not found")
 	}
@@ -106,14 +114,14 @@ func UpdateDiary(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	if err := c.Bind(&newDiary); err != nil {
 		return http.StatusBadRequest, nil, errors.New("Failde to bind diary")
 	}
-	err = UncheckedUpdateDiary(db, uint(id), newDiary)
+	err = UpdateUnchecked(db, uint(id), newDiary)
 	if err != nil {
 		return http.StatusInternalServerError, nil, errors.New("Failed to update diary")
 	}
 	return http.StatusOK, diary, nil
 }
 
-func UncheckedUpdateDiary(db *gorm.DB, id uint, newDiary Diary) error {
+func UpdateUnchecked(db *gorm.DB, id uint, newDiary Diary) error {
 	if id != newDiary.ID {
 		return errors.New("unmatched ID")
 	}
@@ -127,15 +135,16 @@ func UncheckedUpdateDiary(db *gorm.DB, id uint, newDiary Diary) error {
 	return nil
 }
 
-func DeleteDiary(c echo.Context, db *gorm.DB) (HTTPStatus, error) {
+func Delete(c echo.Context, db *gorm.DB) (HTTPStatus, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
 		return http.StatusBadRequest, errors.New("Authentication error: user not found")
 	}
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
+	intid, err := strconv.Atoi(c.Param("id"))
+	if err != nil || intid < 0 {
 		return http.StatusBadRequest, errors.New("Invalid diary ID")
 	}
+	id := uint(intid)
 	diary := &Diary{}
 	if err := db.First(diary, id).Error; err != nil {
 		return http.StatusNotFound, errors.New("Diary not found")
@@ -143,8 +152,12 @@ func DeleteDiary(c echo.Context, db *gorm.DB) (HTTPStatus, error) {
 	if diary.CreatorID != u.ID {
 		return http.StatusUnauthorized, errors.New("You don't own this diary")
 	}
-	if err := db.Delete(diary).Error; err != nil {
-		return http.StatusInternalServerError, errors.New("Failed to delete diary")
+	if err := DeleteUnchecked(db, id); err != nil {
+		return http.StatusInternalServerError, errors.New("Failed to delete diary: " + err.Error())
 	}
 	return http.StatusNoContent, nil
+}
+
+func DeleteUnchecked(db *gorm.DB, id uint) error {
+	return db.Delete(&Diary{}, `id = ?`, id).Error
 }
