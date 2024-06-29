@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"log"
 )
 
@@ -22,7 +21,6 @@ func SHA256(a ...any) hash {
 		}
 		v = append(v, j...)
 	}
-	fmt.Println(string(v))
 	b := sha256.Sum256(v)
 	return hash{
 		b: b[:],
