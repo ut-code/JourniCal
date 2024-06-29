@@ -17,7 +17,7 @@ import (
 var e *echo.Echo
 
 func init() {
-	diaryDB := db.InitDB(
+	db := db.InitDB(
 		&diary.Diary{},
 		&user.User{},
 	)
@@ -40,7 +40,7 @@ func init() {
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"))
 	router.Calendar(e.Group("/api/calendar"))
-	router.Diary(e.Group("/api/diaries"), diaryDB)
+	router.Diary(e.Group("/api/diaries"), db)
 
 	// GitHub CI 用
 	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {
