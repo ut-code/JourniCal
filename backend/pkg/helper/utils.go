@@ -2,6 +2,7 @@ package helper
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -19,6 +20,14 @@ func TODO(text ...string) {
 func ErrorLog(err error, msgs ...string) {
 	if err != nil {
 		log.Fatalln(": "+strings.Join(msgs, " "), err)
+	}
+}
+
+func PanicIf(err error, msg ...string) {
+	if err != nil {
+		message := "helper.PanicIf called on error: " + fmt.Sprint(err)
+		message += strings.Join(msg, " ")
+		log.Fatalln(message)
 	}
 }
 
