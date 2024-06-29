@@ -11,12 +11,16 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
 	"github.com/ut-code/JourniCal/backend/app/router"
+	"github.com/ut-code/JourniCal/backend/app/user"
 )
 
 var e *echo.Echo
 
 func init() {
-	diaryDB := db.InitDB(&diary.Diary{})
+	db := db.InitDB(
+		&diary.Diary{},
+		&user.User{},
+	)
 	// Doc: https://echo.labstack.com/
 	e = echo.New()
 	// ミドルウェアを設定
@@ -36,7 +40,7 @@ func init() {
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"))
 	router.Calendar(e.Group("/api/calendar"))
-	router.Diary(e.Group("/api/diaries"), diaryDB)
+	router.Diary(e.Group("/api/diaries"), db)
 
 	// GitHub CI 用
 	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {

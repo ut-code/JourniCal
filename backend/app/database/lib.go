@@ -30,10 +30,12 @@ func init() {
 	}
 }
 
-func InitDB(t any) *gorm.DB {
-	// migrate T to database
-	if err := db.AutoMigrate(t); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
+func InitDB(t ...any) *gorm.DB {
+	for _, v := range t {
+		// migrate T to database
+		if err := db.AutoMigrate(v); err != nil {
+			log.Fatalf("Failed to migrate database: %v", err)
+		}
 	}
 	return db
 }
