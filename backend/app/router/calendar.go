@@ -1,17 +1,20 @@
 package router
 
 import (
-	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/ut-code/JourniCal/backend/app/calendar"
+	"golang.org/x/oauth2"
+	"gorm.io/gorm"
+
 	"github.com/labstack/echo/v4"
 )
 
-func Calendar(g *echo.Group) {
+func Calendar(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
 	g.GET("/get-events-in-range/:start_unix/:end_unix", func(c echo.Context) error {
-		srv, err := calendar.SrvFromContext(c)
+		srv, err := calendar.SrvFromContext(db, conf, c)
 		if err != nil {
 			return err
 		}

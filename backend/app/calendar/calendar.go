@@ -18,7 +18,6 @@ import (
 var cfg *oauth2.Config
 var ctx context.Context
 var AuthURL string
-var TokenCache = helper.NewMap[string, oauth2.Token]()
 
 func init() {
 	ctx = context.Background()

@@ -1,14 +1,18 @@
 package router
 
 import (
+	"net/http"
+
+	"github.com/ut-code/JourniCal/backend/app/auth"
 	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
-	"net/http"
+	"golang.org/x/oauth2"
+	"gorm.io/gorm"
 
 	"github.com/labstack/echo/v4"
 )
 
-func Auth(g *echo.Group) {
+func Auth(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
 
 	g.GET("/new", func(c echo.Context) error {
 		c.Redirect(http.StatusFound, calendar.AuthURL)
@@ -16,7 +20,7 @@ func Auth(g *echo.Group) {
 	})
 
 	g.GET("/check", func(c echo.Context) error {
-		token, err := calendar.ReadToken(c)
+		token, err := auth.TokenFromContext(db, conf, c)
 		if err != nil {
 			c.String(200, "You are not authenticated. access /auth/new to authenticate.")
 		} else {
@@ -39,5 +43,4 @@ func Auth(g *echo.Group) {
 		c.Redirect(http.StatusFound, "/")
 		return nil
 	})
-
 }

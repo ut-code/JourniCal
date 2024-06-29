@@ -27,7 +27,7 @@ func init() {
 
 func TestBasicFunctionality(t *testing.T) {
 	rand := "RANDOM_VALUE"
-	u, err := user.CreateUser(db, "username", "password", rand, rand)
+	u, err := user.CreateUser(db, "username", "password", rand, rand, nil)
 	helper.PanicOn(err)
 	assert := assert.New(t)
 

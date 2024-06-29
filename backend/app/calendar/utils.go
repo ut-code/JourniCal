@@ -1,19 +1,20 @@
 package calendar
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ut-code/JourniCal/backend/app/auth"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
+	"gorm.io/gorm"
 )
 
-func SrvFromContext(c echo.Context) (*calendar.Service, error) {
-	token, err := ReadToken(c)
+func SrvFromContext(db *gorm.DB, conf *oauth2.Config, c echo.Context) (*calendar.Service, error) {
+	token, err := auth.TokenFromContext(db, conf, c)
 	if err != nil {
 		c.Redirect(http.StatusFound, AuthURL)
 		return nil, err
@@ -25,36 +26,6 @@ func SrvFromContext(c echo.Context) (*calendar.Service, error) {
 		return nil, err
 	}
 	return srv, nil
-}
-
-func ReadToken(c echo.Context) (*oauth2.Token, error) {
-	// maybe this should be stored in a database?
-	// reason: getting token from same code twice doesn't seem to be possible
-	var code string
-	{
-		cookie, err := c.Cookie("code")
-		if err != nil {
-			return nil, err
-		}
-		code, err = url.QueryUnescape(cookie.Value)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// read from cache here
-	if cachedToken, ok := TokenCache.Get(code); ok {
-		return &cachedToken, nil
-	}
-
-	token, err := cfg.Exchange(ctx, code)
-	if err != nil {
-		fmt.Println("Unable to retrieve token from web", err)
-		return nil, err
-	}
-	TokenCache.Set(code, *token)
-
-	return token, nil
 }
 
 func WriteAuthCodeToCookie(c echo.Context, code string) {

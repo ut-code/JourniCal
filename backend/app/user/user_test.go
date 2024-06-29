@@ -19,14 +19,14 @@ func TestUser(t *testing.T) {
 	helper.PanicOn(err)
 	randomValue := "123456789"
 
-	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue)
+	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue, nil)
 	helper.PanicOn(err)
 
-	_, err = user.CreateUser(db, "USERNAME", "different_password", randomValue, randomValue)
+	_, err = user.CreateUser(db, "USERNAME", "different_password", randomValue, randomValue, nil)
 	assert.Error(err, "Creating users with same username should return error.")
 
 	// is it escaped?
-	uesc, err := user.CreateUser(db, "USERNAME2\"'; --", "hashedPassword", "random", randomValue)
+	uesc, err := user.CreateUser(db, "USERNAME2\"'; --", "hashedPassword", "random", randomValue, nil)
 	uesc2, err := user.FindUserFromPassword(db, "USERNAME2\"'; --", "hashedPassword")
 	assert.Equal(uesc.ID, uesc2.ID)
 

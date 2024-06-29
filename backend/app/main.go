@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/oauth2"
 
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
@@ -21,6 +22,8 @@ func init() {
 		&diary.Diary{},
 		&user.User{},
 	)
+	conf := &oauth2.Config{} // FIXME: copy this from somewhere
+
 	// Doc: https://echo.labstack.com/
 	e = echo.New()
 	// ミドルウェアを設定
@@ -36,10 +39,10 @@ func init() {
 	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {
 		e.Static("/", "./static")
 	}
-	router.Root(e.Group(""))
+	router.Root(e.Group(""), db, conf)
 	router.Api(e.Group("/api"))
-	router.Auth(e.Group("/auth"))
-	router.Calendar(e.Group("/api/calendar"))
+	router.Auth(e.Group("/auth"), db, conf)
+	router.Calendar(e.Group("/api/calendar"), db, conf)
 	router.Diary(e.Group("/api/diaries"), db)
 
 	// GitHub CI 用
