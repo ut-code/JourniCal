@@ -1,10 +1,8 @@
 package user
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/labstack/echo/v4"
+	"github.com/ut-code/JourniCal/backend/pkg/cookie"
 	"gorm.io/gorm"
 )
 
@@ -18,42 +16,32 @@ const (
 	year            = 365 * day
 )
 
-func SessionFromContext(c echo.Context) (string, error) {
-	return Cookie(c, "session")
-}
-
-func Cookie(c echo.Context, name string) (string, error) {
-	cookie, err := c.Cookie(name)
-	if err != nil {
-		return "", err
-	}
-	return cookie.Value, nil
-}
-
 // session user this function returns is not always valid.
 // attackers can send whatever and this won't detect.
 func SessionUserFromCookie(c echo.Context) (*SessionUser, error) {
-	username, err := Cookie(c, "username")
+	username, err := cookie.Get(c, "username")
 	if err != nil {
 		return nil, err
 	}
-	session, err := Cookie(c, "session")
+	session, err := cookie.Get(c, "session")
 	if err != nil {
 		return nil, err
 	}
-	idString, err := Cookie(c, "id")
+	id, err := cookie.GetUint(c, "userid")
 	if err != nil {
-		return nil, err
-	}
-	id, err := strconv.Atoi(idString)
-	if err != nil || id < 0 {
 		return nil, err
 	}
 	return &SessionUser{
-		ID:       uint(id),
+		ID:       id,
 		Username: username,
 		Session:  session,
 	}, nil
+}
+
+func SaveSessionUserToCookie(c echo.Context, s *SessionUser) {
+	cookie.SetUint(c, "userid", s.ID)
+	cookie.Set(c, "username", s.Username)
+	cookie.Set(c, "session", s.Session)
 }
 
 // don't just read from cookie username, instead use this.
@@ -67,15 +55,4 @@ func FromEchoContext(db *gorm.DB, c echo.Context) (*User, error) {
 		return nil, err
 	}
 	return u, nil
-}
-
-func AddSessionCookieOnContext(c echo.Context, session string) {
-	cookie := http.Cookie{
-		Name:     "session",
-		Value:    session,
-		MaxAge:   1 * year,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
-	c.SetCookie(&cookie)
 }

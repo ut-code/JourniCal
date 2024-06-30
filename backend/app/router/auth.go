@@ -5,6 +5,7 @@ import (
 
 	"github.com/ut-code/JourniCal/backend/app/auth"
 	"github.com/ut-code/JourniCal/backend/app/calendar"
+	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
@@ -38,7 +39,18 @@ func Auth(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
 			return nil
 		}
 
-		calendar.WriteAuthCodeToCookie(c, code)
+		// assert: user has been defined before coming to this url
+		u, err := user.FromEchoContext(db, c)
+
+		token, err := auth.ExchangeToken(calendar.Config, code)
+		if err != nil {
+			c.String(http.StatusBadRequest, "bad authorization code")
+			return nil
+		}
+		err = auth.SaveToken(db, u, token)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "failed to save your token: "+err.Error())
+		}
 
 		c.Redirect(http.StatusFound, "/")
 		return nil

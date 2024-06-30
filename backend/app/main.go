@@ -42,6 +42,7 @@ func init() {
 	router.Root(e.Group(""), db, conf)
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"), db, conf)
+	router.User(e.Group("/api/user"), db)
 	router.Calendar(e.Group("/api/calendar"), db, conf)
 	router.Diary(e.Group("/api/diaries"), db)
 
