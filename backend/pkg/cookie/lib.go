@@ -48,6 +48,8 @@ func From(key, value string, age ...time.Duration) *http.Cookie {
 		maxAge = DefaultMaxAge
 	} else if len(age) == 1 {
 		maxAge = age[0]
+	} else {
+		log.Fatalln("Don't specify more than two ages, what are you doing???")
 	}
 	return &http.Cookie{
 		Name:     key,
