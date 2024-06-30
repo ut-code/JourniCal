@@ -15,7 +15,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-var cfg *oauth2.Config
+var Config *oauth2.Config
 var ctx context.Context
 var AuthURL string
 
@@ -25,8 +25,8 @@ func init() {
 		return
 	}
 
-	cfg = readCredentials()
-	AuthURL = cfg.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	Config = readCredentials()
+	AuthURL = Config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 }
 
 func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token) {
