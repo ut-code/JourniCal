@@ -14,7 +14,6 @@ import (
 
 type userId = uint
 
-// TODO: use this.
 var TokenCache = helper.NewMap[userId, *oauth2.Token]()
 
 // entrypoint. use this if you don't know what you should use.

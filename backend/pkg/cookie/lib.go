@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"log"
 )
 
 var DefaultMaxAge = MaxAgeMonth

@@ -1,9 +1,13 @@
 package auth_test
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ut-code/JourniCal/backend/app/auth"
@@ -19,12 +23,13 @@ import (
 ---
 README
 ---
-you need to have token.secret at somewhere to test this.
+you need to have token.json at somewhere to test this.
 TODO: write how to obtain it
 */
 
 var db *gorm.DB
 var config *oauth2.Config
+var token *oauth2.Token
 
 func init() {
 	os.Remove("./test.db")
@@ -35,14 +40,12 @@ func init() {
 	helper.PanicOn(err)
 
 	config = calendar.Config
+	token, err = readTestingToken()
+	helper.PanicOn(err)
 }
 
 func TestBasicFunctionality(t *testing.T) {
 	assert := assert.New(t)
-
-	// FIXME: get token from somewhere
-	token, err := readTestingToken()
-	helper.PanicOn(err)
 
 	// test RestoreUsersToken
 	seed := "random seed value"
@@ -50,21 +53,55 @@ func TestBasicFunctionality(t *testing.T) {
 	assert.Nil(err)
 
 	tok, err := auth.RestoreUsersToken(config, u)
-	assert.Nil(err)          // this is not nil for now
-	assert.True(tok.Valid()) // this is not valid now
+	assert.Nil(err)
+	assert.True(tok.Valid())
 
 	// test TokenFromContext is skipped because I can't provide echo.Context, and the only thing it uses echo.Context for is to get user from it
 }
 
 func readTestingToken() (*oauth2.Token, error) {
-	f, err := os.Open("./token.secret")
+	f, err := os.Open("./token.json")
 	if err != nil {
-		return nil, err
+		// there no token.json
+		token, err := obtainTestingToken()
+		if err != nil {
+			return nil, err
+		}
+		f, err := os.Create("./token.json")
+		if err != nil {
+			return nil, err
+		}
+		json.NewEncoder(f).Encode(token)
+		fmt.Println("run the test again.")
+		os.Exit(1)
 	}
+	defer f.Close()
 	var token oauth2.Token
 	err = json.NewDecoder(f).Decode(&token)
 	if err != nil {
 		return nil, err
 	}
 	return &token, nil
+}
+
+func obtainTestingToken() (*oauth2.Token, error) {
+	fmt.Println("Go to this link and click ok: ", calendar.AuthURL)
+	time.Sleep(10 * time.Second)
+	handler := handler{ch: make(chan string)}
+	go http.ListenAndServe(":3000", handler)
+
+	code := <-handler.ch
+	token, err := config.Exchange(context.Background(), code)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
+
+type handler struct{ ch chan string }
+
+func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.ch <- r.URL.Query().Get("code")
+	fmt.Fprintf(w, "accepted")
+	close(h.ch)
 }
