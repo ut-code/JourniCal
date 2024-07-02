@@ -15,6 +15,14 @@ function assert_no_change () {
 function start () {
   echo [Go tests] starting $1...
 }
+function assert_zero () {
+  if [ $1 == 0 ]; then
+    echo [Go tests] $2 passed
+  else
+    echo [Go tests] failed at: $2
+    exit_code=1
+  fi
+}
 
 start vet
 go vet ./...
@@ -26,20 +34,16 @@ assert_no_change fmt
 
 start staticcheck
 go run honnef.co/go/tools/cmd/staticcheck@latest ./...
-if [ $? == 0 ]; then
-  echo [Go tests] staticcheck passed.
-else
-  echo [Go tests] staticcheck failed.
-  exit_code=1
-fi
+assert_zero $? staticcheck
 
 start test
 go test -v ./pkg/...
+assert_zero $? test
 go test -v ./app/...
-assert_no_change test
+assert_zero $? test
 
 start build
 go build -n 2&>/dev/null
-assert_no_change build
+assert_zero $? build
 
 exit $exit_code
