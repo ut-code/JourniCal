@@ -15,8 +15,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-var AuthURL string
-
 func init() {
 	if os.Getenv("NO_CREDENTIALS_REQUIRED") == "true" {
 		return

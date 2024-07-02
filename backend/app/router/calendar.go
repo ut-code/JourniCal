@@ -12,9 +12,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Calendar(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
+func Calendar(g *echo.Group, db *gorm.DB, authURL string, conf *oauth2.Config) {
 	g.GET("/get-events-in-range/:start_unix/:end_unix", func(c echo.Context) error {
-		srv, err := calendar.SrvFromContext(db, conf, c)
+		srv, err := calendar.SrvFromContext(db, conf, authURL, c)
 		if err != nil {
 			return err
 		}

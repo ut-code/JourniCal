@@ -13,10 +13,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func SrvFromContext(db *gorm.DB, conf *oauth2.Config, c echo.Context) (*calendar.Service, error) {
+func SrvFromContext(db *gorm.DB, conf *oauth2.Config, authURL string, c echo.Context) (*calendar.Service, error) {
 	token, err := auth.TokenFromContext(db, conf, c)
 	if err != nil {
-		c.Redirect(http.StatusFound, AuthURL)
+		c.Redirect(http.StatusFound, authURL)
 		return nil, err
 	}
 	client := conf.Client(c.Request().Context(), token)

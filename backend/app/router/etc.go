@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/ut-code/JourniCal/backend/app/auth"
-	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 
@@ -12,12 +11,12 @@ import (
 )
 
 // TODO: make this function
-func Root(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
+func Root(g *echo.Group, db *gorm.DB, authURL string, conf *oauth2.Config) {
 
 	g.GET("/", func(c echo.Context) error {
 		_, err := auth.TokenFromContext(db, conf, c)
 		if err != nil {
-			c.Redirect(http.StatusFound, calendar.AuthURL)
+			c.Redirect(http.StatusFound, authURL)
 			return nil
 		}
 		c.File("./index.html")

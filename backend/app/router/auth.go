@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/ut-code/JourniCal/backend/app/auth"
-	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"golang.org/x/oauth2"
@@ -13,10 +12,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Auth(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
+func Auth(g *echo.Group, db *gorm.DB, authURL string, conf *oauth2.Config) {
 
 	g.GET("/new", func(c echo.Context) error {
-		return c.Redirect(http.StatusFound, calendar.AuthURL)
+		return c.Redirect(http.StatusFound, authURL)
 	})
 
 	g.GET("/check", func(c echo.Context) error {

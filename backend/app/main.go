@@ -43,11 +43,11 @@ func init() {
 	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {
 		e.Static("/", "./static")
 	}
-	router.Root(e.Group(""), db, conf)
+	router.Root(e.Group(""), db, AuthURL, conf)
 	router.Api(e.Group("/api"))
-	router.Auth(e.Group("/auth"), db, conf)
+	router.Auth(e.Group("/auth"), db, AuthURL, conf)
 	router.User(e.Group("/api/user"), db)
-	router.Calendar(e.Group("/api/calendar"), db, conf)
+	router.Calendar(e.Group("/api/calendar"), db, AuthURL, conf)
 	router.Diary(e.Group("/api/diaries"), db)
 
 	// GitHub CI 用
