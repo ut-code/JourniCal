@@ -3,13 +3,15 @@
 **/.github
 **/.gitignore
 **/.gitkeep
+/build/ci/
 
 # developers' files
 **/*README.*
 **/*.sample
-/static-check.sh
-/run-postgres-at-localhost.sh
+/scripts/
+/doc/
 test.db
 
 # local build results
-backend
+/backend
+/dist/
