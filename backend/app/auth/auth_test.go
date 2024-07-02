@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ut-code/JourniCal/backend/app/auth"
@@ -91,7 +90,6 @@ func readTestingToken() (*oauth2.Token, error) {
 
 func obtainTestingToken() (*oauth2.Token, error) {
 	fmt.Println("Go to this link and click ok: ", authURL)
-	time.Sleep(10 * time.Second)
 	handler := handler{ch: make(chan string)}
 	go http.ListenAndServe(":3000", handler)
 
