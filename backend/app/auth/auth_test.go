@@ -1,10 +1,7 @@
 package auth_test
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
-	"net/http"
 	"os"
 	"testing"
 
@@ -66,18 +63,6 @@ func TestBasicFunctionality(t *testing.T) {
 func readTestingToken() (*oauth2.Token, error) {
 	f, err := os.Open("./token.json")
 	if err != nil {
-		// there no token.json
-		token, err := obtainTestingToken()
-		if err != nil {
-			return nil, err
-		}
-		f, err := os.Create("./token.json")
-		if err != nil {
-			return nil, err
-		}
-		json.NewEncoder(f).Encode(token)
-		fmt.Println("run the test again.")
-		os.Exit(1)
 	}
 	defer f.Close()
 	var token oauth2.Token
@@ -86,25 +71,4 @@ func readTestingToken() (*oauth2.Token, error) {
 		return nil, err
 	}
 	return &token, nil
-}
-
-func obtainTestingToken() (*oauth2.Token, error) {
-	fmt.Println("Go to this link and click ok: ", authURL)
-	handler := handler{ch: make(chan string)}
-	go http.ListenAndServe(":3000", handler)
-
-	code := <-handler.ch
-	token, err := config.Exchange(context.Background(), code)
-	if err != nil {
-		return nil, err
-	}
-	return token, nil
-}
-
-type handler struct{ ch chan string }
-
-func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.ch <- r.URL.Query().Get("code")
-	fmt.Fprintf(w, "accepted")
-	close(h.ch)
 }
