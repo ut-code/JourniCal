@@ -26,7 +26,12 @@ assert_no_change fmt
 
 start staticcheck
 go run honnef.co/go/tools/cmd/staticcheck@latest ./...
-assert_no_change staticcheck
+if [ $? == 0 ]; then
+  echo [Go tests] staticcheck passed.
+else
+  echo [Go tests] staticcheck failed.
+  exit_code=1
+fi
 
 start test
 go test -v ./pkg/...
