@@ -15,18 +15,13 @@ import (
 	"google.golang.org/api/option"
 )
 
-var Config *oauth2.Config
-var ctx context.Context
 var AuthURL string
 
 func init() {
-	ctx = context.Background()
 	if os.Getenv("NO_CREDENTIALS_REQUIRED") == "true" {
 		return
 	}
 
-	Config = readCredentials()
-	AuthURL = Config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 }
 
 func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token) {
@@ -75,7 +70,7 @@ func prettyFormatEvent(e *calendar.Event) string {
 }
 
 // this operation halts the app if there is no credentials.json found.
-func readCredentials() *oauth2.Config {
+func ReadCredentials() *oauth2.Config {
 	bytes, err := os.ReadFile("credentials.json")
 	helper.ErrorLog(err, "Failed reading credentials.json")
 

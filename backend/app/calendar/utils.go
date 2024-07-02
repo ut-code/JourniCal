@@ -19,8 +19,8 @@ func SrvFromContext(db *gorm.DB, conf *oauth2.Config, c echo.Context) (*calendar
 		c.Redirect(http.StatusFound, AuthURL)
 		return nil, err
 	}
-	client := Config.Client(ctx, token)
-	srv, err := calendar.NewService(ctx, option.WithHTTPClient(client))
+	client := conf.Client(c.Request().Context(), token)
+	srv, err := calendar.NewService(c.Request().Context(), option.WithHTTPClient(client))
 	if err != nil {
 		c.String(500, "Internal Error: calendar.NewService failed")
 		return nil, err

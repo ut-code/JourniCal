@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/oauth2"
 
+	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
 	"github.com/ut-code/JourniCal/backend/app/router"
@@ -16,13 +17,16 @@ import (
 )
 
 var e *echo.Echo
+var conf *oauth2.Config
+var AuthURL string
 
 func init() {
 	db := db.InitDB(
 		&diary.Diary{},
 		&user.User{},
 	)
-	conf := &oauth2.Config{} // FIXME: copy this from somewhere
+	conf = calendar.ReadCredentials()
+	AuthURL = conf.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 
 	// Doc: https://echo.labstack.com/
 	e = echo.New()

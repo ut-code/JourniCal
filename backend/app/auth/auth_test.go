@@ -39,7 +39,7 @@ func init() {
 	err = db.AutoMigrate(&user.User{})
 	helper.PanicOn(err)
 
-	config = calendar.Config
+	config = calendar.ReadCredentials()
 	token, err = readTestingToken()
 	helper.PanicOn(err)
 }

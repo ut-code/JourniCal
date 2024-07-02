@@ -44,7 +44,7 @@ func Auth(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
 			c.String(http.StatusUnauthorized, "you haven't registered user yet")
 		}
 
-		token, err := auth.ExchangeToken(calendar.Config, code)
+		token, err := auth.ExchangeToken(conf, code)
 		if err != nil {
 			c.String(http.StatusBadRequest, "bad authorization code")
 			return nil
