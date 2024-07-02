@@ -6,16 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type inSeconds = int
-
-const (
-	hour  inSeconds = 60 * 60
-	day             = 24 * hour
-	week            = 7 * day
-	month           = 30 * day
-	year            = 365 * day
-)
-
 // session user this function returns is not always valid.
 // attackers can send whatever and this won't detect.
 func SessionUserFromCookie(c echo.Context) (*SessionUser, error) {

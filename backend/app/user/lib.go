@@ -43,7 +43,7 @@ func CreateUser(db *gorm.DB, username string, password Password, frontendSeed, b
 		return nil, err
 	}
 	if len(us) >= 1 {
-		return nil, errors.New("User of same username already there")
+		return nil, errors.New("user of same username already there")
 	}
 regen_session:
 	session := hash.SHA256(frontendSeed, backendSeed).Hex()
@@ -90,7 +90,7 @@ func FindUserFromPassword(db *gorm.DB, username string, password Password) (*Use
 		return nil, err
 	}
 	if findSalt.Salt == "" {
-		return nil, errors.New("User not found in find salt step")
+		return nil, errors.New("user not found in find salt step")
 	}
 	var dest = []User{}
 	hashedPassword := HashPassword(username, password, findSalt.Salt)
@@ -99,10 +99,10 @@ func FindUserFromPassword(db *gorm.DB, username string, password Password) (*Use
 		return nil, err
 	}
 	if len(dest) == 0 {
-		return nil, errors.New("User matching the username and password not found")
+		return nil, errors.New("user matching the username and password not found")
 	}
 	if len(dest) > 1 {
-		return nil, errors.New("More than 2 Users matching the and password found")
+		return nil, errors.New("more than 2 Users matching the and password found")
 	}
 	return &dest[0], err
 }

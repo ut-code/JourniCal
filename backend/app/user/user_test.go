@@ -27,7 +27,9 @@ func TestUser(t *testing.T) {
 
 	// is it escaped?
 	uesc, err := user.CreateUser(db, "USERNAME2\"'; --", "hashedPassword", "random", randomValue, nil)
+	assert.Nil(err)
 	uesc2, err := user.FindUserFromPassword(db, "USERNAME2\"'; --", "hashedPassword")
+	assert.Nil(err)
 	assert.Equal(uesc.ID, uesc2.ID)
 
 	u2, err := user.FindUserFromPassword(db, "USERNAME", "password")

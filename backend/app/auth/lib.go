@@ -41,7 +41,7 @@ func RestoreUsersToken(config *oauth2.Config, u *user.User) (*oauth2.Token, erro
 	}
 	config.Client(context.Background(), token)
 	if !token.Valid() {
-		return nil, errors.New("failed to revive token. blame google.oauth2, not us.")
+		return nil, errors.New("failed to revive token")
 	}
 	TokenCache.Set(u.ID, token)
 	return token, nil

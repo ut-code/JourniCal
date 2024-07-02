@@ -13,7 +13,7 @@ import (
 
 func init() {
 	go app.Serve(3000)
-	time.Sleep(1) // wait for the server to start
+	time.Sleep(1 * time.Second) // wait for the server to start
 }
 
 /* -------------------- */

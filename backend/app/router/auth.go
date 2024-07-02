@@ -16,8 +16,7 @@ import (
 func Auth(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
 
 	g.GET("/new", func(c echo.Context) error {
-		c.Redirect(http.StatusFound, calendar.AuthURL)
-		return nil
+		return c.Redirect(http.StatusFound, calendar.AuthURL)
 	})
 
 	g.GET("/check", func(c echo.Context) error {
@@ -41,6 +40,9 @@ func Auth(g *echo.Group, db *gorm.DB, conf *oauth2.Config) {
 
 		// assert: user has been defined before coming to this url
 		u, err := user.FromEchoContext(db, c)
+		if err != nil {
+			c.String(http.StatusUnauthorized, "you haven't registered user yet")
+		}
 
 		token, err := auth.ExchangeToken(calendar.Config, code)
 		if err != nil {
