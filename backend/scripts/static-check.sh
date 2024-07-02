@@ -44,7 +44,7 @@ assert_zero $? test
 # assert_zero $? test
 
 start build
-go build -n 2&>/dev/null
+go build -n 2>/dev/null
 assert_zero $? build
 
 exit $exit_code
