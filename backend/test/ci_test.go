@@ -27,7 +27,7 @@ func TestFull(t *testing.T) {
 	assert := assert.New(t)
 
 	// assert := assertion.New(t)
-	curl := curl.Init("./token.cookie")
+	curl := curl.WithCookie("./token.cookie")
 	curl.PrefixPath("localhost:3000")
 	local := time.Now().Local().Location()
 	var events []calendar.Event

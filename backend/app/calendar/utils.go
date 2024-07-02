@@ -19,7 +19,7 @@ func SrvFromContext(db *gorm.DB, conf *oauth2.Config, c echo.Context) (*calendar
 		c.Redirect(http.StatusFound, AuthURL)
 		return nil, err
 	}
-	client := cfg.Client(ctx, token)
+	client := Config.Client(ctx, token)
 	srv, err := calendar.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
 		c.String(500, "Internal Error: calendar.NewService failed")
@@ -28,6 +28,7 @@ func SrvFromContext(db *gorm.DB, conf *oauth2.Config, c echo.Context) (*calendar
 	return srv, nil
 }
 
+// unsafe; don't use this.
 func WriteAuthCodeToCookie(c echo.Context, code string) {
 	MaxAge := (24 * time.Hour).Seconds() // about 1 day.
 	c.SetCookie(&http.Cookie{

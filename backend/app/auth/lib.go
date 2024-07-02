@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ut-code/JourniCal/backend/app/user"
@@ -13,7 +14,6 @@ import (
 
 type userId = uint
 
-// TODO: use this.
 var TokenCache = helper.NewMap[userId, *oauth2.Token]()
 
 // entrypoint. use this if you don't know what you should use.
@@ -47,6 +47,23 @@ func RestoreUsersToken(config *oauth2.Config, u *user.User) (*oauth2.Token, erro
 	return token, nil
 }
 
+func ExchangeToken(config *oauth2.Config, code string) (*oauth2.Token, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	return config.Exchange(ctx, code)
+}
+
+func SaveToken(db *gorm.DB, u *user.User, token *oauth2.Token) error {
+	var user *user.User
+	err := db.Where("id = ?", u.ID).Find(&user).Error
+	if err != nil {
+		return err
+	}
+	SetToken(u, token)
+	return db.Save(user).Error
+}
+
 func RawToken(u *user.User) *oauth2.Token {
 	return &oauth2.Token{
 		AccessToken:  u.AccessToken,
@@ -54,6 +71,12 @@ func RawToken(u *user.User) *oauth2.Token {
 		TokenType:    u.TokenType,
 		Expiry:       u.TokenExpiry,
 	}
+}
+func SetToken(u *user.User, token *oauth2.Token) {
+	u.AccessToken = token.AccessToken
+	u.RefreshToken = token.RefreshToken
+	u.TokenType = token.TokenType
+	u.TokenExpiry = token.Expiry
 }
 
 func IsEmpty(t *oauth2.Token) bool {
