@@ -7,19 +7,15 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"golang.org/x/oauth2"
 
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
 	"github.com/ut-code/JourniCal/backend/app/env"
 	"github.com/ut-code/JourniCal/backend/app/router"
-	"github.com/ut-code/JourniCal/backend/app/secret"
 	"github.com/ut-code/JourniCal/backend/app/user"
 )
 
 var e *echo.Echo
-var conf *oauth2.Config = secret.OAuth2Config
-var authURL string = secret.AuthURL
 
 func init() {
 	db := db.InitDB(

@@ -2,12 +2,13 @@ package auth_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ut-code/JourniCal/backend/app/auth"
-	"github.com/ut-code/JourniCal/backend/app/calendar"
+	"github.com/ut-code/JourniCal/backend/app/secret"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	_ "github.com/ut-code/JourniCal/backend/pkg/tests/run-test-at-root"
@@ -39,7 +40,7 @@ func init() {
 	err = db.AutoMigrate(&user.User{})
 	helper.PanicOn(err)
 
-	config = calendar.ReadCredentials()
+	config = secret.OAuth2Config
 	authURL = config.AuthCodeURL("state-string", oauth2.AccessTypeOffline)
 	token, err = readTestingToken()
 	helper.PanicOn(err)

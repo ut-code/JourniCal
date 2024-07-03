@@ -11,7 +11,7 @@ import (
 func init() {
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Join(path.Dir(filename), "../../..")
-	fmt.Println("cd'ing to ", dir)
+	fmt.Println("running test at", dir)
 	err := os.Chdir(dir)
 	if err != nil {
 		log.Fatalln(err)

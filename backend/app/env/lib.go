@@ -13,6 +13,7 @@ var ECHO_SERVES_FRONTEND_TOO = false
 var ENABLE_CORS = false
 var CORS_ORIGIN string
 var HALT_AFTER_SUCCESS = false
+var DSN string
 
 func init() {
 	godotenv.Load()
@@ -32,6 +33,7 @@ func init() {
 		ENABLE_CORS = true
 		CORS_ORIGIN = corsOrigin
 	}
+	DSN = os.Getenv("DSN")
 
 	// GitHub Workflow 用
 	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {
