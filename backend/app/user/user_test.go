@@ -14,13 +14,19 @@ import (
 func TestUser(t *testing.T) {
 	assert := assert.New(t)
 
+	os.Remove("./test.db")
 	db, err := gorm.Open(sqlite.Open("./test.db"))
+	defer os.Remove("./test.db")
 	db.AutoMigrate(&user.User{})
 	helper.PanicOn(err)
 	randomValue := "123456789"
 
 	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue, nil)
 	helper.PanicOn(err)
+
+	// shouldn't panic with db == nil
+	_, err = user.CreateUser(nil, "TEST", "PAPSA", randomValue, "rand", nil)
+	assert.Nil(err)
 
 	_, err = user.CreateUser(db, "USERNAME", "different_password", randomValue, randomValue, nil)
 	assert.Error(err, "Creating users with same username should return error.")

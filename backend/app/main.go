@@ -28,8 +28,8 @@ func init() {
 	)
 	if !env.NO_CREDENTIALS_REQUIRED {
 		conf = calendar.ReadCredentials()
+		AuthURL = conf.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	}
-	AuthURL = conf.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 
 	// Doc: https://echo.labstack.com/
 	e = echo.New()
