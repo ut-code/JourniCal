@@ -12,6 +12,7 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
+	"github.com/ut-code/JourniCal/backend/app/env"
 	"github.com/ut-code/JourniCal/backend/app/router"
 	"github.com/ut-code/JourniCal/backend/app/user"
 )
@@ -25,7 +26,9 @@ func init() {
 		&diary.Diary{},
 		&user.User{},
 	)
-	conf = calendar.ReadCredentials()
+	if !env.NO_CREDENTIALS_REQUIRED {
+		conf = calendar.ReadCredentials()
+	}
 	AuthURL = conf.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 
 	// Doc: https://echo.labstack.com/

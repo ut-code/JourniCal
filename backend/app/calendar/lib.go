@@ -15,13 +15,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-func init() {
-	if os.Getenv("NO_CREDENTIALS_REQUIRED") == "true" {
-		return
-	}
-
-}
-
 func CalendarSample(ctx context.Context, config oauth2.Config, tok *oauth2.Token) {
 	client := config.Client(ctx, tok)
 
