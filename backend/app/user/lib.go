@@ -36,9 +36,14 @@ type HashedPassword string
 
 // provide frontendSeed from frontend RNG and backendSeed from backend RNG for safety (idk if this really matters)
 // provide token with nil to skip token initialization
+// provide db with nil to skip saving to db
 func CreateUser(db *gorm.DB, username string, password Password, frontendSeed, backendSeed string, token *oauth2.Token) (*User, error) {
+	var err error
 	us := []User{}
-	err := db.Where("username = ?", username).Find(&us).Error
+	if db == nil {
+		goto regen_session
+	}
+	err = db.Where("username = ?", username).Find(&us).Error
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +77,9 @@ regen_session:
 		TokenExpiry:    token.Expiry,
 	}
 	u.HashedPassword = HashPassword(username, password, salt)
+	if db == nil {
+		return &u, nil
+	}
 	tx := db.Create(&u)
 	if err := tx.Error; err != nil {
 		return nil, err
