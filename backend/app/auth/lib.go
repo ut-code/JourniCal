@@ -2,10 +2,13 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"os"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ut-code/JourniCal/backend/app/env"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"golang.org/x/oauth2"
@@ -15,6 +18,19 @@ import (
 type userId = uint
 
 var TokenCache = helper.NewMap[userId, *oauth2.Token]()
+var TokenFromJSON *oauth2.Token
+
+func init() {
+	if env.USE_TOKEN_JSON {
+		f, err := os.Open("./token.json")
+		helper.PanicOn(err)
+		err = json.NewDecoder(f).Decode(TokenFromJSON)
+		helper.PanicOn(err)
+		if env.STATIC_USER {
+			SetToken(user.StaticUser, TokenFromJSON)
+		}
+	}
+}
 
 // entrypoint. use this if you don't know what you should use.
 // this does not update user's token if it's expired, but don't care just generate it again
@@ -54,13 +70,13 @@ func ExchangeToken(config *oauth2.Config, code string) (*oauth2.Token, error) {
 	return config.Exchange(ctx, code)
 }
 
-func SaveToken(db *gorm.DB, u *user.User, token *oauth2.Token) error {
+func SaveToken(db *gorm.DB, uid uint, token *oauth2.Token) error {
 	var user *user.User
-	err := db.Where("id = ?", u.ID).Find(&user).Error
+	err := db.Where("id = ?", uid).Find(&user).Error
 	if err != nil {
 		return err
 	}
-	SetToken(u, token)
+	SetToken(user, token)
 	return db.Save(user).Error
 }
 

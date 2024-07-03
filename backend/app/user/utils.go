@@ -1,10 +1,31 @@
 package user
 
 import (
+	"os"
+
 	"github.com/labstack/echo/v4"
+	"github.com/ut-code/JourniCal/backend/app/env"
 	"github.com/ut-code/JourniCal/backend/pkg/cookie"
+	"github.com/ut-code/JourniCal/backend/pkg/helper"
+	"golang.org/x/oauth2"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
+var StaticUser *User
+var NilDB *gorm.DB
+
+func init() {
+	var err error
+	os.Remove("null.db")
+	NilDB, err = gorm.Open(sqlite.Open("null.db"))
+	helper.PanicOn(err)
+	if env.STATIC_USER {
+		var err error
+		StaticUser, err = CreateUser(NilDB, "test user", "test password", "random", "value", nil)
+		helper.PanicOn(err)
+	}
+}
 
 // session user this function returns is not always valid.
 // attackers can send whatever and this won't detect.

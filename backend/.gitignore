@@ -10,6 +10,9 @@ token.cookie
 !/dist/.gitkeep
 test.db
 
+# devenv
+null.db
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
