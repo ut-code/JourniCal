@@ -35,6 +35,9 @@ func init() {
 // entrypoint. use this if you don't know what you should use.
 // this does not update user's token if it's expired, but don't care just generate it again
 func TokenFromContext(db *gorm.DB, config *oauth2.Config, c echo.Context) (*oauth2.Token, error) {
+	if env.USE_TOKEN_JSON {
+		return TokenFromJSON, nil
+	}
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
 		return nil, err

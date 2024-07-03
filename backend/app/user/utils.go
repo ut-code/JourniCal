@@ -53,6 +53,9 @@ func (u *User) Save(c echo.Context) {
 
 // don't just read from cookie username, instead use this.
 func FromEchoContext(db *gorm.DB, c echo.Context) (*User, error) {
+	if env.STATIC_USER {
+		return StaticUser, nil
+	}
 	su, err := SessionUserFromCookie(c)
 	if err != nil {
 		return nil, err
