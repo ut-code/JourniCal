@@ -14,6 +14,7 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
+	_ "github.com/ut-code/JourniCal/backend/pkg/tests/run-test-at-root"
 	"golang.org/x/oauth2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -33,8 +34,10 @@ var token *oauth2.Token
 var authURL string
 
 func init() {
+	wd, err := os.Getwd()
+	helper.PanicOn(err)
+	fmt.Println("[auth test] working directory:", wd)
 	os.Remove("./test.db")
-	var err error
 	db, err = gorm.Open(sqlite.Open("./test.db"))
 	helper.PanicOn(err)
 	err = db.AutoMigrate(&user.User{})

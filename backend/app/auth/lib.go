@@ -18,7 +18,7 @@ import (
 type userId = uint
 
 var TokenCache = helper.NewMap[userId, *oauth2.Token]()
-var TokenFromJSON *oauth2.Token
+var TokenFromJSON = &oauth2.Token{}
 
 func init() {
 	if env.USE_TOKEN_JSON {
