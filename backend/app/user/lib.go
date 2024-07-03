@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"go/token"
 
 	"time"
 
@@ -40,7 +39,7 @@ type HashedPassword string
 // provide token with nil to skip token initialization
 // provide db with nil to skip saving to db
 // (or just use New() instead)
-func CreateUser(db *gorm.DB, username string, password Password, frontendSeed, backendSeed string, token *oauth2.Token) (*User, error) {
+func Create(db *gorm.DB, username string, password Password, frontendSeed, backendSeed string, token *oauth2.Token) (*User, error) {
 	if db == nil {
 		u := New(username, password, frontendSeed, backendSeed, token)
 		return &u, nil

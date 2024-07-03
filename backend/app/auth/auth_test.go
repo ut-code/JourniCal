@@ -53,7 +53,7 @@ func TestBasicFunctionality(t *testing.T) {
 
 	// test RestoreUsersToken
 	seed := "random seed value"
-	u, err := user.CreateUser(db, "username", "password_hashed_at_frontend", seed, seed, token)
+	u, err := user.Create(db, "username", "password_hashed_at_frontend", seed, seed, token)
 	assert.Nil(err)
 
 	tok, err := auth.RestoreUsersToken(config, u)

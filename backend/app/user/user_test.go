@@ -21,18 +21,18 @@ func TestUser(t *testing.T) {
 	helper.PanicOn(err)
 	randomValue := "123456789"
 
-	u, err := user.CreateUser(db, "USERNAME", "password", randomValue, randomValue, nil)
+	u, err := user.Create(db, "USERNAME", "password", randomValue, randomValue, nil)
 	helper.PanicOn(err)
 
 	// shouldn't panic with db == nil
-	_, err = user.CreateUser(nil, "TEST", "PAPSA", randomValue, "rand", nil)
+	_, err = user.Create(nil, "TEST", "PAPSA", randomValue, "rand", nil)
 	assert.Nil(err)
 
-	_, err = user.CreateUser(db, "USERNAME", "different_password", randomValue, randomValue, nil)
+	_, err = user.Create(db, "USERNAME", "different_password", randomValue, randomValue, nil)
 	assert.Error(err, "Creating users with same username should return error.")
 
 	// is it escaped?
-	uesc, err := user.CreateUser(db, "USERNAME2\"'; --", "hashedPassword", "random", randomValue, nil)
+	uesc, err := user.Create(db, "USERNAME2\"'; --", "hashedPassword", "random", randomValue, nil)
 	assert.Nil(err)
 	uesc2, err := user.FindUserFromPassword(db, "USERNAME2\"'; --", "hashedPassword")
 	assert.Nil(err)
