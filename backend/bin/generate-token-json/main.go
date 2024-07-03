@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ut-code/JourniCal/backend/app/calendar"
+	"github.com/ut-code/JourniCal/backend/app/secret"
 	"golang.org/x/oauth2"
 )
 
@@ -26,7 +26,7 @@ func main() {
 }
 
 func obtainTestingToken() (*oauth2.Token, error) {
-	config := calendar.ReadCredentials()
+	config := secret.OAuth2Config
 	authURL := config.AuthCodeURL("state-string", oauth2.AccessTypeOffline)
 	fmt.Println("Go to this link and click ok: ", authURL)
 	handler := handler{ch: make(chan string)}
