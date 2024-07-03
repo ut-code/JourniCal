@@ -19,6 +19,7 @@ func User(g *echo.Group, db *gorm.DB) {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
+		u.Save(c)
 		return c.JSON(http.StatusCreated, u)
 	})
 	g.GET("/debug/create/:username/:password", func(c echo.Context) error {
@@ -28,6 +29,7 @@ func User(g *echo.Group, db *gorm.DB) {
 		if err != nil {
 			return c.String(http.StatusOK, err.Error())
 		}
+		u.Save(c)
 		return c.JSON(http.StatusOK, u)
 	})
 	g.GET("/debug/whoami", func(c echo.Context) error {

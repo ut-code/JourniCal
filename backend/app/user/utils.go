@@ -34,6 +34,11 @@ func SaveSessionUserToCookie(c echo.Context, s *SessionUser) {
 	cookie.Set(c, "session", s.Session)
 }
 
+func (u *User) Save(c echo.Context) {
+	s := u.SessionUser()
+	SaveSessionUserToCookie(c, &s)
+}
+
 // don't just read from cookie username, instead use this.
 func FromEchoContext(db *gorm.DB, c echo.Context) (*User, error) {
 	su, err := SessionUserFromCookie(c)
