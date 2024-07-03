@@ -4,19 +4,19 @@ import (
 	"net/http"
 
 	"github.com/ut-code/JourniCal/backend/app/auth"
-	"golang.org/x/oauth2"
+	"github.com/ut-code/JourniCal/backend/app/secret"
 	"gorm.io/gorm"
 
 	"github.com/labstack/echo/v4"
 )
 
 // TODO: make this function
-func Root(g *echo.Group, db *gorm.DB, authURL string, conf *oauth2.Config) {
+func Root(g *echo.Group, db *gorm.DB) {
 
 	g.GET("/", func(c echo.Context) error {
-		_, err := auth.TokenFromContext(db, conf, c)
+		_, err := auth.TokenFromContext(db, secret.OAuth2Config, c)
 		if err != nil {
-			c.Redirect(http.StatusFound, authURL)
+			c.Redirect(http.StatusFound, secret.AuthURL)
 			return nil
 		}
 		c.File("./index.html")

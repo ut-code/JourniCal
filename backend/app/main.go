@@ -9,27 +9,23 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/oauth2"
 
-	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
 	"github.com/ut-code/JourniCal/backend/app/env"
 	"github.com/ut-code/JourniCal/backend/app/router"
+	"github.com/ut-code/JourniCal/backend/app/secret"
 	"github.com/ut-code/JourniCal/backend/app/user"
 )
 
 var e *echo.Echo
-var conf *oauth2.Config
-var AuthURL string
+var conf *oauth2.Config = secret.OAuth2Config
+var authURL string = secret.AuthURL
 
 func init() {
 	db := db.InitDB(
 		&diary.Diary{},
 		&user.User{},
 	)
-	if !env.NO_CREDENTIALS_REQUIRED {
-		conf = calendar.ReadCredentials()
-		AuthURL = conf.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	}
 
 	// Doc: https://echo.labstack.com/
 	e = echo.New()
@@ -37,24 +33,24 @@ func init() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	if cors_origin := os.Getenv("CORS_ORIGIN"); cors_origin != "" {
+	if env.ENABLE_CORS {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{cors_origin},
+			AllowOrigins:     []string{env.CORS_ORIGIN},
 			AllowCredentials: true,
 		}))
 	}
-	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {
+	if env.ECHO_SERVES_FRONTEND_TOO {
 		e.Static("/", "./static")
 	}
-	router.Root(e.Group(""), db, AuthURL, conf)
+	router.Root(e.Group(""), db)
 	router.Api(e.Group("/api"))
-	router.Auth(e.Group("/auth"), db, AuthURL, conf)
+	router.Auth(e.Group("/auth"), db)
 	router.User(e.Group("/api/user"), db)
-	router.Calendar(e.Group("/api/calendar"), db, AuthURL, conf)
+	router.Calendar(e.Group("/api/calendar"), db)
 	router.Diary(e.Group("/api/diaries"), db)
 
 	// GitHub CI 用
-	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {
+	if env.HALT_AFTER_SUCCESS {
 		go func() {
 			time.Sleep(15 * time.Second)
 			os.Exit(0)

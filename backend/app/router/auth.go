@@ -4,22 +4,22 @@ import (
 	"net/http"
 
 	"github.com/ut-code/JourniCal/backend/app/auth"
+	"github.com/ut-code/JourniCal/backend/app/secret"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
-	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 
 	"github.com/labstack/echo/v4"
 )
 
-func Auth(g *echo.Group, db *gorm.DB, authURL string, conf *oauth2.Config) {
+func Auth(g *echo.Group, db *gorm.DB) {
 
 	g.GET("/new", func(c echo.Context) error {
-		return c.Redirect(http.StatusFound, authURL)
+		return c.Redirect(http.StatusFound, secret.AuthURL)
 	})
 
 	g.GET("/check", func(c echo.Context) error {
-		token, err := auth.TokenFromContext(db, conf, c)
+		token, err := auth.TokenFromContext(db, secret.OAuth2Config, c)
 		if err != nil {
 			c.String(200, "You are not authenticated. access /auth/new to authenticate.")
 		} else {
@@ -43,7 +43,7 @@ func Auth(g *echo.Group, db *gorm.DB, authURL string, conf *oauth2.Config) {
 			c.String(http.StatusUnauthorized, "you haven't registered user yet")
 		}
 
-		token, err := auth.ExchangeToken(conf, code)
+		token, err := auth.ExchangeToken(secret.OAuth2Config, code)
 		if err != nil {
 			c.String(http.StatusBadRequest, "bad authorization code")
 			return nil

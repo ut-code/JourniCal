@@ -2,7 +2,6 @@ package calendar
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
@@ -58,17 +56,6 @@ func prettyFormatEvent(e *calendar.Event) string {
 		e.End.DateTime,
 		"attachments: " + strings.Join(attachments_urls, " , "),
 	}, "|")
-}
-
-// this operation halts the app if there is no credentials.json found.
-func ReadCredentials() *oauth2.Config {
-	bytes, err := os.ReadFile("credentials.json")
-	helper.ErrorLog(err, "Failed reading credentials.json")
-
-	cfg, err := google.ConfigFromJSON(bytes, calendar.CalendarScope)
-	helper.ErrorLog(err, "Unable to parse client secret file to config")
-
-	return cfg
 }
 
 type Timezone struct {

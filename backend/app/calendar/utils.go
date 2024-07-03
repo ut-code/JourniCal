@@ -7,13 +7,16 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/ut-code/JourniCal/backend/app/auth"
-	"golang.org/x/oauth2"
+	"github.com/ut-code/JourniCal/backend/app/secret"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 	"gorm.io/gorm"
 )
 
-func SrvFromContext(db *gorm.DB, conf *oauth2.Config, authURL string, c echo.Context) (*calendar.Service, error) {
+func SrvFromContext(db *gorm.DB, c echo.Context) (*calendar.Service, error) {
+	conf := secret.OAuth2Config
+	authURL := secret.AuthURL
+
 	token, err := auth.TokenFromContext(db, conf, c)
 	if err != nil {
 		c.Redirect(http.StatusFound, authURL)
