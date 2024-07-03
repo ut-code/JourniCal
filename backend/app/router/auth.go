@@ -48,7 +48,7 @@ func Auth(g *echo.Group, db *gorm.DB, authURL string, conf *oauth2.Config) {
 			c.String(http.StatusBadRequest, "bad authorization code")
 			return nil
 		}
-		err = auth.SaveToken(db, u, token)
+		err = auth.SaveToken(db, u.ID, token)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "failed to save your token: "+err.Error())
 		}
