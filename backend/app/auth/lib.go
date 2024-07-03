@@ -58,11 +58,13 @@ func RestoreUsersToken(config *oauth2.Config, u *user.User) (*oauth2.Token, erro
 	if IsEmpty(token) {
 		return nil, errors.New("cannot restore user's token: user doesn't have a token")
 	}
-	config.Client(context.Background(), token)
-	if !token.Valid() {
-		return nil, errors.New("failed to revive token")
-	}
-	TokenCache.Set(u.ID, token)
+	// apparently reviving token isn't possible
+	// hopefully we can revive this here in the future!
+	// config.Client(context.Background(), token) // this line no work
+	// if !token.Valid() {
+	// 	return nil, errors.New("failed to revive token")
+	// }
+	// TokenCache.Set(u.ID, token)
 	return token, nil
 }
 
