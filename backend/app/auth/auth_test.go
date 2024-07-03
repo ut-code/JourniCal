@@ -66,6 +66,7 @@ func TestBasicFunctionality(t *testing.T) {
 func readTestingToken() (*oauth2.Token, error) {
 	f, err := os.Open("./token.json")
 	if err != nil {
+		return nil, err
 	}
 	defer f.Close()
 	var token oauth2.Token
@@ -83,8 +84,5 @@ func isValid(token *oauth2.Token) bool {
 		return false
 	}
 	evs := cal.GetNEventsForward(srv, "primary", time.Now(), 10)
-	if len(evs) == 0 {
-		return false
-	}
-	return true
+	return len(evs) != 0
 }
