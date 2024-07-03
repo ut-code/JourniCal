@@ -7,7 +7,6 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/env"
 	"github.com/ut-code/JourniCal/backend/pkg/cookie"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
-	"golang.org/x/oauth2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
