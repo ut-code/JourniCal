@@ -33,7 +33,7 @@ func init() {
 				AccessToken:  env.TOKEN_ACCESS_TOKEN,
 				TokenType:    env.TOKEN_TOKEN_TYPE,
 				RefreshToken: env.TOKEN_REFRESH_TOKEN,
-				Expiry:       env.TOKEN_EXPIERY,
+				Expiry:       env.TOKEN_EXPIRY,
 			}
 		}
 		if env.STATIC_USER {

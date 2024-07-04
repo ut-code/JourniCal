@@ -27,7 +27,7 @@ var CREDENTIAL_REDIRECT_URLS [1]string
 var TOKEN_ACCESS_TOKEN string
 var TOKEN_TOKEN_TYPE string
 var TOKEN_REFRESH_TOKEN string
-var TOKEN_EXPIERY time.Time
+var TOKEN_EXPIRY time.Time
 
 func init() {
 	godotenv.Load()
@@ -65,11 +65,11 @@ func init() {
 	TOKEN_ACCESS_TOKEN = os.Getenv("TOKEN_ACCESS_TOKEN")
 	TOKEN_TOKEN_TYPE = os.Getenv("TOKEN_TOKEN_TYPE")
 	TOKEN_REFRESH_TOKEN = os.Getenv("TOKEN_REFRESH_TOKEN")
-	t, err := time.Parse(time.RFC3339, os.Getenv("TOKEN_EXPIERY"))
+	t, err := time.Parse(time.RFC3339, os.Getenv("TOKEN_EXPIRY"))
 	if err != nil {
 		return
 	}
-	TOKEN_EXPIERY = t
+	TOKEN_EXPIRY = t
 
 	// GitHub Workflow 用
 	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {
