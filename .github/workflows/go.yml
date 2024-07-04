@@ -27,3 +27,12 @@ jobs:
       - name: Run tests
         working-directory: ./backend/
         run: ./scripts/static-check.sh
+        env:
+          TOKEN_FROM_ENV: true
+          CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL: ${{secrets.CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL}}
+          CREDENTIAL_AUTH_URI: ${{secrets.CREDENTIAL_AUTH_URI}}
+          CREDENTIAL_CLIENT_ID: ${{secrets.CREDENTIAL_CLIENT_ID}}
+          CREDENTIAL_CLIENT_SECRET: ${{secrets.CREDENTIAL_CLIENT_SECRET}}
+          CREDENTIAL_PROJECT_ID: ${{secrets.CREDENTIAL_PROJECT_ID}}
+          CREDENTIAL_REDIRECT_URLS: ${{secrets.CREDENTIAL_REDIRECT_URLS}}
+          CREDENTIAL_TOKEN_URI: ${{secrets.CREDENTIAL_TOKEN_URI}}
