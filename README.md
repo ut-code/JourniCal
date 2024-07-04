@@ -14,6 +14,7 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 
 - backend/.env.sample を backend/.env にコピーする。
 - credentials.json を探してきて、 backend/credentials.json にコピーする。
+- token.json を探し、 backend/token.json にコピーする。または、 `go run backend/bin/generate-token-json` で token.json を取得する。
 
 ---
 

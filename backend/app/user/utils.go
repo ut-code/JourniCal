@@ -13,7 +13,7 @@ var StaticUser *User
 func init() {
 	if env.STATIC_USER {
 		var err error
-		StaticUser, err = CreateUser(nil, "test user", "test password", "random", "value", nil)
+		StaticUser, err = Create(nil, "test user", "test password", "random", "value", nil)
 		helper.PanicOn(err)
 	}
 }

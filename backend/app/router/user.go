@@ -15,7 +15,7 @@ func User(g *echo.Group, db *gorm.DB) {
 		password := c.Param("password")
 		frontendSeed := c.Param("frontendSeed")
 		backendSeed := random.String(32)
-		u, err := user.CreateUser(db, username, password, frontendSeed, backendSeed, nil)
+		u, err := user.Create(db, username, password, frontendSeed, backendSeed, nil)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
@@ -25,7 +25,7 @@ func User(g *echo.Group, db *gorm.DB) {
 	g.GET("/debug/create/:username/:password", func(c echo.Context) error {
 		username := c.Param("username")
 		password := c.Param("password")
-		u, err := user.CreateUser(db, username, password, "random", "value", nil)
+		u, err := user.Create(db, username, password, "random", "value", nil)
 		if err != nil {
 			return c.String(http.StatusOK, err.Error())
 		}
