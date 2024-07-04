@@ -39,11 +39,20 @@ func init() {
 		AuthURL = OAuth2Config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	}
 	if env.USE_TOKEN_JSON {
-		TokenFromJSON = new(oauth2.Token)
-		f, err := os.Open("./token.json")
-		helper.ErrorLog(err)
-		err = json.NewDecoder(f).Decode(TokenFromJSON)
-		helper.ErrorLog(err)
+		if !env.TOKEN_FROM_ENV {
+			TokenFromJSON = new(oauth2.Token)
+			f, err := os.Open("./token.json")
+			helper.ErrorLog(err)
+			err = json.NewDecoder(f).Decode(TokenFromJSON)
+			helper.ErrorLog(err)
+		} else {
+			TokenFromJSON = &oauth2.Token{
+				AccessToken:  env.TOKEN_ACCESS_TOKEN,
+				TokenType:    env.TOKEN_TOKEN_TYPE,
+				RefreshToken: env.TOKEN_REFRESH_TOKEN,
+				Expiry:       env.TOKEN_EXPIERY,
+			}
+		}
 	}
 }
 

@@ -22,10 +22,20 @@ var TokenFromJSON = &oauth2.Token{}
 
 func init() {
 	if env.USE_TOKEN_JSON {
-		f, err := os.Open("./token.json")
-		helper.PanicOn(err)
-		err = json.NewDecoder(f).Decode(TokenFromJSON)
-		helper.PanicOn(err)
+		if !env.TOKEN_FROM_ENV {
+			TokenFromJSON = new(oauth2.Token)
+			f, err := os.Open("./token.json")
+			helper.ErrorLog(err)
+			err = json.NewDecoder(f).Decode(TokenFromJSON)
+			helper.ErrorLog(err)
+		} else {
+			TokenFromJSON = &oauth2.Token{
+				AccessToken:  env.TOKEN_ACCESS_TOKEN,
+				TokenType:    env.TOKEN_TOKEN_TYPE,
+				RefreshToken: env.TOKEN_REFRESH_TOKEN,
+				Expiry:       env.TOKEN_EXPIERY,
+			}
+		}
 		if env.STATIC_USER {
 			SetToken(user.StaticUser, TokenFromJSON)
 		}

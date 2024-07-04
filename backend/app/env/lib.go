@@ -2,6 +2,7 @@ package env
 
 import (
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -15,6 +16,7 @@ var CORS_ORIGIN string
 var HALT_AFTER_SUCCESS = false
 var DSN string
 var CREDENTIAL_FROM_ENV = false
+var TOKEN_FROM_ENV = false
 var CREDENTIAL_CLIENT_ID string
 var CREDENTIAL_PROJECT_ID string
 var CREDENTIAL_AUTH_URI string
@@ -22,6 +24,10 @@ var CREDENTIAL_TOKEN_URI string
 var CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL string
 var CREDENTIAL_CLIENT_SECRET string
 var CREDENTIAL_REDIRECT_URLS [1]string
+var TOKEN_ACCESS_TOKEN string
+var TOKEN_TOKEN_TYPE string
+var TOKEN_REFRESH_TOKEN string
+var TOKEN_EXPIERY time.Time
 
 func init() {
 	godotenv.Load()
@@ -45,6 +51,9 @@ func init() {
 	if os.Getenv("CREDENTIAL_FROM_ENV") == "true" {
 		CREDENTIAL_FROM_ENV = true
 	}
+	if os.Getenv("TOKEN_FROM_ENV") == "true" {
+		TOKEN_FROM_ENV = true
+	}
 	CREDENTIAL_CLIENT_ID = os.Getenv("CREDENTIAL_CLIENT_ID")
 	CREDENTIAL_PROJECT_ID = os.Getenv("CREDENTIAL_PROJECT_ID")
 	CREDENTIAL_AUTH_URI = os.Getenv("CREDENTIAL_AUTH_URI")
@@ -52,6 +61,15 @@ func init() {
 	CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL = os.Getenv("CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL")
 	CREDENTIAL_CLIENT_SECRET = os.Getenv("CREDENTIAL_CLIENT_SECRET")
 	CREDENTIAL_REDIRECT_URLS[0] = os.Getenv("CREDENTIAL_REDIRECT_URLS")
+
+	TOKEN_ACCESS_TOKEN = os.Getenv("TOKEN_ACCESS_TOKEN")
+	TOKEN_TOKEN_TYPE = os.Getenv("TOKEN_TOKEN_TYPE")
+	TOKEN_REFRESH_TOKEN = os.Getenv("TOKEN_REFRESH_TOKEN")
+	t, err := time.Parse(time.RFC3339, os.Getenv("TOKEN_EXPIERY"))
+	if err != nil {
+		return
+	}
+	TOKEN_EXPIERY = t
 
 	// GitHub Workflow 用
 	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {

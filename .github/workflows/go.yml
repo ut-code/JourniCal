@@ -29,6 +29,7 @@ jobs:
         run: ./scripts/static-check.sh
         env:
           CREDENTIAL_FROM_ENV: true
+          TOKEN_FROM_ENV: true
           CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL: ${{secrets.CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL}}
           CREDENTIAL_AUTH_URI: ${{secrets.CREDENTIAL_AUTH_URI}}
           CREDENTIAL_CLIENT_ID: ${{secrets.CREDENTIAL_CLIENT_ID}}
@@ -36,3 +37,7 @@ jobs:
           CREDENTIAL_PROJECT_ID: ${{secrets.CREDENTIAL_PROJECT_ID}}
           CREDENTIAL_REDIRECT_URLS: ${{secrets.CREDENTIAL_REDIRECT_URLS}}
           CREDENTIAL_TOKEN_URI: ${{secrets.CREDENTIAL_TOKEN_URI}}
+          TOKEN_ACCESS_TOKEN: ${{secrets.TOKEN_ACCESS_TOKEN}}
+          TOKEN_TOKEN_TYPE: ${{secrets.TOKEN_TOKEN_TYPE}}
+          TOKEN_REFRESH_TOKEN: ${{secrets.TOKEN_REFRESH_TOKEN}}
+          TOKEN_EXPIERY: ${{secrets.TOKEN_EXPIERY}}
