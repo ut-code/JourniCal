@@ -12,7 +12,7 @@ WORKDIR /usr/docker/JourniCal/backend/
 COPY backend/go.mod backend/go.sum .
 RUN --mount=type=cache,target=/go/pkg/mod/ go mod download
 COPY ./backend/ .
-RUN --mount=type=cache,target=/go/pkg/mod/ go build -o ./result .
+RUN --mount=type=cache,target=/go/pkg/mod/ go build -o ./result -ldflags="-s -w" -trimpath .
 
 # serve with minimal dependency
 FROM busybox as runtime
