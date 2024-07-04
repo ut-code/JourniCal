@@ -2,7 +2,6 @@ package auth_test
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"testing"
 	"time"
@@ -43,9 +42,8 @@ func init() {
 	helper.PanicOn(err)
 
 	config = secret.OAuth2Config
-	authURL = config.AuthCodeURL("state-string", oauth2.AccessTypeOffline)
-	token, err = readTestingToken()
-	helper.PanicOn(err)
+	authURL = secret.AuthURL
+	token = secret.TokenFromJSON
 }
 
 func TestBasicFunctionality(t *testing.T) {
@@ -61,20 +59,6 @@ func TestBasicFunctionality(t *testing.T) {
 	assert.True(isValid(tok))
 
 	// test TokenFromContext is skipped because I can't provide echo.Context, and the only thing it uses echo.Context for is to get user from it
-}
-
-func readTestingToken() (*oauth2.Token, error) {
-	f, err := os.Open("./token.json")
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	var token oauth2.Token
-	err = json.NewDecoder(f).Decode(&token)
-	if err != nil {
-		return nil, err
-	}
-	return &token, nil
 }
 
 func isValid(token *oauth2.Token) bool {
