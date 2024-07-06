@@ -4,7 +4,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/ut-code/JourniCal/backend/app/env"
 	"github.com/ut-code/JourniCal/backend/pkg/cookie"
-	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"gorm.io/gorm"
 )
 
@@ -12,9 +11,8 @@ var StaticUser *User
 
 func init() {
 	if env.STATIC_USER {
-		var err error
-		StaticUser, err = Create(nil, "test user", "test password", "random", "value", nil)
-		helper.PanicOn(err)
+		u := New("test user", "test password", "random", "value", nil)
+		StaticUser = &u
 	}
 }
 
