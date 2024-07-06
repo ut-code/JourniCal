@@ -24,9 +24,9 @@ func TestUser(t *testing.T) {
 	u, err := user.Create(db, "USERNAME", "password", randomValue, randomValue, nil)
 	helper.PanicOn(err)
 
-	// shouldn't panic with db == nil
-	_, err = user.Create(nil, "TEST", "PAPSA", randomValue, "rand", nil)
-	assert.Nil(err)
+	// test user.New
+	unew := user.New("TEST", "PAPSA", randomValue, "rand", nil)
+	assert.Equal(unew.Username, "TEST")
 
 	_, err = user.Create(db, "USERNAME", "different_password", randomValue, randomValue, nil)
 	assert.Error(err, "Creating users with same username should return error.")
