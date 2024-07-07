@@ -83,7 +83,7 @@ func init() {
 	EmptyCheck(TOKEN_REFRESH_TOKEN)
 	t, err := time.Parse(time.RFC3339, os.Getenv("TOKEN_EXPIRY"))
 	if err != nil {
-		return
+		panic("Invalid TOKEN_EXPIRY formatting")
 	}
 	TOKEN_EXPIRY = t
 
