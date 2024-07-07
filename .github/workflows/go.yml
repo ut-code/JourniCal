@@ -28,6 +28,7 @@ jobs:
         working-directory: ./backend/
         run: ./scripts/static-check.sh
         env:
+          USE_TOKEN_JSON: true
           CREDENTIAL_FROM_ENV: true
           TOKEN_FROM_ENV: true
           CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL: ${{secrets.CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL}}
