@@ -29,6 +29,12 @@ var TOKEN_TOKEN_TYPE string
 var TOKEN_REFRESH_TOKEN string
 var TOKEN_EXPIRY time.Time
 
+func EmptyCheck(variable string) {
+	if variable == "" {
+		panic("empty environment variable")
+	}
+}
+
 func init() {
 	godotenv.Load()
 	if os.Getenv("USE_TOKEN_JSON") == "true" {
@@ -55,16 +61,26 @@ func init() {
 		TOKEN_FROM_ENV = true
 	}
 	CREDENTIAL_CLIENT_ID = os.Getenv("CREDENTIAL_CLIENT_ID")
+	EmptyCheck(CREDENTIAL_CLIENT_ID)
 	CREDENTIAL_PROJECT_ID = os.Getenv("CREDENTIAL_PROJECT_ID")
+	EmptyCheck(CREDENTIAL_PROJECT_ID)
 	CREDENTIAL_AUTH_URI = os.Getenv("CREDENTIAL_AUTH_URI")
+	EmptyCheck(CREDENTIAL_AUTH_URI)
 	CREDENTIAL_TOKEN_URI = os.Getenv("CREDENTIAL_TOKEN_URI")
+	EmptyCheck(CREDENTIAL_TOKEN_URI)
 	CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL = os.Getenv("CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL")
+	EmptyCheck(CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL)
 	CREDENTIAL_CLIENT_SECRET = os.Getenv("CREDENTIAL_CLIENT_SECRET")
+	EmptyCheck(CREDENTIAL_CLIENT_SECRET)
 	CREDENTIAL_REDIRECT_URLS[0] = os.Getenv("CREDENTIAL_REDIRECT_URLS")
+	EmptyCheck(CREDENTIAL_REDIRECT_URLS[0])
 
 	TOKEN_ACCESS_TOKEN = os.Getenv("TOKEN_ACCESS_TOKEN")
+	EmptyCheck(TOKEN_ACCESS_TOKEN)
 	TOKEN_TOKEN_TYPE = os.Getenv("TOKEN_TOKEN_TYPE")
+	EmptyCheck(TOKEN_TOKEN_TYPE)
 	TOKEN_REFRESH_TOKEN = os.Getenv("TOKEN_REFRESH_TOKEN")
+	EmptyCheck(TOKEN_REFRESH_TOKEN)
 	t, err := time.Parse(time.RFC3339, os.Getenv("TOKEN_EXPIRY"))
 	if err != nil {
 		return
