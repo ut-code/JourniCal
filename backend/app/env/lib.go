@@ -35,12 +35,6 @@ var TOKEN_TOKEN_TYPE string
 var TOKEN_REFRESH_TOKEN string
 var TOKEN_EXPIRY time.Time
 
-func EmptyCheck(variable string, message string) {
-	if variable == "" {
-		panic("empty environment variable: " + message)
-	}
-}
-
 func init() {
 	godotenv.Load()
 	if os.Getenv("USE_TOKEN_JSON") == "true" {
@@ -89,7 +83,7 @@ func init() {
 		HALT_AFTER_SUCCESS = true
 	}
 	if len(failedChecks) > 0 {
-		log.Fatalln(len(failedChecks), "checks failed, ", strings.Join(failedChecks, "; "))
+		log.Fatalln(len(failedChecks), "checks failed.\n- ", strings.Join(failedChecks, "- "))
 	}
 }
 
