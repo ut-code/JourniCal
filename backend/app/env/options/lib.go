@@ -71,8 +71,8 @@ func init() {
 
 	// validation
 
-	if STATIC_TOKEN && !STATIC_USER {
-		log.Fatalln("validation failed; STATIC_USER must be set true when using STATIC_TOKEN")
+	if STATIC_USER && !STATIC_TOKEN {
+		log.Fatalln("validation failed: STATIC_TOKEN must be set to true when using STATIC_USER")
 	}
 }
 
