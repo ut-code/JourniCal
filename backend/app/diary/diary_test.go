@@ -18,7 +18,7 @@ var db *gorm.DB
 
 func init() {
 	var err error
-	db, err = gorm.Open(sqlite.Open("./test/diary.db"))
+	db, err = gorm.Open(sqlite.Open(":memory:"))
 	helper.PanicOn(err)
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&diary.Diary{})

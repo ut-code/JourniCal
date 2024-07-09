@@ -14,7 +14,7 @@ import (
 func TestUser(t *testing.T) {
 	assert := assert.New(t)
 
-	db, err := gorm.Open(sqlite.Open("./user.db"))
+	db, err := gorm.Open(sqlite.Open(":memory:"))
 	helper.PanicOn(err)
 	helper.PanicOn(db.AutoMigrate(&user.User{}))
 	randomValue := "123456789"
