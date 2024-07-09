@@ -1,6 +1,7 @@
 package env
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/joho/godotenv"
 )
+
+var failedChecks []string
 
 var USE_TOKEN_JSON = false
 var STATIC_USER = false
@@ -85,6 +88,9 @@ func init() {
 	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {
 		HALT_AFTER_SUCCESS = true
 	}
+	if len(failedChecks) > 0 {
+		log.Fatalln(len(failedChecks), "checks failed, ", strings.Join(failedChecks, "; "))
+	}
 }
 
 // env must not be empty.
@@ -92,7 +98,8 @@ func init() {
 func someEnv(name string) string {
 	env := os.Getenv(name)
 	if env == "" {
-		log.Fatalln("Empty environment variable:", name)
+		message := fmt.Sprintln("Empty environment variable:", name)
+		failedChecks = append(failedChecks, message)
 	}
 	return env
 }
@@ -100,7 +107,8 @@ func someEnv(name string) string {
 func validURL(envName string) string {
 	env := someEnv(envName)
 	if _, err := url.Parse(env); err != nil {
-		log.Fatalln("Invalid url: ", envName, env)
+		message := fmt.Sprintln("Invalid url: ", envName, env)
+		failedChecks = append(failedChecks, message)
 	}
 	return env
 }
