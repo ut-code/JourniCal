@@ -39,9 +39,8 @@ assert_zero $? staticcheck
 start test
 go test -v ./pkg/...
 assert_zero $? test
-# FIXME: use secret files in CI s.t. this test works!!
-# go test -v ./app/...
-# assert_zero $? test
+go test -v ./app/...
+assert_zero $? test
 
 start build
 go build -n 2>/dev/null
