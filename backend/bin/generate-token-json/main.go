@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ut-code/JourniCal/backend/app/secret"
+	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"golang.org/x/oauth2"
 )
 

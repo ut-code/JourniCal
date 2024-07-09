@@ -1,12 +1,12 @@
 package user_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
+	_ "github.com/ut-code/JourniCal/backend/pkg/tests/run-test-at-root"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -14,9 +14,7 @@ import (
 func TestUser(t *testing.T) {
 	assert := assert.New(t)
 
-	os.Remove("./test.db")
 	db, err := gorm.Open(sqlite.Open("./test.db"))
-	defer os.Remove("./test.db")
 	db.AutoMigrate(&user.User{})
 	helper.PanicOn(err)
 	randomValue := "123456789"
@@ -54,6 +52,4 @@ func TestUser(t *testing.T) {
 	helper.PanicOn(err)
 	assert.Equal(u4.ID, u.ID)
 	assert.Equal(u4.Username, u.Username)
-
-	os.Remove("./test.db")
 }

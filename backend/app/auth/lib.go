@@ -1,14 +1,14 @@
+// this package is for binding oauth2.Token and user together.
 package auth
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"os"
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ut-code/JourniCal/backend/app/env"
+	"github.com/ut-code/JourniCal/backend/app/env/options"
+	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"golang.org/x/oauth2"
@@ -18,35 +18,12 @@ import (
 type userId = uint
 
 var TokenCache = helper.NewMap[userId, *oauth2.Token]()
-var TokenFromJSON = &oauth2.Token{}
-
-func init() {
-	if env.USE_TOKEN_JSON {
-		if !env.TOKEN_FROM_ENV {
-			TokenFromJSON = new(oauth2.Token)
-			f, err := os.Open("./token.json")
-			helper.ErrorLog(err)
-			err = json.NewDecoder(f).Decode(TokenFromJSON)
-			helper.ErrorLog(err)
-		} else {
-			TokenFromJSON = &oauth2.Token{
-				AccessToken:  env.TOKEN_ACCESS_TOKEN,
-				TokenType:    env.TOKEN_TOKEN_TYPE,
-				RefreshToken: env.TOKEN_REFRESH_TOKEN,
-				Expiry:       env.TOKEN_EXPIRY,
-			}
-		}
-		if env.STATIC_USER {
-			SetToken(user.StaticUser, TokenFromJSON)
-		}
-	}
-}
 
 // entrypoint. use this if you don't know what you should use.
 // this does not update user's token if it's expired, but don't care just generate it again
 func TokenFromContext(db *gorm.DB, config *oauth2.Config, c echo.Context) (*oauth2.Token, error) {
-	if env.USE_TOKEN_JSON {
-		return TokenFromJSON, nil
+	if options.STATIC_TOKEN {
+		return secret.StaticToken, nil
 	}
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
@@ -103,6 +80,7 @@ func RawToken(u *user.User) *oauth2.Token {
 		Expiry:       u.TokenExpiry,
 	}
 }
+
 func SetToken(u *user.User, token *oauth2.Token) {
 	u.AccessToken = token.AccessToken
 	u.RefreshToken = token.RefreshToken

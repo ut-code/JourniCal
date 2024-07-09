@@ -2,16 +2,22 @@ package user
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/ut-code/JourniCal/backend/app/env"
+	"github.com/ut-code/JourniCal/backend/app/env/options"
+	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"github.com/ut-code/JourniCal/backend/pkg/cookie"
+	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
 
 var StaticUser *User
 
 func init() {
-	if env.STATIC_USER {
-		u := New("test user", "test password", "random", "value", nil)
+	var token *oauth2.Token
+	if options.STATIC_TOKEN {
+		token = secret.StaticToken
+	}
+	if options.STATIC_USER {
+		u := New("test user", "test password", "random", "value", token)
 		StaticUser = &u
 	}
 }
@@ -51,7 +57,7 @@ func (u *User) Save(c echo.Context) {
 
 // don't just read from cookie username, instead use this.
 func FromEchoContext(db *gorm.DB, c echo.Context) (*User, error) {
-	if env.STATIC_USER {
+	if options.STATIC_USER {
 		return StaticUser, nil
 	}
 	su, err := SessionUserFromCookie(c)

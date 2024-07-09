@@ -10,7 +10,7 @@ import (
 
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
-	"github.com/ut-code/JourniCal/backend/app/env"
+	"github.com/ut-code/JourniCal/backend/app/env/options"
 	"github.com/ut-code/JourniCal/backend/app/router"
 	"github.com/ut-code/JourniCal/backend/app/user"
 )
@@ -29,15 +29,16 @@ func init() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	if env.ENABLE_CORS {
+	if options.ENABLE_CORS {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{env.CORS_ORIGIN},
+			AllowOrigins:     []string{options.CORS_ORIGIN},
 			AllowCredentials: true,
 		}))
 	}
-	if env.ECHO_SERVES_FRONTEND_TOO {
+	if options.ECHO_SERVES_FRONTEND_TOO {
 		e.Static("/", "./static")
 	}
+
 	router.Root(e.Group(""), db)
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"), db)
@@ -46,7 +47,7 @@ func init() {
 	router.Diary(e.Group("/api/diaries"), db)
 
 	// GitHub CI 用
-	if env.HALT_AFTER_SUCCESS {
+	if options.HALT_AFTER_SUCCESS {
 		go func() {
 			time.Sleep(15 * time.Second)
 			os.Exit(0)
@@ -54,7 +55,7 @@ func init() {
 	}
 }
 
-func Serve(port int) {
+func Serve(port uint) {
 	// サーバの起動
 	if err := e.Start(":" + fmt.Sprint(port)); err != nil {
 		fmt.Println(err.Error())

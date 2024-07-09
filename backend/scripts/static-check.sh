@@ -2,6 +2,8 @@
 cd $(dirname -- $0)
 cd ..
 
+rm test.db
+
 exit_code=0
 function assert_no_change () {
   git diff --exit-code --quiet;
@@ -47,3 +49,5 @@ go build -n 2>/dev/null
 assert_zero $? build
 
 exit $exit_code
+
+rm test.db
