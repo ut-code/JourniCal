@@ -58,7 +58,7 @@ func init() {
 		log.Fatalln("Failed assertion in TOKEN_SOURCE.\n  - Must be one of: db, env, file\n  - Got: " + src)
 	}
 
-	switch src := some("CREDENTIALS_SOURCE"); src {
+	switch src := env("CREDENTIALS_SOURCE"); src {
 	case "file", "":
 		CREDENTIALS_SOURCE = CredentialsSourceFile
 	case "env", "environment":
