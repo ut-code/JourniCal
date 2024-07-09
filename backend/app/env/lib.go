@@ -1,7 +1,6 @@
 package env
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -32,9 +31,9 @@ var TOKEN_TOKEN_TYPE string
 var TOKEN_REFRESH_TOKEN string
 var TOKEN_EXPIRY time.Time
 
-func EmptyCheck(variable string) {
+func EmptyCheck(variable string, message string) {
 	if variable == "" {
-		panic("empty environment variable")
+		panic("empty environment variable: " + message)
 	}
 }
 
@@ -60,35 +59,34 @@ func init() {
 	if os.Getenv("CREDENTIAL_FROM_ENV") == "true" {
 		CREDENTIAL_FROM_ENV = true
 		CREDENTIAL_CLIENT_ID = os.Getenv("CREDENTIAL_CLIENT_ID")
-		EmptyCheck(CREDENTIAL_CLIENT_ID)
+		EmptyCheck(CREDENTIAL_CLIENT_ID, "CREDENTIAL_CLIENT_ID")
 		CREDENTIAL_PROJECT_ID = os.Getenv("CREDENTIAL_PROJECT_ID")
-		EmptyCheck(CREDENTIAL_PROJECT_ID)
+		EmptyCheck(CREDENTIAL_PROJECT_ID, "CREDENTIAL_PROJECT_ID")
 		CREDENTIAL_AUTH_URI = os.Getenv("CREDENTIAL_AUTH_URI")
-		EmptyCheck(CREDENTIAL_AUTH_URI)
+		EmptyCheck(CREDENTIAL_AUTH_URI, "CREDENTIAL_AUTH_URI")
 		CREDENTIAL_TOKEN_URI = os.Getenv("CREDENTIAL_TOKEN_URI")
-		EmptyCheck(CREDENTIAL_TOKEN_URI)
+		EmptyCheck(CREDENTIAL_TOKEN_URI, "CREDENTIAL_TOKEN_URI")
 		CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL = os.Getenv("CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL")
-		EmptyCheck(CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL)
+		EmptyCheck(CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL, "CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL")
 		CREDENTIAL_CLIENT_SECRET = os.Getenv("CREDENTIAL_CLIENT_SECRET")
-		EmptyCheck(CREDENTIAL_CLIENT_SECRET)
+		EmptyCheck(CREDENTIAL_CLIENT_SECRET, "CREDENTIAL_CLIENT_SECRET")
 		CREDENTIAL_REDIRECT_URLS[0] = os.Getenv("CREDENTIAL_REDIRECT_URLS")
-		EmptyCheck(CREDENTIAL_REDIRECT_URLS[0])
+		EmptyCheck(CREDENTIAL_REDIRECT_URLS[0], "CREDENTIAL_REDIRECT_URIS")
 	}
 	if os.Getenv("TOKEN_FROM_ENV") == "true" {
 		TOKEN_FROM_ENV = true
 		TOKEN_ACCESS_TOKEN = os.Getenv("TOKEN_ACCESS_TOKEN")
-		EmptyCheck(TOKEN_ACCESS_TOKEN)
+		EmptyCheck(TOKEN_ACCESS_TOKEN, "TOKEN_ACCESS_TOKEN")
 		TOKEN_TOKEN_TYPE = os.Getenv("TOKEN_TOKEN_TYPE")
-		EmptyCheck(TOKEN_TOKEN_TYPE)
+		EmptyCheck(TOKEN_TOKEN_TYPE, "TOKEN_TOKEN_TYPE")
 		TOKEN_REFRESH_TOKEN = os.Getenv("TOKEN_REFRESH_TOKEN")
-		EmptyCheck(TOKEN_REFRESH_TOKEN)
+		EmptyCheck(TOKEN_REFRESH_TOKEN, "TOKEN_REFRESH_TOKEN")
 		TOKEN_EXPIRY_STRING := os.Getenv("TOKEN_EXPIRY")
 		TOKEN_EXPIRY_STRING = strings.Trim(TOKEN_EXPIRY_STRING, " \n")
-		EmptyCheck(TOKEN_EXPIRY_STRING)
+		EmptyCheck(TOKEN_EXPIRY_STRING, "TOKEN_EXPIRY_STRING")
 		t, err := time.Parse(time.RFC3339, TOKEN_EXPIRY_STRING)
 		if err != nil {
-			fmt.Println(err)
-			log.Fatalln("Invalid TOKEN_EXPIRY formatting")
+			log.Fatalln("Invalid TOKEN_EXPIRY formatting", err)
 		}
 		TOKEN_EXPIRY = t
 	}
