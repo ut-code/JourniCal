@@ -75,7 +75,7 @@ func ReadCredentialsFromEnv() *oauth2.Config {
 		TokenUri:                env.CREDENTIAL_TOKEN_URI,
 		AuthProviderX509CertUrl: env.CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL,
 		ClientSecret:            env.CREDENTIAL_CLIENT_SECRET,
-		RedirectUris:            env.CREDENTIAL_REDIRECT_URLS,
+		RedirectUris:            env.CREDENTIAL_REDIRECT_URIS,
 	}}
 	bytes, err := json.Marshal(credentialData)
 	helper.ErrorLog(err, "Failed struct credentials")
