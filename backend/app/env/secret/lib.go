@@ -17,14 +17,16 @@ import (
 
 var OAuth2Config *oauth2.Config // is nil if options.CredentialsSource == none.
 var StaticToken *oauth2.Token   // is nil if options.TokenSource == db.
-var AuthURL string              // is never empty.
+var AuthURL string              // is empty if OAuth2Config == nil.
 var DSN string                  // may be empty.
 
 func init() {
 	DSN = env("DSN")
 	loadCredentials()
 	loadStaticToken()
-	AuthURL = OAuth2Config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	if OAuth2Config != nil {
+		AuthURL = OAuth2Config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	}
 }
 
 type innerCredential struct {
