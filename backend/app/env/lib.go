@@ -1,6 +1,8 @@
 package env
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -85,7 +87,8 @@ func init() {
 		EmptyCheck(TOKEN_EXPIRY_STRING)
 		t, err := time.Parse(time.RFC3339, TOKEN_EXPIRY_STRING)
 		if err != nil {
-			panic("Invalid TOKEN_EXPIRY formatting")
+			fmt.Println(err)
+			log.Fatalln("Invalid TOKEN_EXPIRY formatting")
 		}
 		TOKEN_EXPIRY = t
 	}
