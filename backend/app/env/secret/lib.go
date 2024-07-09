@@ -18,10 +18,10 @@ import (
 var OAuth2Config *oauth2.Config // is nil if options.CredentialsSource == none.
 var StaticToken *oauth2.Token   // is nil if options.TokenSource == db.
 var AuthURL string              // is never empty.
-var DSN string                  // is never empty.
+var DSN string                  // may be empty.
 
 func init() {
-	DSN = some("DSN")
+	DSN = env("DSN")
 	loadCredentials()
 	loadStaticToken()
 	AuthURL = OAuth2Config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
@@ -112,6 +112,10 @@ func readCredentialsFromEnv() *oauth2.Config {
 	helper.ErrorLog(err, "Unable to parse client secret file to config")
 
 	return cfg
+}
+
+func env(name string) string {
+	return os.Getenv(name)
 }
 
 // this functions asserts that env is not be empty.

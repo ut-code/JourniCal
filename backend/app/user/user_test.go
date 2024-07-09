@@ -15,18 +15,20 @@ func TestUser(t *testing.T) {
 	assert := assert.New(t)
 
 	db, err := gorm.Open(sqlite.Open("./test.db"))
-	db.AutoMigrate(&user.User{})
 	helper.PanicOn(err)
+	helper.PanicOn(db.AutoMigrate(&user.User{}))
 	randomValue := "123456789"
 
-	u, err := user.Create(db, "USERNAME", "password", randomValue, randomValue, nil)
+	USERNAME := "USERNAME - test user"
+
+	u, err := user.Create(db, USERNAME, "password", randomValue, randomValue, nil)
 	helper.PanicOn(err)
 
 	// test user.New
 	unew := user.New("TEST", "PAPSA", randomValue, "rand", nil)
 	assert.Equal(unew.Username, "TEST")
 
-	_, err = user.Create(db, "USERNAME", "different_password", randomValue, randomValue, nil)
+	_, err = user.Create(db, USERNAME, "different_password", randomValue, randomValue, nil)
 	assert.Error(err, "Creating users with same username should return error.")
 
 	// is it escaped?
@@ -36,17 +38,17 @@ func TestUser(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(uesc.ID, uesc2.ID)
 
-	u2, err := user.FindUserFromPassword(db, "USERNAME", "password")
+	u2, err := user.FindUserFromPassword(db, USERNAME, "password")
 	helper.PanicOn(err)
-	assert.Equal(u2.Username, "USERNAME")
+	assert.Equal(u2.Username, USERNAME)
 	assert.Equal(u2.ID, u.ID)
 
-	_, err = user.FindUserFromPassword(db, "USERNAME", "password2")
+	_, err = user.FindUserFromPassword(db, USERNAME, "password2")
 	assert.Error(err)
 
 	u4, err := user.FindUserFromSession(db, user.SessionUser{
 		ID:       u.ID,
-		Username: "USERNAME",
+		Username: USERNAME,
 		Session:  u.Session,
 	})
 	helper.PanicOn(err)

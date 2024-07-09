@@ -82,16 +82,6 @@ func env(name string) string {
 	return os.Getenv(name)
 }
 
-// this retures $name.
-// panics if not set.
-func some(name string) string {
-	env := os.Getenv(name)
-	if env == "" {
-		log.Fatalln("Empty environment variable:", name)
-	}
-	return env
-}
-
 // this returns true if $name is "true".
 // returns false otherwise.
 func boolean(name string) bool {
