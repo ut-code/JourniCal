@@ -48,6 +48,13 @@ start build
 go build -n 2>/dev/null
 assert_zero $? build
 
-exit $exit_code
-
 rm test.db
+if [ $exit_code == 0 ]; then
+  echo [Go tests] Total Result: SUCCESS
+  exit 0
+else
+  echo [GO tests] Total Result: FAIL
+  echo exit code: $exit_code
+  exit $exit_code
+fi
+
