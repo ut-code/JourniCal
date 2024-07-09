@@ -2,6 +2,7 @@ package env
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -80,6 +81,7 @@ func init() {
 		TOKEN_REFRESH_TOKEN = os.Getenv("TOKEN_REFRESH_TOKEN")
 		EmptyCheck(TOKEN_REFRESH_TOKEN)
 		TOKEN_EXPIRY_STRING := os.Getenv("TOKEN_EXPIRY")
+		TOKEN_EXPIRY_STRING = strings.Trim(TOKEN_EXPIRY_STRING, " \n")
 		EmptyCheck(TOKEN_EXPIRY_STRING)
 		t, err := time.Parse(time.RFC3339, TOKEN_EXPIRY_STRING)
 		if err != nil {
