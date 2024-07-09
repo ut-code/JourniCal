@@ -26,7 +26,14 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend/
-        run: ./scripts/static-check.sh
+        run: |
+          ./scripts/mutable-check.sh
+          go vet ./...
+          go run honnef.co/go/tools/cmd/staticcheck@latest ./...
+          go test ./pkg/...
+          go test ./app/...
+          go build -n 2>/dev/null
+
         env:
           TOKEN_SOURCE: env
           CREDENTIALS_SOURCE: env
