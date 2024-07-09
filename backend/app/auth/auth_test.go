@@ -34,7 +34,7 @@ var authURL string
 
 func init() {
 	var err error
-	db, err = gorm.Open(sqlite.Open("./test.db"))
+	db, err = gorm.Open(sqlite.Open("./test/auth.db"))
 	helper.PanicOn(err)
 	err = db.AutoMigrate(&user.User{})
 	helper.PanicOn(err)

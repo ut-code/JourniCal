@@ -2,7 +2,7 @@
 cd $(dirname -- $0)
 cd ..
 
-rm test.db
+rm test/*.db
 
 ./mutable.sh
 go vet ./...
@@ -11,4 +11,4 @@ go test ./pkg/...
 go test ./app/...
 go build -n 2>/dev/null
 
-rm test.db
+rm test/*.db
