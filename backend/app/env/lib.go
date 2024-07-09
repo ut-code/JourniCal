@@ -2,6 +2,7 @@ package env
 
 import (
 	"log"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -60,11 +61,11 @@ func init() {
 		CREDENTIAL_FROM_ENV = true
 		CREDENTIAL_CLIENT_ID = someEnv("CREDENTIAL_CLIENT_ID")
 		CREDENTIAL_PROJECT_ID = someEnv("CREDENTIAL_PROJECT_ID")
-		CREDENTIAL_AUTH_URI = someEnv("CREDENTIAL_AUTH_URI")
-		CREDENTIAL_TOKEN_URI = someEnv("CREDENTIAL_TOKEN_URI")
-		CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL = someEnv("CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL")
+		CREDENTIAL_AUTH_URI = validURL("CREDENTIAL_AUTH_URI")
+		CREDENTIAL_TOKEN_URI = validURL("CREDENTIAL_TOKEN_URI")
+		CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL = validURL("CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL")
 		CREDENTIAL_CLIENT_SECRET = someEnv("CREDENTIAL_CLIENT_SECRET")
-		CREDENTIAL_REDIRECT_URLS[0] = someEnv("CREDENTIAL_REDIRECT_URLS")
+		CREDENTIAL_REDIRECT_URLS[0] = validURL("CREDENTIAL_REDIRECT_URLS")
 	}
 	if os.Getenv("TOKEN_FROM_ENV") == "true" {
 		TOKEN_FROM_ENV = true
@@ -92,6 +93,14 @@ func someEnv(name string) string {
 	env := os.Getenv(name)
 	if env == "" {
 		log.Fatalln("Empty environment variable:", name)
+	}
+	return env
+}
+
+func validURL(envName string) string {
+	env := someEnv(envName)
+	if _, err := url.Parse(env); err != nil {
+		log.Fatalln("Invalid url: ", envName, env)
 	}
 	return env
 }
