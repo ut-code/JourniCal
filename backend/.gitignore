@@ -9,8 +9,7 @@ token.cookie
 /dist/*
 !/dist/.gitkeep
 
-# testing environment
-/test/*
+# tests
 test.db
 
 # Editor directories and files
