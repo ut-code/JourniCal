@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ut-code/JourniCal/backend/app/auth"
-	"github.com/ut-code/JourniCal/backend/app/secret"
+	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"gorm.io/gorm"
 
 	"github.com/labstack/echo/v4"

@@ -1,28 +1,19 @@
 package db
 
 import (
-	"fmt"
 	"log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/joho/godotenv"
-	"github.com/ut-code/JourniCal/backend/app/env"
+	"github.com/ut-code/JourniCal/backend/app/env/secret"
 )
 
 var db *gorm.DB
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		fmt.Printf("Error loading .env file: %v\n", err)
-		fmt.Println("If this is not run from docker compose, this is probably not expected")
-	}
-	if env.DSN == "" {
-		log.Fatalln("DSN environment variable not found")
-	}
 	var err error
-	db, err = gorm.Open(postgres.Open(env.DSN), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(secret.DSN), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Error opening postgres: %v", err)
 	}

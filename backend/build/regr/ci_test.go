@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/ut-code/JourniCal/backend/app"
 	"github.com/ut-code/JourniCal/backend/pkg/curl"
+	_ "github.com/ut-code/JourniCal/backend/pkg/tests/run-test-at-root"
 	"google.golang.org/api/calendar/v3"
 )
 

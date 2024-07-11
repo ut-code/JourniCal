@@ -26,11 +26,17 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend/
-        run: ./scripts/static-check.sh
+        run: |
+          ./scripts/mutable-check.sh
+          go vet ./...
+          go run honnef.co/go/tools/cmd/staticcheck@latest ./...
+          go test ./pkg/...
+          go test ./app/...
+          go build -n 2>/dev/null
+
         env:
-          USE_TOKEN_JSON: true
-          CREDENTIAL_FROM_ENV: true
-          TOKEN_FROM_ENV: true
+          TOKEN_SOURCE: env
+          CREDENTIALS_SOURCE: env
           CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL: ${{secrets.CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL}}
           CREDENTIAL_AUTH_URI: ${{secrets.CREDENTIAL_AUTH_URI}}
           CREDENTIAL_CLIENT_ID: ${{secrets.CREDENTIAL_CLIENT_ID}}

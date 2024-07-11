@@ -25,3 +25,8 @@ func init() {
 		log.Fatalln(err)
 	}
 }
+
+func Pwd() {
+	wd, _ := os.Getwd()
+	fmt.Println(wd)
+}

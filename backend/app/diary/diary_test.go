@@ -1,7 +1,6 @@
 package diary_test
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -12,14 +11,14 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/diary"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
+	_ "github.com/ut-code/JourniCal/backend/pkg/tests/run-test-at-root"
 )
 
 var db *gorm.DB
 
 func init() {
 	var err error
-	os.Remove("./test.db")
-	db, err = gorm.Open(sqlite.Open("./test.db"))
+	db, err = gorm.Open(sqlite.Open(":memory:"))
 	helper.PanicOn(err)
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&diary.Diary{})

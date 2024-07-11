@@ -2,14 +2,13 @@ package auth_test
 
 import (
 	"context"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ut-code/JourniCal/backend/app/auth"
 	cal "github.com/ut-code/JourniCal/backend/app/calendar"
-	"github.com/ut-code/JourniCal/backend/app/secret"
+	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"github.com/ut-code/JourniCal/backend/app/user"
 	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	_ "github.com/ut-code/JourniCal/backend/pkg/tests/run-test-at-root"
@@ -35,15 +34,14 @@ var authURL string
 
 func init() {
 	var err error
-	os.Remove("./test.db")
-	db, err = gorm.Open(sqlite.Open("./test.db"))
+	db, err = gorm.Open(sqlite.Open(":memory:"))
 	helper.PanicOn(err)
 	err = db.AutoMigrate(&user.User{})
 	helper.PanicOn(err)
 
 	config = secret.OAuth2Config
 	authURL = secret.AuthURL
-	token = secret.TokenFromJSON
+	token = secret.StaticToken
 }
 
 func TestBasicFunctionality(t *testing.T) {
