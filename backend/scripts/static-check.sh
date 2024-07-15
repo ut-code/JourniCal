@@ -2,13 +2,9 @@
 cd $(dirname -- $0)
 cd ..
 
-rm test/*.db
-
-./mutable.sh
+./scripts/mutable-check.sh
 go vet ./...
 go run honnef.co/go/tools/cmd/staticcheck@latest ./...
 go test ./pkg/...
 go test ./app/...
 go build -n 2>/dev/null
-
-rm test/*.db
