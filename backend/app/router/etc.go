@@ -15,18 +15,11 @@ func Root(g *echo.Group, db *gorm.DB) {
 
 	g.GET("/", func(c echo.Context) error {
 		_, err := auth.TokenFromContext(db, secret.OAuth2Config, c)
-		if err != nil {
+		if err != nil && secret.AuthURL != "" {
 			c.Redirect(http.StatusFound, secret.AuthURL)
 			return nil
 		}
 		c.File("./index.html")
-		return nil
-	})
-}
-
-func Api(g *echo.Group) {
-	g.GET("/ping", func(c echo.Context) error {
-		c.String(http.StatusOK, "pong!")
 		return nil
 	})
 }
