@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Login(db *gorm.DB) echo.MiddlewareFunc {
+func LoginMiddleware(db *gorm.DB) echo.MiddlewareFunc {
 	// todo: use some sort of cacher
 	// s.t. we don't have to request database every request
 	// purpose: reduce db query.

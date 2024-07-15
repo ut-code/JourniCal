@@ -28,7 +28,7 @@ func init() {
 	// ミドルウェアを設定
 	// e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	mustLogin := user.Login(db)
+	mustLogin := user.LoginMiddleware(db)
 
 	if options.ENABLE_CORS {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
