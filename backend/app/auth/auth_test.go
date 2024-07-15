@@ -65,6 +65,9 @@ func isValid(token *oauth2.Token) bool {
 	if err != nil {
 		return false
 	}
-	evs := cal.GetNEventsForward(srv, "primary", time.Now(), 10)
+	evs, err := cal.GetNEventsForward(srv, "primary", time.Now(), 10)
+	if err != nil {
+		return false
+	}
 	return len(evs) != 0
 }
