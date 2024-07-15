@@ -56,6 +56,7 @@ func (u *User) Save(c echo.Context) {
 }
 
 // don't just read from cookie username, instead use this.
+// this should be pure* so no r/w must occur on cache (if any).
 func FromEchoContext(db *gorm.DB, c echo.Context) (*User, error) {
 	if options.STATIC_USER {
 		return StaticUser, nil

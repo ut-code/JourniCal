@@ -26,8 +26,9 @@ func init() {
 	// Doc: https://echo.labstack.com/
 	e = echo.New()
 	// ミドルウェアを設定
-	e.Use(middleware.Logger())
+	// e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	mustLogin := user.Login(db)
 
 	if options.ENABLE_CORS {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -40,11 +41,10 @@ func init() {
 	}
 
 	router.Root(e.Group(""), db)
-	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"), db)
-	router.User(e.Group("/api/user"), db)
-	router.Calendar(e.Group("/api/calendar"), db)
-	router.Diary(e.Group("/api/diaries"), db)
+	router.User(e.Group("/api/user", mustLogin), db)
+	router.Calendar(e.Group("/api/calendar", mustLogin), db)
+	router.Diary(e.Group("/api/diaries", mustLogin), db)
 
 	// GitHub CI 用
 	if options.HALT_AFTER_SUCCESS {
