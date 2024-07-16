@@ -43,7 +43,6 @@ func init() {
 		return c.String(200, "Hello from Echo!")
 	})
 
-	router.Root(e.Group(""), db)
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"), db)
 	router.User(e.Group("/api/user"), db)
