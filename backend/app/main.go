@@ -39,7 +39,10 @@ func init() {
 		e.Static("/", "./static")
 	}
 
-	router.Root(e.Group(""), db)
+	e.GET("/", func(c echo.Context) error {
+		return c.String(200, "Hello from Echo!")
+	})
+
 	router.Api(e.Group("/api"))
 	router.Auth(e.Group("/auth"), db)
 	router.User(e.Group("/api/user"), db)
