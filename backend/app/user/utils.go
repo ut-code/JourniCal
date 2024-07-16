@@ -1,10 +1,15 @@
 package user
 
 import (
+	"log"
+	"time"
+
 	"github.com/labstack/echo/v4"
+	"github.com/patrickmn/go-cache"
 	"github.com/ut-code/JourniCal/backend/app/env/options"
 	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"github.com/ut-code/JourniCal/backend/pkg/cookie"
+	"github.com/ut-code/JourniCal/backend/pkg/hash"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
@@ -55,19 +60,46 @@ func (u *User) Save(c echo.Context) {
 	SaveSessionUserToCookie(c, &s)
 }
 
+// ---------------- minimum lifetime, clear interval
+
+var ucache = cache.New(20*time.Minute, 10*time.Minute)
+
 // don't just read from cookie username, instead use this.
-// this should be pure* so no r/w must occur on cache (if any).
 func FromEchoContext(db *gorm.DB, c echo.Context) (*User, error) {
+	// read from context data
+	// we don't need to save it here, because it is done at middleware
+	cu, ok := c.Get("user").(User)
+	if ok {
+		return &cu, nil
+	}
+
 	if options.STATIC_USER {
 		return StaticUser, nil
 	}
+	var u *User
 	su, err := SessionUserFromCookie(c)
 	if err != nil {
 		return nil, err
 	}
-	u, err := FindUserFromSession(db, *su)
+
+	// this doesn't need to be a hash, but I couldn't find a better method
+	key := hash.SHA256(su).Base64()
+	ptr, ok := ucache.Get(key)
+	if !ok {
+		goto access_db
+	}
+	u, ok = ptr.(*User)
+	if !ok {
+		log.Printf("unexpected casting failure at user.FromEchoContext()")
+		goto access_db
+	}
+	return u, nil
+
+access_db:
+	u, err = FindUserFromSession(db, *su)
 	if err != nil {
 		return nil, err
 	}
+	ucache.Set(key, u, 0) // use default expiration
 	return u, nil
 }

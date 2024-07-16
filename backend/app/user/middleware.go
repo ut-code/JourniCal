@@ -2,19 +2,12 @@ package user
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
-	cache "github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
 )
 
 func LoginMiddleware(db *gorm.DB) echo.MiddlewareFunc {
-	// todo: use some sort of cacher
-	// s.t. we don't have to request database every request
-	// purpose: reduce db query.
-	c := cache.New(5*time.Minute, 10*time.Minute)
-	_ = c
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// insert cache here and escape early if cache is found.
