@@ -3,9 +3,15 @@ package options
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
+
+// NOTE: this one only loads from environment, not .env (it's clear if you think about it)
+// ".env", ".env.ci", ".env.localtest". default to ".env" if empty or not set.
+// if set to "normal" | "default", "ci", or "localtest", they will converted to ".env", ".env.ci", and ".env.localtest" respectively.
+var ENV_FILE string
 
 var TOKEN_SOURCE TokenSource             // "db", "file" or "env". defaults to "db" if not set.
 var CREDENTIALS_SOURCE CredentialsSource // "file", "env" or "none". defaults to "file" if not set. if "none", auth-related things cannot be done.
@@ -19,7 +25,6 @@ var ENABLE_CORS = false              // will be set true if CORS_ORIGIN != "". c
 var CORS_ORIGIN string // optional
 
 type TokenSource int
-type CredentialsSource int
 
 const (
 	TokenSourceDB TokenSource = iota
@@ -27,14 +32,30 @@ const (
 	TokenSourceFile
 )
 
+type CredentialsSource int
+
 const (
-	CredentialsSourceFile = iota
+	CredentialsSourceFile CredentialsSource = iota
 	CredentailsSourceEnv
 	CredentialsSourceNone
 )
 
 func init() {
-	godotenv.Load()
+	switch filename := os.Getenv("ENV_FILE"); strings.ToLower(filename) {
+	default:
+		log.Printf("WARNING: assertion failed in app/env/options: unknown ENV_FILE string: %s \ndefaulting to .env ...", filename)
+		fallthrough
+	case "", ".env", "normal", "default":
+		ENV_FILE = ".env"
+
+	case ".env.ci", "ci":
+		ENV_FILE = ".env.ci"
+
+	case ".env.localtest", "localtest", "test":
+		ENV_FILE = ".env.localtest"
+	}
+
+	godotenv.Load(ENV_FILE)
 
 	STATIC_USER = boolean("STATIC_USER")
 	ECHO_SERVES_FRONTEND_TOO = boolean("ECHO_SERVES_FRONTEND_TOO")
@@ -45,7 +66,7 @@ func init() {
 		CORS_ORIGIN = corsOrigin
 	}
 
-	switch src := env("TOKEN_SOURCE"); src {
+	switch src := env("TOKEN_SOURCE"); strings.ToLower(src) {
 	case "db", "database", "":
 		TOKEN_SOURCE = TokenSourceDB
 	case "env", "environment":
@@ -58,7 +79,7 @@ func init() {
 		log.Fatalln("Failed assertion in TOKEN_SOURCE.\n  - Must be one of: db, env, file\n  - Got: " + src)
 	}
 
-	switch src := env("CREDENTIALS_SOURCE"); src {
+	switch src := env("CREDENTIALS_SOURCE"); strings.ToLower(src) {
 	case "file", "":
 		CREDENTIALS_SOURCE = CredentialsSourceFile
 	case "env", "environment":
