@@ -59,12 +59,14 @@ func TestBasicFunctionality(t *testing.T) {
 	// test TokenFromContext is skipped because I can't provide echo.Context, and the only thing it uses echo.Context for is to get user from it
 }
 
+const Month = time.Hour * 24 * 30
+
 func isValid(token *oauth2.Token) bool {
 	client := config.Client(context.Background(), token)
 	srv, err := calendar.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
 		return false
 	}
-	evs := cal.GetNEventsForward(srv, "primary", time.Now(), 10)
+	evs := cal.GetEventsInRange(srv, "primary", time.Now(), time.Now().Add(1*Month))
 	return len(evs) != 0
 }

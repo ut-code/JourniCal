@@ -29,30 +29,7 @@ func TokenFromContext(db *gorm.DB, config *oauth2.Config, c echo.Context) (*oaut
 	if err != nil {
 		return nil, err
 	}
-	return RestoreUsersToken(config, u)
-}
-
-// Use this instead if you want to update user's token.
-// This will update user's token as necessary.
-func RestoreUsersToken(config *oauth2.Config, u *user.User) (*oauth2.Token, error) {
-	cached, ok := TokenCache.Get(u.ID)
-	if ok && cached.Valid() {
-		return cached, nil
-	}
-	token := RawToken(u)
-	// The token will auto-refresh as necessary.
-	// src: https://pkg.go.dev/golang.org/x/oauth2?utm_source=godoc#Config.Client
-	if IsEmpty(token) {
-		return nil, errors.New("cannot restore user's token: user doesn't have a token")
-	}
-	// apparently reviving token isn't possible
-	// hopefully we can revive this here in the future!
-	// config.Client(context.Background(), token) // this line no work
-	// if !token.Valid() {
-	// 	return nil, errors.New("failed to revive token")
-	// }
-	// TokenCache.Set(u.ID, token)
-	return token, nil
+	return UserToken(u)
 }
 
 func ExchangeToken(config *oauth2.Config, code string) (*oauth2.Token, error) {
@@ -72,13 +49,19 @@ func SaveToken(db *gorm.DB, uid uint, token *oauth2.Token) error {
 	return db.Save(user).Error
 }
 
-func RawToken(u *user.User) *oauth2.Token {
-	return &oauth2.Token{
+func UserToken(u *user.User) (*oauth2.Token, error) {
+	// the token will auto-refresh as necessary.
+	// src: https://pkg.go.dev/golang.org/x/oauth2?utm_source=godoc#Config.Client
+	token := &oauth2.Token{
 		AccessToken:  u.AccessToken,
 		RefreshToken: u.RefreshToken,
 		TokenType:    u.TokenType,
 		Expiry:       u.TokenExpiry,
 	}
+	if IsEmpty(token) {
+		return nil, errors.New("cannot restore user's token: user doesn't have a token")
+	}
+	return token, nil
 }
 
 func SetToken(u *user.User, token *oauth2.Token) {

@@ -39,7 +39,6 @@ type HashedPassword string
 // provide token with nil to skip token initialization
 // to skip db interatoins, use New() instead.
 func Create(db *gorm.DB, username string, password Password, frontendSeed, backendSeed string, token *oauth2.Token) (*User, error) {
-
 	us := []User{}
 	err := db.Where("username = ?", username).Find(&us).Error
 	if err != nil {
