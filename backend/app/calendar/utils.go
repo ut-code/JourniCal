@@ -2,8 +2,6 @@ package calendar
 
 import (
 	"net/http"
-	"net/url"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ut-code/JourniCal/backend/app/auth"
@@ -28,17 +26,4 @@ func SrvFromContext(db *gorm.DB, c echo.Context) (*calendar.Service, error) {
 		return nil, err
 	}
 	return srv, nil
-}
-
-// unsafe; don't use this.
-func WriteAuthCodeToCookie(c echo.Context, code string) {
-	MaxAge := (24 * time.Hour).Seconds() // about 1 day.
-	c.SetCookie(&http.Cookie{
-		Path:     "/",
-		Name:     "code",
-		Value:    url.QueryEscape(code),
-		MaxAge:   int(MaxAge),
-		HttpOnly: true, // reduces XSS risk via disallowing access from browser JS
-		SameSite: http.SameSiteDefaultMode,
-	})
 }
