@@ -10,14 +10,9 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/env/options"
 	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"github.com/ut-code/JourniCal/backend/app/user"
-	"github.com/ut-code/JourniCal/backend/pkg/helper"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
-
-type userId = uint
-
-var TokenCache = helper.NewMap[userId, *oauth2.Token]()
 
 // entrypoint. use this if you don't know what you should use.
 // this does not update user's token if it's expired, but don't care just generate it again
@@ -29,7 +24,7 @@ func TokenFromContext(db *gorm.DB, config *oauth2.Config, c echo.Context) (*oaut
 	if err != nil {
 		return nil, err
 	}
-	return UserToken(u)
+	return Token(u)
 }
 
 func ExchangeToken(config *oauth2.Config, code string) (*oauth2.Token, error) {
@@ -49,7 +44,7 @@ func SaveToken(db *gorm.DB, uid uint, token *oauth2.Token) error {
 	return db.Save(user).Error
 }
 
-func UserToken(u *user.User) (*oauth2.Token, error) {
+func Token(u *user.User) (*oauth2.Token, error) {
 	// the token will auto-refresh as necessary.
 	// src: https://pkg.go.dev/golang.org/x/oauth2?utm_source=godoc#Config.Client
 	token := &oauth2.Token{

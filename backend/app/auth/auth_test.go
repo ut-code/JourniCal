@@ -52,7 +52,7 @@ func TestBasicFunctionality(t *testing.T) {
 	u, err := user.Create(db, "username", "password_hashed_at_frontend", seed, seed, token)
 	assert.Nil(err)
 
-	tok, err := auth.RestoreUsersToken(config, u)
+	tok, err := auth.Token(u)
 	assert.Nil(err)
 	assert.True(isValid(tok))
 
