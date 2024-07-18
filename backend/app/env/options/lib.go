@@ -8,9 +8,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// NOTE: this one only loads from environment, not .env (it's clear if you think about it)
-// ".env", ".env.ci", ".env.localtest". default to ".env" if empty or not set.
-// if set to "normal" | "default", "ci", or "localtest", they will converted to ".env", ".env.ci", and ".env.localtest" respectively.
+// NOTE: this can also be written in .env, because godotenv is loaded twice.
+// ALLOWS: multiple values separated by space.
+// supported values: "secret" or "localtest". they will load ".env.secret" and "env/localtest.env" respectively.
 var ENV_FILE string
 
 var TOKEN_SOURCE TokenSource             // "db", "file", "env", or "none". defaults to "db" if not set.
@@ -41,21 +41,31 @@ const (
 )
 
 func init() {
-	switch filename := os.Getenv("ENV_FILE"); strings.ToLower(filename) {
-	default:
-		log.Printf("WARNING: assertion failed in app/env/options: unknown ENV_FILE string: %s \ndefaulting to .env ...", filename)
-		fallthrough
-	case "", ".env", "normal", "default":
-		ENV_FILE = ".env"
+	// load .env once for ENV_FILE
+	godotenv.Load(".env")
 
-	case ".env.ci", "ci":
-		ENV_FILE = ".env.ci"
-
-	case ".env.localtest", "localtest", "test":
-		ENV_FILE = ".env.localtest"
+	var envfile []string
+	for _, filename := range strings.Split(os.Getenv("ENV_FILE"), " ") {
+		var appending string
+		switch strings.ToLower(filename) {
+		case "":
+			continue // not breaking in case of multi space in between such as ENV_FILE="secret    test"
+		case ".env":
+			log.Fatalln("You don't need to specify .env because it is already loaded.")
+		case "secret", ".env.secret":
+			appending = ".env.secret"
+		case "test", "localtest", "localtest.env":
+			appending = "env/localtest.env"
+		case "dev", "dev.env":
+			appending = "env/dev.env"
+		default:
+			log.Fatalln("ERROR: assertion failed in app/env/options: unknown ENV_FILE string:", filename)
+		}
+		envfile = append(envfile, appending)
 	}
-
-	godotenv.Load(ENV_FILE)
+	if len(envfile) >= 1 {
+		godotenv.Load(envfile...)
+	}
 
 	STATIC_USER = boolean("STATIC_USER")
 	ECHO_SERVES_FRONTEND_TOO = boolean("ECHO_SERVES_FRONTEND_TOO")
