@@ -13,7 +13,7 @@ import (
 // if set to "normal" | "default", "ci", or "localtest", they will converted to ".env", ".env.ci", and ".env.localtest" respectively.
 var ENV_FILE string
 
-var TOKEN_SOURCE TokenSource             // "db", "file" or "env". defaults to "db" if not set.
+var TOKEN_SOURCE TokenSource             // "db", "file", "env", or "none". defaults to "db" if not set.
 var CREDENTIALS_SOURCE CredentialsSource // "file", "env" or "none". defaults to "file" if not set. if "none", auth-related things cannot be done.
 
 var STATIC_USER = false              // whether to use static user for everything
@@ -27,7 +27,7 @@ var CORS_ORIGIN string // optional
 type TokenSource int
 
 const (
-	TokenSourceDB TokenSource = iota
+	TokenSourceDB TokenSource = iota // also set if it's "none"
 	TokenSourceEnv
 	TokenSourceFile
 )
@@ -67,7 +67,7 @@ func init() {
 	}
 
 	switch src := env("TOKEN_SOURCE"); strings.ToLower(src) {
-	case "db", "database", "":
+	case "db", "database", "", "none":
 		TOKEN_SOURCE = TokenSourceDB
 	case "env", "environment":
 		TOKEN_SOURCE = TokenSourceEnv
