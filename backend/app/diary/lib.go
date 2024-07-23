@@ -20,6 +20,7 @@ type Diary struct {
 	Date      time.Time `json:"date"` // Date of what?
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
+	EventID   uint      `gorm:"unique" json:"eventId"`
 }
 type HTTPStatus = int
 
@@ -52,6 +53,14 @@ func GetUnchecked(db *gorm.DB, id uint) (*Diary, error) {
 	return diary, nil
 }
 
+func GetByEventUnchecked(db *gorm.DB, eventID uint) (*Diary, error) {
+	diary := &Diary{}
+	if err := db.Where("event_id = ?", eventID).First(diary).Error; err != nil {
+		return nil, errors.New("diary not found")
+	}
+	return diary, nil
+}
+
 func Get(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	u, err := user.FromEchoContext(db, c)
 	if err != nil {
@@ -67,6 +76,25 @@ func Get(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
 	}
 	if diary.CreatorID != u.ID {
 		return http.StatusNotFound, nil, errors.New("this diary is not yours")
+	}
+	return http.StatusOK, diary, nil
+}
+
+func GetByEvent(c echo.Context, db *gorm.DB) (HTTPStatus, *Diary, error) {
+	u, err := user.FromEchoContext(db, c)
+	if err != nil {
+		return http.StatusBadRequest, nil, errors.New("authentication error")
+	}
+	eventID, err := strconv.Atoi(c.Param("eventID"))
+	if err != nil || eventID < 0 {
+		return http.StatusBadRequest, nil, errors.New("invalid event ID format")
+	}
+	diary, err := GetByEventUnchecked(db, uint(eventID))
+	if err != nil {
+		return http.StatusNotFound, nil, err
+	}
+	if diary.CreatorID != u.ID {
+		return http.StatusUnauthorized, nil, errors.New("this diary is not yours")
 	}
 	return http.StatusOK, diary, nil
 }

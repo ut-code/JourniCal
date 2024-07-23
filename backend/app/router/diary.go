@@ -24,6 +24,14 @@ func Diary(g *echo.Group, db *gorm.DB) {
 		return c.JSON(status, diary)
 	})
 
+	g.GET("/event/:eventID", func(c echo.Context) error {
+		status, diary, err := diary.GetByEvent(c, db)
+		if err != nil {
+			return c.JSON(status, echo.Map{"error": err.Error()})
+		}
+		return c.JSON(status, diary)
+	})
+
 	g.POST("/", func(c echo.Context) error {
 		status, diary, err := diary.Create(c, db)
 		if err != nil {
