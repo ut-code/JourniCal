@@ -67,6 +67,7 @@ func TestBasicFunctionality(t *testing.T) {
 
 	dd, err = diary.Get(db, d.ID, unauthorizedUser)
 	assert.Error(err, "unauthorized user should not be able to GET")
+	assert.Nil(dd, "unauthorized user should not be able to GET")
 
 	diaries, err = diary.GetAll(db, unauthorizedUser)
 	assert.Nil(err)
@@ -86,4 +87,5 @@ func TestBasicFunctionality(t *testing.T) {
 
 	d, err = diary.Get(db, d.ID, u)
 	assert.Error(err, "diary should've been deleted")
+	assert.Nil(d)
 }
