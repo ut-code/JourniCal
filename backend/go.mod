@@ -5,9 +5,9 @@ go 1.22
 toolchain go1.22.3
 
 require (
-	github.com/caarlos0/env/v11 v11.1.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.12.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.17.0
 	google.golang.org/api v0.169.0
