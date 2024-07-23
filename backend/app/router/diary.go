@@ -52,11 +52,11 @@ func Diary(g *echo.Group, db *gorm.DB) {
 		if err != nil {
 			return c.String(http.StatusUnauthorized, "invalid user. consider creating new one")
 		}
-		diary, err := diary.Create(db, d, u)
+		err = diary.Create(db, d, u)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		return c.JSON(http.StatusCreated, diary)
+		return c.JSON(http.StatusCreated, d)
 	})
 
 	// UPDATE
