@@ -1,4 +1,4 @@
-import { Box, Collapse, Typography } from "@mui/material";
+import { Box, Button, Collapse, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -34,6 +34,26 @@ const TopBar: React.FC<{
         sx={{ bgcolor: "primary.main" }}
       >
         <MenuIcon sx={{ mx: 2, color: "primary.contrastText" }} />
+        <Button variant="contained" color="primary" onClick={async () => {
+          try {
+            await fetch("http://localhost:3000/api/diaries/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: "some title",
+                content: "some content",
+                eventId: 1,
+              }),
+            })
+          } catch (error) {
+            console.error(error);
+          }
+          
+        }}>
+          テスト: 新規作成
+        </Button>
         <Box
           display={"flex"}
           alignItems={"center"}
