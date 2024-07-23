@@ -28,26 +28,62 @@ func TestBasicFunctionality(t *testing.T) {
 	rand := "RANDOM_VALUE"
 	u, err := user.Create(db, "username", "password", rand, rand, nil)
 	helper.PanicOn(err)
+	unauthorizedUser, err := user.Create(db, "another username", "another password", rand, "random string", nil)
+	helper.PanicOn(err)
 	assert := assert.New(t)
 
 	d := &diary.Diary{
-		CreatorID: u.ID,
-		Date:      time.Now(),
-		Title:     "Hello, World!",
-		Content:   "Lorem Ipsum",
+		Date:    time.Now(),
+		Title:   "Hello, World!",
+		Content: "Lorem Ipsum",
 	}
-	err = diary.CreateUnchecked(db, d)
+	err = diary.Create(db, d, u)
 	assert.Nil(err)
+	assert.Equal(u.ID, d.CreatorID)
 
-	d2, err := diary.GetUnchecked(db, d.ID)
-	helper.PanicOn(err)
-	assert.Equal(d.ID, d2.ID, "d should equal d2")
-	assert.Equal(d.Content, d2.Content, "d should equal d2")
+	d2 := &diary.Diary{
+		Date:    time.Now(),
+		Title:   "Good morning, world",
+		Content: "Consectetur adipiscing elit.",
+	}
+	err = diary.Create(db, d2, u)
+	assert.Nil(err)
+	assert.Equal(d.CreatorID, u.ID)
 
-	d3s, err := diary.GetAllUnchecked(db, u.ID)
+	dd, err := diary.Get(db, d.ID, u)
 	helper.PanicOn(err)
-	assert.Equal(len(d3s), 1, "len(d3s) should equal 1")
-	helper.PanicIf(len(d3s) < 1)
-	assert.Equal(d3s[0].ID, d.ID, "d3s[0] should equal d")
-	assert.Equal(d3s[0].Content, d.Content, "d3s[0] should equal d")
+	assert.Equal(d.ID, dd.ID, "d should equal dd")
+	assert.Equal(d.Title, dd.Title, "d should equal dd")
+	assert.Equal(d.Content, dd.Content, "d should equal dd")
+
+	diaries, err := diary.GetAll(db, u)
+	helper.PanicOn(err)
+	assert.Equal(2, len(diaries), "len(diaries) should equal 2")
+	helper.PanicIf(len(diaries) < 1)
+	assert.Equal(d.ID, diaries[0].ID, "diaries[0] should equal d")
+	assert.Equal(d.Content, diaries[0].Content, "diaries[0] should equal d")
+	assert.Equal(d2.ID, diaries[1].ID, "diaries[1] should equal d2")
+	assert.Equal(d2.Content, diaries[1].Content, "diaries[1] should equal d2")
+
+	dd, err = diary.Get(db, d.ID, unauthorizedUser)
+	assert.Error(err, "unauthorized user should not be able to GET")
+
+	diaries, err = diary.GetAll(db, unauthorizedUser)
+	assert.Nil(err)
+	assert.Equal(len(diaries), 0, "unauthorized user should not be able to get any")
+
+	err = diary.Delete(db, d.ID, unauthorizedUser)
+	assert.Error(err, "unauthorized user should not be able to delete")
+	diaries, err = diary.GetAll(db, u)
+	assert.Nil(err)
+	assert.Equal(2, len(diaries), "unauthorized user should not be able to delete")
+
+	err = diary.Delete(db, d.ID, u)
+	assert.Nil(err)
+	diaries, err = diary.GetAll(db, u)
+	assert.Nil(err)
+	assert.Equal(1, len(diaries), "test deletion")
+
+	d, err = diary.Get(db, d.ID, u)
+	assert.Error(err, "diary should've been deleted")
 }

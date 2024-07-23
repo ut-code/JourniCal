@@ -39,13 +39,14 @@ func GetAll(db *gorm.DB, u *user.User) ([]Diary, error) {
 	return diaries, nil
 }
 
-func Create(db *gorm.DB, diary *Diary, creator *user.User) (*Diary, error) {
+// updates diary.ID and diary.CreatorID
+func Create(db *gorm.DB, diary *Diary, creator *user.User) error {
 	diary.CreatorID = creator.ID
 	err := CreateUnchecked(db, diary)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return diary, nil
+	return nil
 }
 
 func Update(db *gorm.DB, id uint, newDiary *Diary, requester *user.User) (*Diary, error) {
@@ -82,7 +83,7 @@ func GetAllUnchecked(db *gorm.DB, creatorId uint) ([]Diary, error) {
 	return diaries, nil
 }
 
-// updates diary's ID
+// updates diary.ID
 func CreateUnchecked(db *gorm.DB, diary *Diary) error {
 	if err := db.Create(diary).Error; err != nil {
 		return errors.New("database error: failed to create diary")
@@ -105,5 +106,9 @@ func UpdateUnchecked(db *gorm.DB, id uint, newDiary *Diary) error {
 }
 
 func Delete(db *gorm.DB, id uint, owner *user.User) error {
-	return db.Model(&Diary{}).Where(`id = ? AND creator_id = ?`, id, owner.ID).Delete(Diary{}).Error
+	ds := []Diary{}
+	if db.Where(`id = ?`, id).Where(`creator_id = ?`, owner.ID).Find(&ds); len(ds) == 0 {
+		return errors.New("you don't own a diary that match the cond")
+	}
+	return db.Model(&Diary{}).Where(`id = ?`, id).Where(`creator_id = ?`, owner.ID).Delete(&Diary{}).Error
 }
