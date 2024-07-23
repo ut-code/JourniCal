@@ -35,6 +35,7 @@ jobs:
           go build -n 2>/dev/null
 
         env:
+          ENV_FILE: test
           TOKEN_SOURCE: env
           CREDENTIALS_SOURCE: env
           CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL: ${{secrets.CREDENTIAL_AUTH_PROVIDER_X509_CERT_URL}}
