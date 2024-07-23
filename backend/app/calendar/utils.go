@@ -1,44 +1,64 @@
 package calendar
 
 import (
+	"context"
+	"errors"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	cache "github.com/patrickmn/go-cache"
 	"github.com/ut-code/JourniCal/backend/app/auth"
 	"github.com/ut-code/JourniCal/backend/app/env/secret"
+	"github.com/ut-code/JourniCal/backend/pkg/hash"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 	"gorm.io/gorm"
 )
 
-func SrvFromContext(db *gorm.DB, c echo.Context) (*calendar.Service, error) {
-	conf := secret.OAuth2Config
+var srvcache = cache.New(10*time.Minute, 15*time.Minute)
 
-	token, err := auth.TokenFromContext(db, conf, c)
+// handles sending responses if it errors
+// reason: it's hard to handle at caller side
+func SrvFromContext(db *gorm.DB, c echo.Context) (*calendar.Service, error) {
+
+	token, err := auth.TokenFromContext(db, secret.OAuth2Config, c)
 	if err != nil {
-		c.Redirect(http.StatusFound, secret.AuthURL)
+		err = c.Redirect(http.StatusFound, secret.AuthURL)
 		return nil, err
 	}
-	client := conf.Client(c.Request().Context(), token)
-	srv, err := calendar.NewService(c.Request().Context(), option.WithHTTPClient(client))
-	if err != nil {
-		c.String(500, "Internal Error: calendar.NewService failed")
-		return nil, err
+
+	key := hash.SHA256(token).Base64()
+	var srv *calendar.Service
+
+	any, ok := srvcache.Get(key)
+	if !ok {
+		goto regen
 	}
+	srv, ok = any.(*calendar.Service)
+	if !ok {
+		goto regen
+	}
+	return srv, nil
+
+regen:
+
+	srv, err = CreateService(c.Request().Context(), token)
+	if err != nil {
+		return nil, c.String(500, "Internal error: "+err.Error())
+	}
+	srvcache.Set(key, srv, 0)
 	return srv, nil
 }
 
-// unsafe; don't use this.
-func WriteAuthCodeToCookie(c echo.Context, code string) {
-	MaxAge := (24 * time.Hour).Seconds() // about 1 day.
-	c.SetCookie(&http.Cookie{
-		Path:     "/",
-		Name:     "code",
-		Value:    url.QueryEscape(code),
-		MaxAge:   int(MaxAge),
-		HttpOnly: true, // reduces XSS risk via disallowing access from browser JS
-		SameSite: http.SameSiteDefaultMode,
-	})
+func CreateService(ctx context.Context, token *oauth2.Token) (*calendar.Service, error) {
+	client := secret.OAuth2Config.Client(ctx, token)
+	srv, err := calendar.NewService(ctx, option.WithHTTPClient(client))
+	if err != nil {
+		err := errors.New("calendar.NewService failed: " + err.Error())
+		return nil, err
+	}
+	return srv, nil
+
 }

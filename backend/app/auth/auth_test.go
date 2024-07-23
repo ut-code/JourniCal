@@ -52,12 +52,14 @@ func TestBasicFunctionality(t *testing.T) {
 	u, err := user.Create(db, "username", "password_hashed_at_frontend", seed, seed, token)
 	assert.Nil(err)
 
-	tok, err := auth.RestoreUsersToken(config, u)
+	tok, err := auth.Token(u)
 	assert.Nil(err)
 	assert.True(isValid(tok))
 
 	// test TokenFromContext is skipped because I can't provide echo.Context, and the only thing it uses echo.Context for is to get user from it
 }
+
+const Month = time.Hour * 24 * 30
 
 func isValid(token *oauth2.Token) bool {
 	client := config.Client(context.Background(), token)
@@ -65,7 +67,7 @@ func isValid(token *oauth2.Token) bool {
 	if err != nil {
 		return false
 	}
-	evs, err := cal.GetNEventsForward(srv, "primary", time.Now(), 10)
+	evs, err := cal.GetEventsInRange(srv, "primary", time.Now(), time.Now().Add(1*Month))
 	if err != nil {
 		return false
 	}

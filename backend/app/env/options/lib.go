@@ -3,11 +3,17 @@ package options
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
 
-var TOKEN_SOURCE TokenSource             // "db", "file" or "env". defaults to "db" if not set.
+// NOTE: this can also be written in .env, because godotenv is loaded twice.
+// ALLOWS: multiple values separated by space.
+// supported values: "secret" or "localtest". they will load ".env.secret" and "env/localtest.env" respectively.
+var ENV_FILE string
+
+var TOKEN_SOURCE TokenSource             // "db", "file", "env", or "none". defaults to "db" if not set.
 var CREDENTIALS_SOURCE CredentialsSource // "file", "env" or "none". defaults to "file" if not set. if "none", auth-related things cannot be done.
 
 var STATIC_USER = false              // whether to use static user for everything
@@ -19,22 +25,47 @@ var ENABLE_CORS = false              // will be set true if CORS_ORIGIN != "". c
 var CORS_ORIGIN string // optional
 
 type TokenSource int
-type CredentialsSource int
 
 const (
-	TokenSourceDB TokenSource = iota
+	TokenSourceDB TokenSource = iota // also set if it's "none"
 	TokenSourceEnv
 	TokenSourceFile
 )
 
+type CredentialsSource int
+
 const (
-	CredentialsSourceFile = iota
+	CredentialsSourceFile CredentialsSource = iota
 	CredentailsSourceEnv
 	CredentialsSourceNone
 )
 
 func init() {
-	godotenv.Load()
+	// load .env once for ENV_FILE
+	godotenv.Load(".env")
+
+	var envfile []string
+	for _, filename := range strings.Split(os.Getenv("ENV_FILE"), " ") {
+		var appending string
+		switch strings.ToLower(filename) {
+		case "":
+			continue // not breaking in case of multi space in between such as ENV_FILE="secret    test"
+		case ".env":
+			log.Fatalln("You don't need to specify .env because it is already loaded.")
+		case "secret", ".env.secret":
+			appending = ".env.secret"
+		case "test", "localtest", "localtest.env":
+			appending = "env/localtest.env"
+		case "dev", "dev.env":
+			appending = "env/dev.env"
+		default:
+			log.Fatalln("ERROR: assertion failed in app/env/options: unknown ENV_FILE string:", filename)
+		}
+		envfile = append(envfile, appending)
+	}
+	if len(envfile) >= 1 {
+		godotenv.Load(envfile...)
+	}
 
 	STATIC_USER = boolean("STATIC_USER")
 	ECHO_SERVES_FRONTEND_TOO = boolean("ECHO_SERVES_FRONTEND_TOO")
@@ -45,8 +76,8 @@ func init() {
 		CORS_ORIGIN = corsOrigin
 	}
 
-	switch src := env("TOKEN_SOURCE"); src {
-	case "db", "database", "":
+	switch src := env("TOKEN_SOURCE"); strings.ToLower(src) {
+	case "db", "database", "", "none":
 		TOKEN_SOURCE = TokenSourceDB
 	case "env", "environment":
 		TOKEN_SOURCE = TokenSourceEnv
@@ -58,7 +89,7 @@ func init() {
 		log.Fatalln("Failed assertion in TOKEN_SOURCE.\n  - Must be one of: db, env, file\n  - Got: " + src)
 	}
 
-	switch src := env("CREDENTIALS_SOURCE"); src {
+	switch src := env("CREDENTIALS_SOURCE"); strings.ToLower(src) {
 	case "file", "":
 		CREDENTIALS_SOURCE = CredentialsSourceFile
 	case "env", "environment":
@@ -72,7 +103,7 @@ func init() {
 	// validation
 
 	if STATIC_USER && !STATIC_TOKEN {
-		log.Fatalln("validation failed: STATIC_TOKEN must be set to true when using STATIC_USER")
+		log.Fatalln("validation failed: TOKEN_SOURCE must be set to either file or env when using STATIC_USER")
 	}
 }
 
