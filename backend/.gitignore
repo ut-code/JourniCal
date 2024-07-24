@@ -3,6 +3,7 @@ credentials.json
 token.json
 token.cookie
 .env
+.env.secret
 
 # generated files
 /backend
