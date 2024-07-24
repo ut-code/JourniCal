@@ -26,7 +26,9 @@ func Prefill(db *gorm.DB) {
 	var idx = 0
 out:
 	for {
-		events, err := calendar.GetEventsInRange(calendar.StaticService(), "primary", time.Now(), time.Now().AddDate(0, 3, 0))
+		var curr = time.Now().AddDate(0, -1, 0)
+		var next = curr.AddDate(0, 1, 0)
+		events, err := calendar.GetEventsInRange(calendar.StaticService(), "primary", curr, next)
 		helper.PanicOn(err)
 		for _, event := range events {
 			lorem_ipsum[idx].eventid = event.Id
@@ -35,6 +37,7 @@ out:
 			}
 			idx++
 		}
+		curr = next
 	}
 
 	for _, journal := range lorem_ipsum {

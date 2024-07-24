@@ -39,6 +39,9 @@ func init() {
 	if options.ECHO_SERVES_FRONTEND_TOO {
 		e.Static("/", "./static")
 	}
+	if options.PREFILL_JOURNAL {
+		diary.Prefill(db)
+	}
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(200, "Hello from Echo!")
