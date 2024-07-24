@@ -24,10 +24,11 @@ func Prefill(db *gorm.DB) {
 		lorem_ipsum[j] = tmp
 	})
 	var idx = 0
+	var curr = time.Now().AddDate(0, -1, 0)
+	var next time.Time
 out:
 	for {
-		var curr = time.Now().AddDate(0, -1, 0)
-		var next = curr.AddDate(0, 1, 0)
+		next = curr.AddDate(0, 1, 0)
 		events, err := calendar.GetEventsInRange(calendar.StaticService(), "primary", curr, next)
 		helper.PanicOn(err)
 		for _, event := range events {
