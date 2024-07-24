@@ -3,12 +3,14 @@ package calendar
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	cache "github.com/patrickmn/go-cache"
 	"github.com/ut-code/JourniCal/backend/app/auth"
+	"github.com/ut-code/JourniCal/backend/app/env/options"
 	"github.com/ut-code/JourniCal/backend/app/env/secret"
 	"github.com/ut-code/JourniCal/backend/pkg/hash"
 	"golang.org/x/oauth2"
@@ -60,5 +62,15 @@ func CreateService(ctx context.Context, token *oauth2.Token) (*calendar.Service,
 		return nil, err
 	}
 	return srv, nil
+}
 
+func StaticService() *calendar.Service {
+	if !options.STATIC_TOKEN {
+		log.Fatalln("to use calendar.StaticService(), you must set TOKEN_SOURCE to either env or file")
+	}
+	srv, err := CreateService(context.Background(), secret.StaticToken)
+	if err != nil {
+		log.Fatalln("Failed to create srv: ", err)
+	}
+	return srv
 }
