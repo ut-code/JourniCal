@@ -12,7 +12,7 @@ serve:
 full-test:
 	go test ./test/...
 
-test: vet staticcheck test-pkg test-app dry-build mutable-test
+test: vet staticcheck test-pkg test-app dry-build mutable-check
 
 vet:
 	go vet ./...
@@ -24,7 +24,7 @@ test-app:
 	ENV_FILE=test go test ./app/...
 dry-build:
 	go build -n 2>/dev/null
-mutable-test:
+mutable-check:
 	scripts/mutable-check.sh
 
 database:
