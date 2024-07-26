@@ -6,7 +6,7 @@ name: Go Test, Check, and Format
 on: push
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,12 +27,12 @@ jobs:
       - name: Run tests
         working-directory: ./backend/
         run: |
-          ./scripts/mutable-check.sh
-          go vet ./...
-          go run honnef.co/go/tools/cmd/staticcheck@latest ./...
-          go test ./pkg/...
-          go test ./app/...
-          go build -n 2>/dev/null
+          make vet
+          make staticcheck
+          make test-pkg
+          make test-app
+          make dry-build
+          make mutable-check
 
         env:
           ENV_FILE: test
