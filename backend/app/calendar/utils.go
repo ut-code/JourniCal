@@ -1,70 +1,76 @@
 package calendar
 
 import (
-	"fmt"
+	"context"
+	"errors"
+	"log"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	cache "github.com/patrickmn/go-cache"
+	"github.com/ut-code/JourniCal/backend/app/auth"
+	"github.com/ut-code/JourniCal/backend/app/env/options"
+	"github.com/ut-code/JourniCal/backend/app/env/secret"
+	"github.com/ut-code/JourniCal/backend/pkg/hash"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
+	"gorm.io/gorm"
 )
 
-func SrvFromContext(c echo.Context) (*calendar.Service, error) {
-	token, err := ReadToken(c)
+var srvcache = cache.New(10*time.Minute, 15*time.Minute)
+
+// handles sending responses if it errors
+// reason: it's hard to handle at caller side
+func SrvFromContext(db *gorm.DB, c echo.Context) (*calendar.Service, error) {
+
+	token, err := auth.TokenFromContext(db, secret.OAuth2Config, c)
 	if err != nil {
-		c.Redirect(http.StatusFound, AuthURL)
+		err = c.Redirect(http.StatusFound, secret.AuthURL)
 		return nil, err
 	}
-	client := cfg.Client(ctx, token)
+
+	key := hash.SHA256(token).Base64()
+	var srv *calendar.Service
+
+	any, ok := srvcache.Get(key)
+	if !ok {
+		goto regen
+	}
+	srv, ok = any.(*calendar.Service)
+	if !ok {
+		goto regen
+	}
+	return srv, nil
+
+regen:
+
+	srv, err = CreateService(c.Request().Context(), token)
+	if err != nil {
+		return nil, c.String(500, "Internal error: "+err.Error())
+	}
+	srvcache.Set(key, srv, 0)
+	return srv, nil
+}
+
+func CreateService(ctx context.Context, token *oauth2.Token) (*calendar.Service, error) {
+	client := secret.OAuth2Config.Client(ctx, token)
 	srv, err := calendar.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		c.String(500, "Internal Error: calendar.NewService failed")
+		err := errors.New("calendar.NewService failed: " + err.Error())
 		return nil, err
 	}
 	return srv, nil
 }
 
-func ReadToken(c echo.Context) (*oauth2.Token, error) {
-	// maybe this should be stored in a database?
-	// reason: getting token from same code twice doesn't seem to be possible
-	var code string
-	{
-		cookie, err := c.Cookie("code")
-		if err != nil {
-			return nil, err
-		}
-		code, err = url.QueryUnescape(cookie.Value)
-		if err != nil {
-			return nil, err
-		}
+func StaticService() *calendar.Service {
+	if !options.STATIC_TOKEN {
+		log.Fatalln("to use calendar.StaticService(), you must set TOKEN_SOURCE to either env or file")
 	}
-
-	// read from cache here
-	if cachedToken, ok := TokenCache.Get(code); ok {
-		return &cachedToken, nil
-	}
-
-	token, err := cfg.Exchange(ctx, code)
+	srv, err := CreateService(context.Background(), secret.StaticToken)
 	if err != nil {
-		fmt.Println("Unable to retrieve token from web", err)
-		return nil, err
+		log.Fatalln("Failed to create srv: ", err)
 	}
-	TokenCache.Set(code, *token)
-
-	return token, nil
-}
-
-func WriteAuthCodeToCookie(c echo.Context, code string) {
-	MaxAge := (24 * time.Hour).Seconds() // about 1 day.
-	c.SetCookie(&http.Cookie{
-		Path:     "/",
-		Name:     "code",
-		Value:    url.QueryEscape(code),
-		MaxAge:   int(MaxAge),
-		HttpOnly: true, // reduces XSS risk via disallowing access from browser JS
-		SameSite: http.SameSiteDefaultMode,
-	})
+	return srv
 }

@@ -12,9 +12,12 @@ JourniCal はカレンダーアプリとジャーナルアプリを組み合わ�
 
 ### ファイルの準備: 1 回のみ
 
-- backend/.env.sample を backend/.env にコピーする。
-  - docker compose を使う場合は、コメントに従って編集する。
-- credentials.json を探してきて、 backend/credentials.json にコピーする。
+- 設定の下準備
+  - backend/.env.sample を backend/.env にコピーする。
+- 機密ファイル
+  - credentials.json を探してきて、 backend/credentials.json にコピーする。
+  - token.json を探し、 backend/token.json にコピーする。または、 `go run backend/bin/generate-token-json` で token.json を取得する。
+  - もしくは、 .env.secret をメンバーに聞いてもらう。
 
 ---
 

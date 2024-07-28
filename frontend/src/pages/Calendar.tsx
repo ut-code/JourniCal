@@ -4,91 +4,9 @@ import { add, sub } from "date-fns";
 import { Box, Button, MenuItem, Select } from "@mui/material";
 import TopBar from "../components/TopBar";
 import TimelineRowName from "../components/TimelineRowName";
-import { Schedule } from "../types/types";
 import ScheduleView from "../components/ScheduleView";
 
 type ModeVariant = "schedule" | "day" | "3days" | "week";
-type FetchedSchedule = {
-  id: string;
-  colorId?: string;
-  start: {
-    date?: string;
-    dateTime?: string;
-  };
-  end: {
-    date?: string;
-    dateTime?: string;
-  };
-  summary: string;
-};
-
-const COLOR_DICT = [
-  "#7986CB",
-  "#33B679",
-  "#8E24AA",
-  "#E67C73",
-  "#F6BF26",
-  "#F4511E",
-  "#039BE5",
-  "#616161",
-  "#3F51B5",
-  "#0B8043",
-  "#D50000",
-];
-
-const scheduleFromFetchedData = (
-  fetchedSchedule: FetchedSchedule,
-): Schedule => {
-  if (
-    fetchedSchedule.start.dateTime == undefined &&
-    fetchedSchedule.start.date != undefined &&
-    fetchedSchedule.end.dateTime == undefined &&
-    fetchedSchedule.end.date != undefined
-  ) {
-    return {
-      id: fetchedSchedule.id,
-      isAllDay: true,
-      start: new Date(fetchedSchedule.start.date),
-      end: new Date(fetchedSchedule.end.date),
-      title: fetchedSchedule.summary,
-      color:
-        COLOR_DICT[
-          Number(fetchedSchedule.colorId)
-            ? Number(fetchedSchedule.colorId) - 1
-            : 6
-        ],
-    };
-  }
-  if (
-    fetchedSchedule.start.dateTime != undefined &&
-    fetchedSchedule.start.date == undefined &&
-    fetchedSchedule.end.dateTime != undefined &&
-    fetchedSchedule.end.date == undefined
-  ) {
-    return {
-      id: fetchedSchedule.id,
-      isAllDay: false,
-      start: new Date(fetchedSchedule.start.dateTime),
-      end: new Date(fetchedSchedule.end.dateTime),
-      title: fetchedSchedule.summary,
-      color:
-        COLOR_DICT[
-          Number(fetchedSchedule.colorId)
-            ? Number(fetchedSchedule.colorId) - 1
-            : 6
-        ],
-    };
-  }
-  throw new Error("invalid schedule format.");
-};
-
-const isEqualDay = (day1: Date, day2: Date) => {
-  return (
-    day1.getFullYear() === day2.getFullYear() &&
-    day1.getMonth() === day2.getMonth() &&
-    day1.getDate() === day2.getDate()
-  );
-};
 
 const Calendar: React.FC = () => {
   const today = new Date(new Date().toDateString());
@@ -112,34 +30,6 @@ const Calendar: React.FC = () => {
       ),
     );
     setThreeDays([...Array(3).keys()].map((i) => add(baseDate, { days: i })));
-  }, [baseDate]);
-
-  const [weekSchedules, setWeekSchedules] = useState<Schedule[]>([]);
-
-  // データフェッチ
-  useEffect(() => {
-    async function fetchData() {
-      const startUnixTime = Math.floor(baseDate.getTime() / 1000);
-      const endUnixTime = Math.floor(
-        add(baseDate, { days: 7 }).getTime() / 1000,
-      );
-      const response = await fetch(
-        `http://localhost:3000/api/calendar/get-events-in-range/${startUnixTime}/${endUnixTime}`,
-        {
-          method: "GET",
-          credentials: "include",
-          mode: "cors",
-        },
-      );
-      const data = await response.json();
-      // 一週間の予定を格納
-      setWeekSchedules(
-        data.map((schedule: FetchedSchedule) =>
-          scheduleFromFetchedData(schedule),
-        ),
-      );
-    }
-    fetchData();
   }, [baseDate]);
 
   return (
@@ -197,31 +87,14 @@ const Calendar: React.FC = () => {
                 key={baseDate.getTime()}
                 day={baseDate}
                 today={today}
-                daySchedules={weekSchedules.filter((schedule) =>
-                  isEqualDay(baseDate, schedule.start),
-                )}
               />
             ) : mode === "3days" ? (
               threeDays.map((day) => (
-                <TimelineView
-                  key={day.getTime()}
-                  day={day}
-                  today={today}
-                  daySchedules={weekSchedules.filter((schedule) =>
-                    isEqualDay(day, schedule.start),
-                  )}
-                />
+                <TimelineView key={day.getTime()} day={day} today={today} />
               ))
             ) : (
               week.map((day) => (
-                <TimelineView
-                  key={day.getTime()}
-                  day={day}
-                  today={today}
-                  daySchedules={weekSchedules.filter((schedule) =>
-                    isEqualDay(day, schedule.start),
-                  )}
-                />
+                <TimelineView key={day.getTime()} day={day} today={today} />
               ))
             )}
           </Box>

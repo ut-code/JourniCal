@@ -9,12 +9,20 @@ import (
 
 type Curl struct {
 	pathprefix string
+	cookie     bool
 	cookiepath string
 }
 
-func Init(cookiePath string) Curl {
+func WithCookie(cookiePath string) Curl {
 	return Curl{
+		cookie:     true,
 		cookiepath: cookiePath,
+	}
+}
+
+func New() Curl {
+	return Curl{
+		cookie: false,
 	}
 }
 
@@ -25,7 +33,12 @@ func (c *Curl) PrefixPath(prefix string) *Curl {
 
 func (c Curl) String(urlPath string) (string, error) {
 	fmt.Println("sending cURL request to: ", c.pathprefix+urlPath)
-	b, err := exec.Command("curl", "-c", c.cookiepath, "-b", c.cookiepath, c.pathprefix+urlPath).Output()
+	var args []string
+	if c.cookie {
+		args = append(args, "-c", c.cookiepath, "-b", c.cookiepath)
+	}
+	args = append(args, c.pathprefix+urlPath)
+	b, err := exec.Command("curl", args...).Output()
 	if err != nil {
 		return "", err
 	}

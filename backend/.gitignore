@@ -3,11 +3,15 @@ credentials.json
 token.json
 token.cookie
 .env
+.env.secret
 
 # generated files
 /backend
 /dist/*
 !/dist/.gitkeep
+
+# tests
+test.db
 
 # Editor directories and files
 .vscode/*

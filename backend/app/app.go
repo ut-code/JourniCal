@@ -10,36 +10,50 @@ import (
 
 	"github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/diary"
+	"github.com/ut-code/JourniCal/backend/app/env/options"
 	"github.com/ut-code/JourniCal/backend/app/router"
+	"github.com/ut-code/JourniCal/backend/app/user"
 )
 
 var e *echo.Echo
 
 func init() {
-	diaryDB := db.InitDB(&diary.Diary{})
+	db := db.InitDB(
+		&diary.Diary{},
+		&user.User{},
+	)
+
 	// Doc: https://echo.labstack.com/
 	e = echo.New()
 	// ミドルウェアを設定
-	e.Use(middleware.Logger())
+	// e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	mustLogin := user.LoginMiddleware(db)
 
-	if cors_origin := os.Getenv("CORS_ORIGIN"); cors_origin != "" {
+	if options.ENABLE_CORS {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{cors_origin},
+			AllowOrigins:     []string{options.CORS_ORIGIN},
 			AllowCredentials: true,
 		}))
 	}
-	if os.Getenv("ECHO_SERVES_FRONTEND_TOO") == "true" {
+	if options.ECHO_SERVES_FRONTEND_TOO {
 		e.Static("/", "./static")
 	}
-	router.Root(e.Group(""))
-	router.Api(e.Group("/api"))
-	router.Auth(e.Group("/auth"))
-	router.Calendar(e.Group("/api/calendar"))
-	router.Diary(e.Group("/api/diaries"), diaryDB)
+	if options.PREFILL_JOURNAL {
+		diary.Prefill(db)
+	}
+
+	e.GET("/", func(c echo.Context) error {
+		return c.String(200, "Hello from Echo!")
+	})
+
+	router.Auth(e.Group("/auth"), db)
+	router.User(e.Group("/api/user", mustLogin), db)
+	router.Calendar(e.Group("/api/calendar", mustLogin), db)
+	router.Diary(e.Group("/api/diaries", mustLogin), db)
 
 	// GitHub CI 用
-	if os.Getenv("HALT_AFTER_SUCCESS") == "true" {
+	if options.HALT_AFTER_SUCCESS {
 		go func() {
 			time.Sleep(15 * time.Second)
 			os.Exit(0)
@@ -47,7 +61,7 @@ func init() {
 	}
 }
 
-func Serve(port int) {
+func Serve(port uint) {
 	// サーバの起動
 	if err := e.Start(":" + fmt.Sprint(port)); err != nil {
 		fmt.Println(err.Error())
