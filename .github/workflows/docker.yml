@@ -13,7 +13,7 @@ jobs:
 
       - name: Run docker-compose.yml
         run: docker compose up --build --abort-on-container-exit --exit-code-from backend
-    environment:
-      HALT_AFTER_SUCCESS=true
-      CREDENTIALS_SOURCE=none 
-      IN_MEMORY_DB=true
+    env:
+      HALT_AFTER_SUCCESS: true
+      CREDENTIALS_SOURCE: none 
+      IN_MEMORY_DB: true
