@@ -2,7 +2,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import { CssBaseline } from "@mui/material";
 import Calendar from "./pages/Calendar";
-import Diary from "./pages/diary";
+import Journal from "./pages/journal";
 
 function App() {
   const router = createBrowserRouter([
@@ -15,8 +15,8 @@ function App() {
       element: <Calendar />,
     },
     {
-      path: "/diary",
-      element: <Diary />,
+      path: "/journal",
+      element: <Journal />,
     },
   ]);
 
