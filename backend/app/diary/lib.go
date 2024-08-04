@@ -17,6 +17,7 @@ type Diary struct {
 	Date      time.Time `json:"date"` // Date of what?
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
+	EventID   string    `gorm:"unique" json:"eventId"`
 }
 type HTTPStatus = int
 
@@ -39,7 +40,17 @@ func GetAll(db *gorm.DB, u *user.User) ([]Diary, error) {
 	return diaries, nil
 }
 
-// updates diary.ID and diary.CreatorID
+func GetByEvent(db *gorm.DB, eventID string, owner *user.User) (*Diary, error) {
+	diary, err := GetByEventUnchecked(db, eventID)
+	if err != nil {
+		return nil, errors.New("diary not found")
+	}
+	if diary.CreatorID != owner.ID {
+		return nil, errors.New("this diary is not yours")
+	}
+	return diary, nil
+}
+
 func Create(db *gorm.DB, diary *Diary, creator *user.User) error {
 	diary.CreatorID = creator.ID
 	err := CreateUnchecked(db, diary)
@@ -83,7 +94,14 @@ func GetAllUnchecked(db *gorm.DB, creatorId uint) ([]Diary, error) {
 	return diaries, nil
 }
 
-// updates diary.ID
+func GetByEventUnchecked(db *gorm.DB, eventID string) (*Diary, error) {
+	diary := &Diary{}
+	if err := db.Where("event_id = ?", eventID).First(diary).Error; err != nil {
+		return nil, errors.New("diary not found")
+	}
+	return diary, nil
+}
+
 func CreateUnchecked(db *gorm.DB, diary *Diary) error {
 	if err := db.Create(diary).Error; err != nil {
 		return errors.New("database error: failed to create diary")
