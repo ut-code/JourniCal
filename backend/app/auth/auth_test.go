@@ -67,6 +67,9 @@ func isValid(token *oauth2.Token) bool {
 	if err != nil {
 		return false
 	}
-	evs := cal.GetEventsInRange(srv, "primary", time.Now(), time.Now().Add(1*Month))
+	evs, err := cal.GetEventsInRange(srv, "primary", time.Now(), time.Now().Add(1*Month))
+	if err != nil {
+		return false
+	}
 	return len(evs) != 0
 }
