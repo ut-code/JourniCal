@@ -22,6 +22,7 @@ services:
       - DSN=host=postgres user=user database=database password=password port=5432
       - HALT_AFTER_SUCCESS # inherit
       - CREDENTIALS_SOURCE # inherit
+      - IN_MEMORY_DB # inherit
   # not necessary anymore. leaving it here in case you need it in the future
   # postgres:
   #   image: postgres:alpine
