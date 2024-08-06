@@ -10,7 +10,7 @@ const Home: React.FC = () => {
           <Link to="/calendar">Calendar</Link>
         </li>
         <li>
-          <Link to="/diary">Diary</Link>
+          <Link to="/journal">Journal</Link>
         </li>
       </ul>
     </>
