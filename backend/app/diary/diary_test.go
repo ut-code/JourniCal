@@ -36,6 +36,7 @@ func TestBasicFunctionality(t *testing.T) {
 		Date:    time.Now(),
 		Title:   "Hello, World!",
 		Content: "Lorem Ipsum",
+		EventID: "311c6584-812c-7f3c-182b-2880ce31af21",
 	}
 	err = diary.Create(db, d, u)
 	assert.Nil(err)
@@ -45,6 +46,7 @@ func TestBasicFunctionality(t *testing.T) {
 		Date:    time.Now(),
 		Title:   "Good morning, world",
 		Content: "Consectetur adipiscing elit.",
+		EventID: "2f2ee8d2-fae0-7dbf-c04a-f3a0999029d1",
 	}
 	err = diary.Create(db, d2, u)
 	assert.Nil(err)
@@ -55,6 +57,7 @@ func TestBasicFunctionality(t *testing.T) {
 	assert.Equal(d.ID, dd.ID, "d should equal dd")
 	assert.Equal(d.Title, dd.Title, "d should equal dd")
 	assert.Equal(d.Content, dd.Content, "d should equal dd")
+	assert.Equal(d.EventID, dd.EventID, "d should equal dd")
 
 	diaries, err := diary.GetAll(db, u)
 	helper.PanicOn(err)
@@ -65,6 +68,13 @@ func TestBasicFunctionality(t *testing.T) {
 	assert.Equal(d2.ID, diaries[1].ID, "diaries[1] should equal d2")
 	assert.Equal(d2.Content, diaries[1].Content, "diaries[1] should equal d2")
 
+	dd, err = diary.GetByEvent(db, d.EventID, u)
+	helper.PanicOn(err)
+	assert.Equal(d.ID, dd.ID, "d should equal dd")
+	assert.Equal(d.Title, dd.Title, "d should equal dd")
+	assert.Equal(d.Content, dd.Content, "d should equal dd")
+	assert.Equal(d.EventID, dd.EventID, "d should equal dd")
+
 	dd, err = diary.Get(db, d.ID, unauthorizedUser)
 	assert.Error(err, "unauthorized user should not be able to GET")
 	assert.Nil(dd, "unauthorized user should not be able to GET")
@@ -72,6 +82,10 @@ func TestBasicFunctionality(t *testing.T) {
 	diaries, err = diary.GetAll(db, unauthorizedUser)
 	assert.Nil(err)
 	assert.Equal(len(diaries), 0, "unauthorized user should not be able to get any")
+
+	dd, err = diary.GetByEvent(db, d.EventID, unauthorizedUser)
+	assert.Error(err, "unauthorized user should not be able to GET by event")
+	assert.Nil(dd, "unauthorized user should not be able to GET by event")
 
 	err = diary.Delete(db, d.ID, unauthorizedUser)
 	assert.Error(err, "unauthorized user should not be able to delete")
