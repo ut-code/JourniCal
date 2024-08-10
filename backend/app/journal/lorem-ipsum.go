@@ -1,4 +1,4 @@
-package diary
+package journal
 
 var lorem_ipsum = []struct {
 	title   string

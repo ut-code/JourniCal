@@ -8,9 +8,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/ut-code/JourniCal/backend/app/database"
-	"github.com/ut-code/JourniCal/backend/app/diary"
+	db "github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/env/options"
+	"github.com/ut-code/JourniCal/backend/app/journal"
 	"github.com/ut-code/JourniCal/backend/app/router"
 	"github.com/ut-code/JourniCal/backend/app/user"
 )
@@ -19,7 +19,7 @@ var e *echo.Echo
 
 func init() {
 	db := db.InitDB(
-		&diary.Diary{},
+		&journal.Journal{},
 		&user.User{},
 	)
 
@@ -40,7 +40,7 @@ func init() {
 		e.Static("/", "./static")
 	}
 	if options.PREFILL_JOURNAL {
-		diary.Prefill(db)
+		journal.Prefill(db)
 	}
 
 	e.GET("/", func(c echo.Context) error {
@@ -50,7 +50,7 @@ func init() {
 	router.Auth(e.Group("/auth"), db)
 	router.User(e.Group("/api/user", mustLogin), db)
 	router.Calendar(e.Group("/api/calendar", mustLogin), db)
-	router.Diary(e.Group("/api/diaries", mustLogin), db)
+	router.Journal(e.Group("/api/journals", mustLogin), db)
 
 	// GitHub CI 用
 	if options.HALT_AFTER_SUCCESS {

@@ -1,4 +1,4 @@
-package diary
+package journal
 
 import (
 	"fmt"
@@ -42,7 +42,7 @@ out:
 	}
 
 	for _, journal := range lorem_ipsum {
-		d := &Diary{
+		d := &Journal{
 			CreatorID: user.StaticUser.ID,
 			Date:      time.Now(),
 			Title:     journal.title,
@@ -51,8 +51,8 @@ out:
 		}
 		err := CreateUnchecked(db, d)
 		if err != nil {
-			log.Fatalln("Failed to create diary: ", err)
+			log.Fatalln("Failed to create journal: ", err)
 		}
 	}
-	fmt.Println("[log] Prefilled db with", len(lorem_ipsum), "entries of diaries")
+	fmt.Println("[log] Prefilled db with", len(lorem_ipsum), "entries of journals")
 }
