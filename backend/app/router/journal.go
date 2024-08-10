@@ -48,11 +48,11 @@ func Journal(g *echo.Group, db *gorm.DB) {
 		if err != nil {
 			return c.String(http.StatusUnauthorized, "authentication error")
 		}
-		diary, err := diary.GetByEvent(db, eventID, u)
+		journal, err := journal.GetByEvent(db, eventID, u)
 		if err != nil {
 			return c.String(http.StatusForbidden, err.Error())
 		}
-		return c.JSON(200, diary)
+		return c.JSON(200, journal)
 	})
 
 	// CREATE
