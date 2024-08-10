@@ -17,6 +17,7 @@ type Journal struct {
 	Date      time.Time `json:"date"` // Date of what?
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
+	EventID   string    `gorm:"unique" json:"eventId"`
 }
 type HTTPStatus = int
 
@@ -37,6 +38,17 @@ func GetAll(db *gorm.DB, u *user.User) ([]Journal, error) {
 		return nil, errors.New("database error")
 	}
 	return journals, nil
+}
+
+func GetByEvent(db *gorm.DB, eventID string, owner *user.User) (*Journal, error) {
+	journal, err := GetByEventUnchecked(db, eventID)
+	if err != nil {
+		return nil, errors.New("journal not found")
+	}
+	if journal.CreatorID != owner.ID {
+		return nil, errors.New("this journal is not yours")
+	}
+	return journal, nil
 }
 
 // updates journal.ID and journal.CreatorID
@@ -81,6 +93,14 @@ func GetAllUnchecked(db *gorm.DB, creatorId uint) ([]Journal, error) {
 		return nil, errors.New("database error: failed to get journals of a user")
 	}
 	return journals, nil
+}
+
+func GetByEventUnchecked(db *gorm.DB, eventID string) (*Journal, error) {
+	journal := &Journal{}
+	if err := db.Where("event_id = ?", eventID).First(journal).Error; err != nil {
+		return nil, errors.New("journal not found")
+	}
+	return journal, nil
 }
 
 // updates journal.ID
