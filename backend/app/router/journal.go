@@ -41,6 +41,20 @@ func Journal(g *echo.Group, db *gorm.DB) {
 		return c.JSON(200, journal)
 	})
 
+	// GET BY EVENT
+	g.GET("/event/:eventID", func(c echo.Context) error {
+		eventID := c.Param("eventID")
+		u, err := user.FromEchoContext(db, c)
+		if err != nil {
+			return c.String(http.StatusUnauthorized, "authentication error")
+		}
+		journal, err := journal.GetByEvent(db, eventID, u)
+		if err != nil {
+			return c.String(http.StatusForbidden, err.Error())
+		}
+		return c.JSON(200, journal)
+	})
+
 	// CREATE
 	g.POST("/", func(c echo.Context) error {
 		d := new(journal.Journal)
