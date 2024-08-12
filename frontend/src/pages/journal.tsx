@@ -12,7 +12,7 @@ function Journal() {
       ) : (
         <div className="journal-entries">
           {journals?.map((journal, index) => (
-            <JournalEntry key={index} {...journal} />
+            <JournalEntry key={index} journal={journal} />
           ))}
         </div>
       )}

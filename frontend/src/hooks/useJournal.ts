@@ -1,15 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import { Journal } from "../types/types";
 
 const API_ENDPOINT = "http://localhost:3000";
 
-interface Entry {
-  date: string;
-  title: string;
-  content: string;
-}
-
 export default function useJournal() {
-  const [journals, setJournals] = useState<Entry[] | null>(null);
+  const [journals, setJournals] = useState<Journal[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
