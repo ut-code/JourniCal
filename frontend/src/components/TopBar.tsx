@@ -10,7 +10,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import { useLocation } from "react-router-dom";
-import { CALENDAR_PATH_NAME, DIARY_PATH_NAME } from "../consts/consts";
+import { CALENDAR_PATH_NAME, JOURNAL_PATH_NAME } from "../consts/consts";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 
@@ -56,13 +56,13 @@ const TopBar: React.FC<{
           <CalendarMonthIcon sx={iconCommonSxProps} />
           <SearchIcon sx={iconCommonSxProps} />
           <CheckCircleOutlineIcon sx={iconCommonSxProps} />
-          {currentPathName === DIARY_PATH_NAME ? (
+          {currentPathName === JOURNAL_PATH_NAME ? (
             <Link to={CALENDAR_PATH_NAME} style={linkIconCommonStyleProps}>
               <DateRangeIcon sx={iconCommonSxProps} />
             </Link>
           ) : (
             currentPathName === CALENDAR_PATH_NAME && (
-              <Link to={DIARY_PATH_NAME} style={linkIconCommonStyleProps}>
+              <Link to={JOURNAL_PATH_NAME} style={linkIconCommonStyleProps}>
                 <AutoStoriesIcon sx={iconCommonSxProps} />
               </Link>
             )

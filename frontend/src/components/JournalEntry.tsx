@@ -1,4 +1,4 @@
-export default function DiaryEntry({
+export default function JournalEntry({
   date,
   title,
   content,
@@ -9,7 +9,7 @@ export default function DiaryEntry({
 }) {
   const parsedDate = new Date(date);
   return (
-    <div className="diary-entry" style={{ display: "flex" }}>
+    <div className="journal-entry" style={{ display: "flex" }}>
       <div
         className="date"
         style={{
