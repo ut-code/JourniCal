@@ -1,13 +1,7 @@
-export default function JournalEntry({
-  date,
-  title,
-  content,
-}: {
-  date: string;
-  title: string;
-  content: string;
-}) {
-  const parsedDate = new Date(date);
+import { Journal } from "../types/types";
+
+export default function JournalEntry({ journal }: { journal: Journal }) {
+  const parsedDate = new Date(journal.date);
   return (
     <div className="journal-entry" style={{ display: "flex" }}>
       <div
@@ -43,8 +37,8 @@ export default function JournalEntry({
         className="content"
         style={{ flexBasis: "85%", marginRight: "10px" }}
       >
-        <h3>{title}</h3>
-        <div>{content}</div>
+        <h3>{journal.title}</h3>
+        <div>{journal.content}</div>
       </div>
     </div>
   );
