@@ -1,5 +1,22 @@
 import { Box, Dialog, Typography } from "@mui/material";
-import { Schedule } from "../types/types";
+import { Journal, Schedule } from "../types/types";
+import useSWR from "swr";
+import { useEffect, useState } from "react";
+
+type JournalPresenterProps = {
+  journal: Journal;
+};
+
+const JournalPresenter = ({ journal }: JournalPresenterProps): JSX.Element => {
+  return (
+    <>
+      <Typography variant="h6" component="h2">
+        {journal.title}
+      </Typography>
+      <Typography>{journal.content}</Typography>
+    </>
+  );
+};
 
 type ScheduleModalProps = {
   schedule: Schedule;
@@ -9,6 +26,25 @@ type ScheduleModalProps = {
 
 const ScheduleModal = (props: ScheduleModalProps): JSX.Element => {
   const { schedule, open, onClose } = props;
+  const [journal, setJournal] = useState<Journal | undefined>(undefined);
+  // diaryを取得
+  const { data, error } = useSWR(
+    `http://localhost:3000/api/journals/event/${schedule.id}`,
+    (url) =>
+      fetch(url, {
+        method: "GET",
+        credentials: "include",
+        mode: "cors",
+      }).then((r) => r.json()),
+  );
+  if (error) {
+    console.error(error);
+  }
+  useEffect(() => {
+    if (data) {
+      setJournal(data);
+    }
+  }, [data]);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -31,7 +67,13 @@ const ScheduleModal = (props: ScheduleModalProps): JSX.Element => {
             minute: "2-digit",
           })}`}
         </Typography>
-        <Box pt="10%">ここにdiaryを載せる</Box>
+        <Box pt="10%">
+          {journal ? (
+            <JournalPresenter journal={journal} />
+          ) : (
+            "ジャーナルがありません。"
+          )}
+        </Box>
       </Box>
     </Dialog>
   );
