@@ -19,3 +19,14 @@ func ConcurrentMap[T, U any](src []T, fn func(T) U) (dest []U) {
 	wg.Wait()
 	return
 }
+
+func FilterNil[T any](src []*T) []T {
+	var dst []T
+
+	for _, item := range src {
+		if item != nil {
+			dst = append(dst, *item)
+		}
+	}
+	return dst
+}
