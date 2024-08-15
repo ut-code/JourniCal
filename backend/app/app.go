@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -49,6 +48,9 @@ func init() {
 		return c.String(200, "Hello from Echo!")
 	})
 
+	if options.DEV_ROUTES {
+		router.Dev(e.Group("/dev"), db)
+	}
 	router.Auth(e.Group("/auth"), db)
 	router.User(e.Group("/api/user", mustLogin), db)
 	router.Calendar(e.Group("/api/calendar", mustLogin), db)
