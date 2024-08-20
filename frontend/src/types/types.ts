@@ -6,3 +6,10 @@ export type Schedule = {
   title: string;
   color: string;
 };
+
+export type Journal = {
+  id: string;
+  date: string;
+  title: string;
+  content: string;
+};
