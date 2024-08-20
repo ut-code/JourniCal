@@ -3,9 +3,13 @@ package router
 import (
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/ut-code/JourniCal/backend/app/calendar"
 	"github.com/ut-code/JourniCal/backend/app/journal"
 	"github.com/ut-code/JourniCal/backend/app/user"
+	"github.com/ut-code/JourniCal/backend/pkg/list"
+	gcal "google.golang.org/api/calendar/v3"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -22,6 +26,43 @@ func Journal(g *echo.Group, db *gorm.DB) {
 			return c.String(500, err.Error())
 		}
 		return c.JSON(200, json)
+	})
+
+	// start and end must be encoded as string of Unix timestamp
+	g.GET("/in-range/:start/:end", func(c echo.Context) error {
+		csrv, err := calendar.SrvFromContext(db, c)
+		if err != nil {
+			return c.String(500, "Couldn't start service")
+		}
+		user, err := user.FromEchoContext(db, c)
+		if err != nil {
+			return c.String(401, "couldn't find user")
+		}
+
+		start, err := strconv.Atoi(c.Param("start"))
+		if err != nil {
+			return c.String(400, "Bad request: invalid start time")
+		}
+		end, err := strconv.Atoi(c.Param("end"))
+		if err != nil {
+			return c.String(400, "Bad request: invalid end time")
+		}
+
+		events, err := calendar.GetEventsInRange(csrv, "primary", time.Unix(int64(start), 0), time.Unix(int64(end), 0))
+		if err != nil {
+			return c.String(500, "Couldn't fetch events")
+		}
+
+		it := list.ConcurrentMap(events, func(event *gcal.Event) *journal.Journal {
+			jnl, err := journal.GetByEvent(db, event.Id, user)
+			if err == nil {
+				return jnl
+			}
+			return nil
+		})
+
+		result := list.FilterNil(it)
+		return c.JSON(200, result)
 	})
 
 	g.GET("/:id", func(c echo.Context) error {
