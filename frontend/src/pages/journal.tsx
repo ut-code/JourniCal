@@ -33,15 +33,15 @@ function Journal() {
         </div>
       )}
       <Box
-      sx={{
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-      }}
-    >
-      <Fab color="primary" aria-label="add" onClick={() => setOpen(true)}>
-        <AddIcon />
-      </Fab>
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+        }}
+      >
+        <Fab color="primary" aria-label="add" onClick={() => setOpen(true)}>
+          <AddIcon />
+        </Fab>
       </Box>
       <Dialog
         open={open}

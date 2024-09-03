@@ -8,7 +8,7 @@ export default function useJournal() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchEntries = useCallback(async () => {
+  const fetchJournals = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -29,8 +29,31 @@ export default function useJournal() {
     }
   }, []);
 
+  const createJournal = useCallback(async (journal: Omit<Journal, "id">) => {
+    try {
+      const response = await fetch(`${API_ENDPOINT}/api/journals/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(journal),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create journal");
+      }
+      const data = await response.json();
+      setJournals((prevJournals) =>
+        prevJournals ? [...prevJournals, data] : [data],
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
-  return { journals, isLoading, error, fetchEntries };
+    fetchJournals();
+  }, [fetchJournals]);
+  return { journals, isLoading, error, fetchJournals, createJournal };
 }

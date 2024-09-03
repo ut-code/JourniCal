@@ -1,6 +1,7 @@
 import { TableCell, TableRow, Typography } from "@mui/material";
 import { Duration, intervalToDuration } from "date-fns";
 import { Schedule } from "../types/types";
+import useJournal from "../hooks/useJournal";
 
 const durationToHours = (duration: Duration) => {
   const hours = duration.hours ? duration.hours : 0;
@@ -31,6 +32,9 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
 
   const scheduleDurationHours = durationToHours(scheduleDuration);
   //TODO 期間が短いと文字がはみ出るのをなんとかする
+
+  const { createJournal } = useJournal();
+
   return (
     <TableRow
       sx={{
@@ -42,6 +46,15 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
         minHeight: "25px",
         borderRadius: "5px",
         backgroundColor: schedule.color,
+      }}
+      onClick={async () => {
+        await createJournal({
+          title: "tmp",
+          content:
+            "あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。",
+          eventId: schedule.id,
+          date: schedule.start.toISOString(),
+        });
       }}
     >
       <TableCell padding="none" sx={{ border: "none" }}>
