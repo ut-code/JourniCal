@@ -27,7 +27,9 @@ function Journal() {
         <div>Error: {error.message}</div>
       ) : (
         <div className="journal-entries">
-          {journals?.map((journal, index) => <JournalEntry key={index} {...journal} />)}
+          {journals?.map((journal, index) => (
+            <JournalEntry key={index} journal={journal} />
+          ))}
         </div>
       )}
       <Box
