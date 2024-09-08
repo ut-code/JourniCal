@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import JournalEntry from "../components/JournalEntry";
 import useJournal from "../hooks/useJournal";
 import { add } from "date-fns";
+import TopBar from "../components/TopBar";
 
 function Journal() {
   const {
@@ -11,6 +12,7 @@ function Journal() {
     fetchMoreEntriesAfter,
     fetchMoreEntriesBefore,
   } = useJournal();
+  const [baseDate, setBaseDate] = useState(new Date());
   const [topDate, setTopDate] = useState<Date>(
     add(new Date(new Date("2024-06-12").toDateString()), { days: -4 }),
   );
@@ -80,7 +82,8 @@ function Journal() {
 
   return (
     <div className="journal-app">
-      <div ref={topTargetRef} />
+      <TopBar baseDate={baseDate} setBaseDate={setBaseDate} />
+      <div ref={topTargetRef} style={{ marginTop: "20%" }} />
       {isLoading ? (
         <div>Loading...</div>
       ) : error ? (
