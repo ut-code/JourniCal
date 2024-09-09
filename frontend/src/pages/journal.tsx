@@ -14,10 +14,10 @@ function Journal() {
   } = useJournal();
   const [baseDate, setBaseDate] = useState(new Date());
   const [topDate, setTopDate] = useState<Date>(
-    add(new Date(new Date("2024-06-12").toDateString()), { days: -4 }),
+   new Date(new Date("2024-09-17").toDateString()),
   );
   const [bottomDate, setBottomDate] = useState<Date>(
-    add(new Date(new Date("2024-06-12").toDateString()), { days: 4 }),
+    new Date(new Date("2024-09-17").toDateString()),
   );
   const topTargetRef = useRef<HTMLDivElement>(null);
   const bottomTargetRef = useRef<HTMLDivElement>(null);
@@ -28,12 +28,12 @@ function Journal() {
         async (entries) => {
           if (entries[0].isIntersecting) {
             await fetchMoreEntriesBefore(topDate);
-            setTopDate((prev) => add(prev, { days: -3 }));
+            setTopDate((prev) => add(prev, { days: -4 }));
           }
         },
         {
           root: null,
-          rootMargin: "300px",
+          rootMargin: "200px",
           threshold: 0.01,
         },
       ),
@@ -46,12 +46,12 @@ function Journal() {
         async (entries) => {
           if (entries[0].isIntersecting) {
             await fetchMoreEntriesAfter(bottomDate);
-            setBottomDate((prev) => add(prev, { days: 3 }));
+            setBottomDate((prev) => add(prev, { days: 4 }));
           }
         },
         {
           root: null,
-          rootMargin: "300px",
+          rootMargin: "200px",
           threshold: 0.01,
         },
       ),
