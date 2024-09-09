@@ -14,7 +14,7 @@ function Journal() {
   } = useJournal();
   const [baseDate, setBaseDate] = useState(new Date());
   const [topDate, setTopDate] = useState<Date>(
-   new Date(new Date("2024-09-17").toDateString()),
+    new Date(new Date("2024-09-17").toDateString()),
   );
   const [bottomDate, setBottomDate] = useState<Date>(
     new Date(new Date("2024-09-17").toDateString()),
