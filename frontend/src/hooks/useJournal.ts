@@ -52,8 +52,33 @@ export default function useJournal() {
     }
   }, []);
 
+  const updateJournal = useCallback(async (journal: Journal) => {
+    try {
+      const response = await fetch(`${API_ENDPOINT}/api/journals/${journal.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(journal),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update journal");
+      }
+      const data = await response.json();
+      setJournals((prevJournals) =>
+        prevJournals
+          ? prevJournals.map((j) => (j.id === data.id ? data : j))
+          : [data],
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     fetchJournals();
   }, [fetchJournals]);
-  return { journals, isLoading, error, fetchJournals, createJournal };
+  return { journals, isLoading, error, fetchJournals, createJournal, updateJournal };
 }
