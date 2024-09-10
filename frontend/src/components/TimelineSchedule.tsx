@@ -3,6 +3,7 @@ import { Duration, intervalToDuration } from "date-fns";
 import { Schedule } from "../types/types";
 import { useState } from "react";
 import JournalEditDialog from "./JournalEditDialog";
+import ScheduleModal from "./ScheduleModal";
 
 const durationToHours = (duration: Duration) => {
   const hours = duration.hours ? duration.hours : 0;
@@ -19,6 +20,7 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
   const schedule = props.schedule;
 
   const hoursBeforeStart = schedule.start.getHours() + schedule.start.getMinutes() / 60;
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
   const scheduleDuration = intervalToDuration({
     start: schedule.start,
@@ -78,6 +80,56 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
           schedule={currentSchedule}
         />
       )}
+      {schedule.isAllDay ? (
+        <TableRow role="button" onClick={() => setIsScheduleModalOpen(true)}>
+          <TableCell
+            padding="none"
+            sx={{
+              paddingLeft: "10px",
+              border: "none",
+              borderRadius: "5px",
+              backgroundColor: schedule.color,
+            }}
+          >
+            {schedule.title}
+          </TableCell>
+        </TableRow>
+      ) : (
+        <TableRow
+          sx={{
+            position: "absolute",
+            paddingLeft: "10px",
+            top: `${4 * (hoursBeforeStart + 1)}%`,
+            width: "90%",
+            height: `${4 * scheduleDurationHours}%`,
+            minHeight: "25px",
+            borderRadius: "5px",
+            backgroundColor: schedule.color,
+          }}
+          role="button"
+          onClick={() => setIsScheduleModalOpen(true)}
+        >
+          <TableCell padding="none" sx={{ border: "none" }}>
+            <Typography variant="caption">{schedule.title}</Typography>{" "}
+            <Typography variant="caption">
+              {schedule.start.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              {" ~ "}
+              {schedule.end.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </Typography>
+          </TableCell>
+        </TableRow>
+      )}
+      <ScheduleModal
+        schedule={schedule}
+        open={isScheduleModalOpen}
+        onClose={() => setIsScheduleModalOpen(false)}
+      />
     </>
   );
 };
