@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -13,6 +13,7 @@ import (
 	"github.com/ut-code/JourniCal/backend/app/journal"
 	"github.com/ut-code/JourniCal/backend/app/router"
 	"github.com/ut-code/JourniCal/backend/app/user"
+	echohandler "github.com/ut-code/JourniCal/backend/pkg/echo-handler"
 )
 
 var e *echo.Echo
@@ -47,6 +48,9 @@ func init() {
 		return c.String(200, "Hello from Echo!")
 	})
 
+	if options.DEV_ROUTES {
+		router.Dev(e.Group("/dev"), db)
+	}
 	router.Auth(e.Group("/auth"), db)
 	router.User(e.Group("/api/user", mustLogin), db)
 	router.Calendar(e.Group("/api/calendar", mustLogin), db)
@@ -63,7 +67,8 @@ func init() {
 
 func Serve(port uint) {
 	// サーバの起動
-	if err := e.Start(":" + fmt.Sprint(port)); err != nil {
-		fmt.Println(err.Error())
+	err := echohandler.Start(e, uint16(port))
+	if err != nil {
+		log.Fatalln(err)
 	}
 }
