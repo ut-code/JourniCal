@@ -1,15 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import { Journal } from "../types/types";
 
 const API_ENDPOINT = "http://localhost:3000";
 
-interface Entry {
-  date: string;
-  title: string;
-  content: string;
-}
-
-export default function useDiary() {
-  const [diaries, setDiaries] = useState<Entry[] | null>(null);
+export default function useJournal() {
+  const [journals, setJournals] = useState<Journal[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -18,16 +13,16 @@ export default function useDiary() {
     setError(null);
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/api/diaries/`);
+      const response = await fetch(`${API_ENDPOINT}/api/journals/`);
       if (!response.ok) {
-        throw new Error("Failed to fetch diary entries");
+        throw new Error("Failed to fetch journal entries");
       }
       const data = await response.json();
-      setDiaries(data);
+      setJournals(data);
     } catch (error) {
       if (error instanceof Error) {
         setError(error);
-        setDiaries(null);
+        setJournals(null);
       }
     } finally {
       setIsLoading(false);
@@ -37,5 +32,5 @@ export default function useDiary() {
   useEffect(() => {
     fetchEntries();
   }, [fetchEntries]);
-  return { diaries, isLoading, error, fetchEntries };
+  return { journals, isLoading, error, fetchEntries };
 }

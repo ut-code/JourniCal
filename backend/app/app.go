@@ -1,25 +1,26 @@
 package app
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/ut-code/JourniCal/backend/app/database"
-	"github.com/ut-code/JourniCal/backend/app/diary"
+	db "github.com/ut-code/JourniCal/backend/app/database"
 	"github.com/ut-code/JourniCal/backend/app/env/options"
+	"github.com/ut-code/JourniCal/backend/app/journal"
 	"github.com/ut-code/JourniCal/backend/app/router"
 	"github.com/ut-code/JourniCal/backend/app/user"
+	echohandler "github.com/ut-code/JourniCal/backend/pkg/echo-handler"
 )
 
 var e *echo.Echo
 
 func init() {
 	db := db.InitDB(
-		&diary.Diary{},
+		&journal.Journal{},
 		&user.User{},
 	)
 
@@ -39,15 +40,21 @@ func init() {
 	if options.ECHO_SERVES_FRONTEND_TOO {
 		e.Static("/", "./static")
 	}
+	if options.PREFILL_JOURNAL {
+		journal.Prefill(db)
+	}
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(200, "Hello from Echo!")
 	})
 
+	if options.DEV_ROUTES {
+		router.Dev(e.Group("/dev"), db)
+	}
 	router.Auth(e.Group("/auth"), db)
 	router.User(e.Group("/api/user", mustLogin), db)
 	router.Calendar(e.Group("/api/calendar", mustLogin), db)
-	router.Diary(e.Group("/api/diaries", mustLogin), db)
+	router.Journal(e.Group("/api/journals", mustLogin), db)
 
 	// GitHub CI 用
 	if options.HALT_AFTER_SUCCESS {
@@ -60,7 +67,8 @@ func init() {
 
 func Serve(port uint) {
 	// サーバの起動
-	if err := e.Start(":" + fmt.Sprint(port)); err != nil {
-		fmt.Println(err.Error())
+	err := echohandler.Start(e, uint16(port))
+	if err != nil {
+		log.Fatalln(err)
 	}
 }
