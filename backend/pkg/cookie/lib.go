@@ -53,6 +53,7 @@ func From(key, value string, age ...time.Duration) *http.Cookie {
 		log.Fatalln("Don't specify more than two ages, what are you doing???")
 	}
 	return &http.Cookie{
+		Path:     "/",
 		Name:     key,
 		Value:    value,
 		MaxAge:   int(maxAge.Seconds()),
