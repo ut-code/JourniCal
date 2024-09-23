@@ -52,7 +52,7 @@ func init() {
 		router.Dev(e.Group("/dev"), db)
 	}
 	router.Auth(e.Group("/auth"), db)
-	router.User(e.Group("/api/user", mustLogin), db)
+	router.User(e.Group("/api/user"), db)
 	router.Calendar(e.Group("/api/calendar", mustLogin), db)
 	router.Journal(e.Group("/api/journals", mustLogin), db)
 
