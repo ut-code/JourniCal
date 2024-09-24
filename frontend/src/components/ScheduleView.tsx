@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import {
   Box,
@@ -7,10 +7,10 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import TimelineSchedule from "./TimelineSchedule";
+// import TimelineSchedule from "./TimelineSchedule";
 import { add } from "date-fns";
 import { Schedule } from "../types/types";
-import useSWR from "swr";
+// import useSWR from "swr";
 
 type ScheduleViewProps = {
   day: Date;
@@ -130,36 +130,75 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
   const isToday = isEqualDay(day, today);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [currentDate, setCurrentDate] = useState<Date>(day);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
-  // fetch data and increase page number
-  const startUnixTime = Math.floor(day.getTime() / 1000);
-  const endUnixTime = Math.floor(add(day, { days: 1 }).getTime() / 1000);
-  const { data, error } = useSWR(
-    `http://localhost:3000/api/calendar/get-events-in-range/${startUnixTime}/${endUnixTime}`,
-    (url) =>
-      fetch(url, {
+  // データフェッチ
+  const fetchSchedules = useCallback(async (date: Date) => {
+    const startUnixTime = Math.floor(date.getTime() / 1000);
+    const endUnixTime = Math.floor(add(date, { days: 1 }).getTime() / 1000);
+    const response = await fetch(
+      `http://localhost:3000/api/calendar/get-events-in-range/${startUnixTime}/${endUnixTime}`,
+      {
         method: "GET",
         credentials: "include",
         mode: "cors",
-      }).then((r) => r.json()),
-  );
-  if (error) {
-    console.error(error);
-  }
-  useEffect(() => {
-    console.log(currentDate);
-    if (data) {
-      const newSchedules = data.map((schedule: FetchedSchedule) =>
-        scheduleFromFetchedData(schedule),
-      );
-      console.log(newSchedules);
-      setSchedules((previousSchedule) => [...previousSchedule, ...newSchedules]);
-      setCurrentDate((prevDage) => add(prevDage, { days: 1 }));
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch schedules");
     }
-  }, [data, currentDate]);
-  const loadMore = () => {
-    setCurrentDate((prevDate) => add(prevDate, { days: 1 }));
+    const data: FetchedSchedule[] = await response.json();
+    return data.map(scheduleFromFetchedData);
+  }
+  , []);
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const initialSchedules = await fetchSchedules(currentDate);
+        console.log(initialSchedules);
+        setSchedules(initialSchedules);
+      } catch (error) {
+        console.error(error);
+        setHasMore(false);
+      }
+    };
+    loadInitialData();
+  }, [currentDate, fetchSchedules]);
+
+  // useEffect(() => {
+  //   if (data) {
+  //     const newSchedules = data.map((schedule: FetchedSchedule) =>
+  //       scheduleFromFetchedData(schedule),
+  //     );
+  //     console.log(newSchedules);
+  //     setSchedules((previousSchedule) => [...previousSchedule, ...newSchedules]);
+  //   }
+  // }, [data]);
+
+  const loadMore = async () => {
+    try {
+      const nextDate = add(currentDate, { days: 1 });
+      const newSchedules = await fetchSchedules(nextDate);
+      if (newSchedules.length > 0) {
+        setSchedules((prevSchedules) => [...prevSchedules, ...newSchedules]);
+        setCurrentDate(nextDate);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+        console.error(error);
+        setHasMore(false);
+    }
   };
+
+  // const loadMore = () => {
+  //   if (data && data.length > 0) {
+  //     setCurrentDate((prevDate) => add(prevDate, { days: 1 }));
+  //   } else {
+  //     setHasMore(false); // Stop further loading
+  //   }
+  // };
 
   // const fetchData = async (__page: number) => {
   //   console.log(__page);
@@ -211,24 +250,30 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
   // };
 
   return (
+    // <Table
+    //   sx={{
+    //     height: "90vh",
+    //     minHeight: "1150px",
+    //     borderRight: "1px solid gainsboro",
+    //   }}
+    // >
     <Table
       sx={{
-        height: "90vh",
+        height: "91vh",
         minHeight: "1150px",
         borderRight: "1px solid gainsboro",
       }}
     >
       <InfiniteScroll
-          style={{ flexGrow: 1 }}
           pageStart={0}
           loadMore={loadMore}
-          hasMore={true}
+          hasMore={hasMore}
           loader={
             <div className="loader" key={0}>
               Loading ...
             </div>
           }
-        >
+      >
         <Box
           display={"flex"}
           flexDirection={"column"}
@@ -256,28 +301,25 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
             <Typography variant="h5">{day.getDate()}</Typography>
           )}
         </Box>
-        {schedules
-          .filter((schedule) => schedule.isAllDay)
-          .map((schedule) => (
-            <TableRow key={schedule.id}>
-              <TableCell
-                padding="none"
-                sx={{
-                  paddingLeft: "10px",
-                  border: "none",
-                  borderRadius: "5px",
-                  backgroundColor: schedule.color,
-                }}
-              >
-                {schedule.title}
-              </TableCell>
-            </TableRow>
-          ))}
-        {schedules
-          .filter((schedule) => !schedule.isAllDay)
-          .map((schedule) => (
-            <TimelineSchedule key={schedule.id} schedule={schedule} />
-          ))}
+        {['allDay', 'notAllDay'].map((type) =>
+          schedules
+            .filter((schedule) => (type === 'allDay' ? schedule.isAllDay : !schedule.isAllDay))
+            .map((schedule) => (
+              <TableRow key={schedule.id}>
+                <TableCell
+                  padding="none"
+                  sx={{
+                    paddingLeft: "10px",
+                    border: "none",
+                    borderRadius: "5px",
+                    backgroundColor: schedule.color,
+                  }}
+                >
+                  {schedule.title}
+                </TableCell>
+              </TableRow>
+            ))
+        )}
       </InfiniteScroll>
     </Table>
   );

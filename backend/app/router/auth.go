@@ -32,25 +32,23 @@ func Auth(g *echo.Group, db *gorm.DB) {
 		code := c.QueryParam("code")
 		if code == "" {
 			c.String(http.StatusBadRequest, "empty authorization code")
-			// anyone can freely send a request to /auth/code so it's not an actual error.
-			// ignoring this on purpose to prevent log flood.
 			return nil
 		}
 
 		// assert: user has been defined before coming to this url
 		u, err := user.FromEchoContext(db, c)
 		if err != nil {
-			c.String(http.StatusUnauthorized, "you haven't registered user yet")
+			return c.String(http.StatusUnauthorized, "you haven't registered user yet")
 		}
 
 		token, err := auth.ExchangeToken(secret.OAuth2Config, code)
 		if err != nil {
-			c.String(http.StatusBadRequest, "bad authorization code")
-			return nil
+			return c.String(http.StatusBadRequest, "bad authorization code")
 		}
+
 		err = auth.SaveToken(db, u.ID, token)
 		if err != nil {
-			c.String(http.StatusInternalServerError, "failed to save your token: "+err.Error())
+			return c.String(http.StatusInternalServerError, "failed to save your token: "+err.Error())
 		}
 
 		c.Redirect(http.StatusFound, "/")
