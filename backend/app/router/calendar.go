@@ -17,6 +17,9 @@ func Calendar(g *echo.Group, db *gorm.DB) {
 		if err != nil {
 			return c.String(500, "Couldn't start service")
 		}
+		if srv == nil {
+			return c.String(500, "service is nil")
+		}
 		start, err := strconv.Atoi(c.Param("start_unix"))
 		if err != nil {
 			return c.String(400, "Bad request: invalid start time")
