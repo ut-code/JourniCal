@@ -1,12 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import {
-  Box,
-  Table,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Table, TableCell, TableRow, Typography } from "@mui/material";
 // import TimelineSchedule from "./TimelineSchedule";
 import { add } from "date-fns";
 import { Schedule } from "../types/types";
@@ -149,8 +143,7 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
     }
     const data: FetchedSchedule[] = await response.json();
     return data.map(scheduleFromFetchedData);
-  }
-  , []);
+  }, []);
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -187,8 +180,8 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
         setHasMore(false);
       }
     } catch (error) {
-        console.error(error);
-        setHasMore(false);
+      console.error(error);
+      setHasMore(false);
     }
   };
 
@@ -265,14 +258,14 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
       }}
     >
       <InfiniteScroll
-          pageStart={0}
-          loadMore={loadMore}
-          hasMore={hasMore}
-          loader={
-            <div className="loader" key={0}>
-              Loading ...
-            </div>
-          }
+        pageStart={0}
+        loadMore={loadMore}
+        hasMore={hasMore}
+        loader={
+          <div className="loader" key={0}>
+            Loading ...
+          </div>
+        }
       >
         <Box
           display={"flex"}
@@ -301,9 +294,11 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
             <Typography variant="h5">{day.getDate()}</Typography>
           )}
         </Box>
-        {['allDay', 'notAllDay'].map((type) =>
+        {["allDay", "notAllDay"].map((type) =>
           schedules
-            .filter((schedule) => (type === 'allDay' ? schedule.isAllDay : !schedule.isAllDay))
+            .filter((schedule) =>
+              type === "allDay" ? schedule.isAllDay : !schedule.isAllDay,
+            )
             .map((schedule) => (
               <TableRow key={schedule.id}>
                 <TableCell
@@ -318,7 +313,7 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
                   {schedule.title}
                 </TableCell>
               </TableRow>
-            ))
+            )),
         )}
       </InfiniteScroll>
     </Table>
