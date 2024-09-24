@@ -78,7 +78,11 @@ const Calendar: React.FC = () => {
         </Select>
 
         {mode === "schedule" ? (
-          <ScheduleView />
+          <ScheduleView
+            key={baseDate.getTime()}
+            day={baseDate}
+            today={today}
+          />
         ) : (
           <Box display={"flex"}>
             <TimelineRowName />

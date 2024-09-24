@@ -6,5 +6,8 @@
     "hooks": {
       "pre-commit": "prettier"
     }
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
   }
 }
