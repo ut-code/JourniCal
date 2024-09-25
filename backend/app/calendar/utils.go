@@ -32,7 +32,7 @@ func SrvFromContext(db *gorm.DB, c echo.Context) (*calendar.Service, error) {
 	}
 
 	key := hash.SHA256(token).Base64()
-	var srv *calendar.Service
+	var srv = new(calendar.Service)
 
 	any, ok := srvcache.Get(key)
 	if !ok {

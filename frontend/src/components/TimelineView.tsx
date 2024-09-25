@@ -118,6 +118,7 @@ const TimelineView = (props: TimelineViewProps): JSX.Element => {
         mode: "cors",
       }).then((r) => r.json()),
   );
+  console.log(data);
   if (error) {
     console.error(error);
   }
