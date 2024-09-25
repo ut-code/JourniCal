@@ -1,10 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { Box, Table, TableCell, TableRow, Typography } from "@mui/material";
-// import TimelineSchedule from "./TimelineSchedule";
 import { add } from "date-fns";
 import { Schedule } from "../types/types";
-// import useSWR from "swr";
 
 type ScheduleViewProps = {
   day: Date;
@@ -105,25 +103,16 @@ const isEqualDay = (day1: Date, day2: Date) => {
 //   p: 4,
 // };
 
-// interface Post {
-//   id: number;
-//   title: string;
-//   body: string;
-//   color: string; // Added color property to Post interface
-// }
-
 const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
-  // const [items, setItems] = useState<Post[]>([]);
   // const [page, setPage] = useState<number>(1);
   // const [selectedEvent, setSelectedEvent] = useState<Post | null>(null);
   // const [editedTitle, setEditedTitle] = useState<string>("");
-  // const [baseDate, setBaseDate] = useState<Date>(new Date());
 
   const { day, today } = props;
   const DAYOFWEEK = ["日", "月", "火", "水", "木", "金", "土"];
-  const isToday = isEqualDay(day, today);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [currentDate, setCurrentDate] = useState<Date>(day);
+  const isToday = isEqualDay(currentDate, today);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
   // データフェッチ
@@ -150,6 +139,7 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
       try {
         const initialSchedules = await fetchSchedules(currentDate);
         console.log(initialSchedules);
+        console.log("helloooo");
         setSchedules(initialSchedules);
       } catch (error) {
         console.error(error);
@@ -208,19 +198,6 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
   //   setPage(page + 1);
   // };
 
-  // const currentDate = new Date("2024-04-16");
-
-  // const getEventColor = (title: string) => {
-  //   const firstLetter = title.charAt(0).toLowerCase();
-  //   if (firstLetter >= "a" && firstLetter <= "j") {
-  //     return "#ff69b4"; // Pink
-  //   } else if (firstLetter >= "k" && firstLetter <= "t") {
-  //     return "#90ee90"; // Light green
-  //   } else {
-  //     return "#ffa500"; // Orange
-  //   }
-  // };
-
   // const handleOpenModal = (event: Post) => {
   //   setSelectedEvent(event);
   //   setEditedTitle(event.title);
@@ -243,16 +220,9 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
   // };
 
   return (
-    // <Table
-    //   sx={{
-    //     height: "90vh",
-    //     minHeight: "1150px",
-    //     borderRight: "1px solid gainsboro",
-    //   }}
-    // >
     <Table
       sx={{
-        height: "91vh",
+        height: "90vh",
         minHeight: "1150px",
         borderRight: "1px solid gainsboro",
       }}
@@ -274,7 +244,7 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
           alignItems={"center"}
           height={"3vh"}
         >
-          <Typography>{DAYOFWEEK[day.getDay()]}</Typography>
+          <Typography>{DAYOFWEEK[currentDate.getDay()]}</Typography>
           {isToday ? (
             <Box
               display={"flex"}
@@ -287,11 +257,11 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
               }}
             >
               <Typography variant="h5" color={"primary.contrastText"}>
-                {day.getDate()}
+                {currentDate.getDate()}
               </Typography>
             </Box>
           ) : (
-            <Typography variant="h5">{day.getDate()}</Typography>
+            <Typography variant="h5">{currentDate.getDate()}</Typography>
           )}
         </Box>
         {["allDay", "notAllDay"].map((type) =>
@@ -300,20 +270,33 @@ const ScheduleView = (props: ScheduleViewProps): JSX.Element => {
               type === "allDay" ? schedule.isAllDay : !schedule.isAllDay,
             )
             .map((schedule) => (
-              <TableRow key={schedule.id}>
-                <TableCell
-                  padding="none"
-                  sx={{
-                    paddingLeft: "10px",
-                    border: "none",
-                    borderRadius: "5px",
-                    backgroundColor: schedule.color,
-                  }}
-                >
-                  {schedule.title}
+              <TableRow
+                key={schedule.id}
+                sx={{
+                  paddingLeft: "10px",
+                  width: "90%",
+                  height: `4%`,
+                  minHeight: "25px",
+                  borderRadius: "5px",
+                  backgroundColor: schedule.color,
+                }}
+              >
+                <TableCell padding="none" sx={{ border: "none"}}>
+                  <Typography variant="caption">{schedule.title}</Typography>{" "}
+                  <Typography variant="caption">
+                    {schedule.start.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                    {" ~ "}
+                    {schedule.end.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Typography>
                 </TableCell>
               </TableRow>
-            )),
+            ))
         )}
       </InfiniteScroll>
     </Table>
