@@ -19,6 +19,7 @@ var CREDENTIALS_SOURCE CredentialsSource // "file", "env" or "none". defaults to
 var STATIC_USER = false              // whether to use static user for everything
 var STATIC_TOKEN = false             // will be set to true if TOKEN_SOURCE != db. requires STATIC_USER to be set true.
 var HALT_AFTER_SUCCESS = false       // GitHub Workflow 用
+var DEV_ROUTES = false               // whether to  enable routes meant for dev-use only.
 var ECHO_SERVES_FRONTEND_TOO = false // whether echo serves ./static/ as well as backend.
 var PREFILL_JOURNAL = false          // whether to prefill journal on startup
 var IN_MEMORY_DB = false             // whether to use sqlite's in-memory db.
@@ -70,8 +71,8 @@ func init() {
 	}
 
 	STATIC_USER = boolean("STATIC_USER")
-	STATIC_USER = boolean("STATIC_USER")
 	HALT_AFTER_SUCCESS = boolean("HALT_AFTER_SUCCESS")
+	DEV_ROUTES = boolean("DEV_ROUTES")
 	ECHO_SERVES_FRONTEND_TOO = boolean("ECHO_SERVES_FRONTEND_TOO")
 	PREFILL_JOURNAL = boolean("PREFILL_JOURNAL")
 	IN_MEMORY_DB = boolean("IN_MEMORY_DB")
