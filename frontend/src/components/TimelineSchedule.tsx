@@ -19,7 +19,8 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
   // TODO 変数名の付け方を統一する
   const schedule = props.schedule;
 
-  const hoursBeforeStart = schedule.start.getHours() + schedule.start.getMinutes() / 60;
+  const hoursBeforeStart =
+    schedule.start.getHours() + schedule.start.getMinutes() / 60;
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
   const scheduleDuration = intervalToDuration({

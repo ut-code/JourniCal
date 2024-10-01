@@ -17,15 +17,22 @@ import { add } from "date-fns";
 import TopBar from "../components/TopBar";
 
 function Journal() {
-  const { journals, isLoading, error, fetchMoreJournalsAfter, fetchMoreJournalsBefore } =
-    useJournal();
+  const {
+    journals,
+    isLoading,
+    error,
+    fetchMoreJournalsAfter,
+    fetchMoreJournalsBefore,
+  } = useJournal();
   const [open, setOpen] = useState(false);
   const [journalTitle, setJournalTitle] = useState("");
   const [journalContent, setJournalContent] = useState("");
   const [baseDate, setBaseDate] = useState(new Date());
-  const [topDate, setTopDate] = useState<Date>(new Date(new Date("2024-09-17").toDateString()));
+  const [topDate, setTopDate] = useState<Date>(
+    new Date(new Date("2024-09-17").toDateString()),
+  );
   const [bottomDate, setBottomDate] = useState<Date>(
-    new Date(new Date("2024-09-17").toDateString())
+    new Date(new Date("2024-09-17").toDateString()),
   );
   const topTargetRef = useRef<HTMLDivElement>(null);
   const bottomTargetRef = useRef<HTMLDivElement>(null);
@@ -43,9 +50,9 @@ function Journal() {
           root: null,
           rootMargin: "200px",
           threshold: 0.01,
-        }
+        },
       ),
-    [fetchMoreJournalsBefore, topDate]
+    [fetchMoreJournalsBefore, topDate],
   );
 
   const bottomScrollObserver = useCallback(
@@ -61,9 +68,9 @@ function Journal() {
           root: null,
           rootMargin: "200px",
           threshold: 0.01,
-        }
+        },
       ),
-    [fetchMoreJournalsAfter, bottomDate]
+    [fetchMoreJournalsAfter, bottomDate],
   );
 
   useEffect(() => {
@@ -98,7 +105,9 @@ function Journal() {
         <div>Error: {error.message}</div>
       ) : (
         <div className="journal-entries">
-          {journals?.map((journal, index) => <JournalEntry key={index} journal={journal} />)}
+          {journals?.map((journal, index) => (
+            <JournalEntry key={index} journal={journal} />
+          ))}
         </div>
       )}
       <Box

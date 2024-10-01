@@ -64,13 +64,16 @@ export default function useJournal() {
 
   const updateJournal = useCallback(async (journal: Journal) => {
     try {
-      const response = await fetch(`${API_ENDPOINT}/api/journals/${journal.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${API_ENDPOINT}/api/journals/${journal.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(journal),
         },
-        body: JSON.stringify(journal),
-      });
+      );
       if (!response.ok) {
         throw new Error("Failed to update journal");
       }
@@ -171,5 +174,5 @@ export default function useJournal() {
     fetchMoreJournalsBefore,
     createJournal,
     updateJournal,
-  }
+  };
 }
