@@ -8,8 +8,9 @@ export type Schedule = {
 };
 
 export type Journal = {
-  id: string;
+  id: number;
   date: string;
   title: string;
   content: string;
+  eventId: string;
 };

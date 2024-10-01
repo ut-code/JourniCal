@@ -9,7 +9,7 @@ export default function useJournal() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchEntries = useCallback(async () => {
+  const fetchJournals = useCallback(async () => {
     const today = new Date(new Date("2024-09-17").toDateString());
     setIsLoading(true);
     setError(null);
@@ -39,11 +39,62 @@ export default function useJournal() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
+  const createJournal = useCallback(async (journal: Omit<Journal, "id">) => {
+    try {
+      const response = await fetch(`${API_ENDPOINT}/api/journals/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(journal),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create journal");
+      }
+      const data = await response.json();
+      setJournals((prevJournals) =>
+        prevJournals ? [...prevJournals, data] : [data],
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error);
+      }
+    }
+  }, []);
 
-  const fetchMoreEntriesAfter = useCallback(async (bottomDate: Date) => {
+  const updateJournal = useCallback(async (journal: Journal) => {
+    try {
+      const response = await fetch(
+        `${API_ENDPOINT}/api/journals/${journal.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(journal),
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update journal");
+      }
+      const data = await response.json();
+      setJournals((prevJournals) =>
+        prevJournals
+          ? prevJournals.map((j) => (j.id === data.id ? data : j))
+          : [data],
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchJournals();
+  }, [fetchJournals]);
+
+  const fetchMoreJournalsAfter = useCallback(async (bottomDate: Date) => {
     setError(null);
     const startUnixTime = Math.floor(
       add(bottomDate, { days: 1 }).getTime() / 1000,
@@ -80,7 +131,7 @@ export default function useJournal() {
     }
   }, []);
 
-  const fetchMoreEntriesBefore = useCallback(async (topDate: Date) => {
+  const fetchMoreJournalsBefore = useCallback(async (topDate: Date) => {
     setError(null);
     const startUnixTime = Math.floor(
       add(topDate, { days: -4 }).getTime() / 1000,
@@ -118,8 +169,10 @@ export default function useJournal() {
     journals,
     isLoading,
     error,
-    fetchEntries,
-    fetchMoreEntriesAfter,
-    fetchMoreEntriesBefore,
+    fetchJournals,
+    fetchMoreJournalsAfter,
+    fetchMoreJournalsBefore,
+    createJournal,
+    updateJournal,
   };
 }

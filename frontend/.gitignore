@@ -26,3 +26,5 @@ dist.tmp
 *.njsproj
 *.sln
 *.sw?
+
+.env
