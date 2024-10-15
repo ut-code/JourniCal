@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 if [ `git branch --show-current` == "main" ]; then
   echo "Cannot make local commit on main branch!"
   exit 1
