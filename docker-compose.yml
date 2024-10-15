@@ -1,14 +1,14 @@
 # docker compose for development
 
 services:
-  frontend: 
+  frontend:
     restart: always
     build:
       context: ./frontend/
       dockerfile: ./Dockerfile
     ports:
       - "5173:5173"
-  backend: 
+  backend:
     build:
       context: ./backend/
       dockerfile: ./Dockerfile
