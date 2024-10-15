@@ -4,5 +4,4 @@ if [ `git branch --show-current` == "main" ]; then
   exit 1
 fi
 
-npx prettier . --write
-(cd frontend && npm run lint)
+(cd frontend && npm run lint && npm run format)
