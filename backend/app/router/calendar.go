@@ -31,4 +31,16 @@ func Calendar(g *echo.Group, db *gorm.DB) {
 		}
 		return c.JSON(http.StatusOK, evs)
 	})
+
+	g.GET("/event/:id", func(c echo.Context) error {
+		srv, err := calendar.SrvFromContext(db, c)
+		if err != nil {
+			return c.String(500, "Couldn't start service")
+		}
+		evs, err := calendar.GetEventByID(srv, "primary", c.Param("id"))
+		if err != nil {
+			return c.String(500, "Couldn't fetch events")
+		}
+		return c.JSON(http.StatusOK, evs)
+	})
 }
