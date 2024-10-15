@@ -170,19 +170,7 @@ const TimelineView = (props: TimelineViewProps): JSX.Element => {
         {schedules
           .filter((schedule) => schedule.isAllDay)
           .map((schedule) => (
-            <TableRow key={schedule.id}>
-              <TableCell
-                padding="none"
-                sx={{
-                  paddingLeft: "10px",
-                  border: "none",
-                  borderRadius: "5px",
-                  backgroundColor: schedule.color,
-                }}
-              >
-                {schedule.title}
-              </TableCell>
-            </TableRow>
+            <TimelineSchedule key={schedule.id} schedule={schedule} />
           ))}
       </TableHead>
       <TableBody sx={{ position: "relative" }}>

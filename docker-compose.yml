@@ -24,6 +24,8 @@ services:
       - CREDENTIALS_SOURCE # inherit
   postgres:
     image: postgres:alpine
+    ports:
+      - "5432:5432"
     hostname: postgres
     environment:
       - POSTGRES_PASSWORD=password

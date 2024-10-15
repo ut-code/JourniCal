@@ -19,3 +19,7 @@ func GetEventsInRange(service *calendar.Service, calendar_id calendar_id, start 
 	events, err := service.Events.List(calendar_id).SingleEvents(true).TimeMin(start.Format(time.RFC3339)).TimeMax(end.Format(time.RFC3339)).Do()
 	return events.Items, err
 }
+
+func GetEventByID(service *calendar.Service, calendar_id calendar_id, event_id string) (*calendar.Event, error) {
+	return service.Events.Get(calendar_id, event_id).Do()
+}
