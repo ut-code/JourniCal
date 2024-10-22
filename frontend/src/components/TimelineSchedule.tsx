@@ -73,7 +73,7 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
               paddingLeft: "10px",
               border: "none",
               borderRadius: "5px",
-              backgroundColor: "yellow",
+              backgroundColor: schedule.color,
             }}
           >
             {schedule.title}
