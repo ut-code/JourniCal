@@ -2,7 +2,6 @@ import { TableCell, TableRow, Typography } from "@mui/material";
 import { Duration, intervalToDuration } from "date-fns";
 import { Schedule } from "../types/types";
 import { useState } from "react";
-import JournalEditDialog from "./JournalEditDialog";
 import ScheduleModal from "./ScheduleModal";
 
 const durationToHours = (duration: Duration) => {
@@ -36,9 +35,6 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
   const scheduleDurationHours = durationToHours(scheduleDuration);
   //TODO 期間が短いと文字がはみ出るのをなんとかする
 
-  const [open, setOpen] = useState(false);
-  const [currentSchedule, setCurrentSchedule] = useState<Schedule | null>(null);
-
   return (
     <>
       <TableRow
@@ -52,10 +48,7 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
           borderRadius: "5px",
           backgroundColor: schedule.color,
         }}
-        onClick={async () => {
-          setCurrentSchedule(schedule);
-          setOpen(true);
-        }}
+        onClick={() => setIsScheduleModalOpen(true)}
       >
         <TableCell padding="none" sx={{ border: "none" }}>
           <Typography variant="caption">{schedule.title}</Typography>{" "}
@@ -72,15 +65,6 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
           </Typography>
         </TableCell>
       </TableRow>
-      {currentSchedule && (
-        <JournalEditDialog
-          open={open}
-          handleClose={() => {
-            setOpen(false);
-          }}
-          schedule={currentSchedule}
-        />
-      )}
       {schedule.isAllDay ? (
         <TableRow role="button" onClick={() => setIsScheduleModalOpen(true)}>
           <TableCell
@@ -89,7 +73,7 @@ const TimelineSchedule = (props: TimelineScheduleProps): JSX.Element => {
               paddingLeft: "10px",
               border: "none",
               borderRadius: "5px",
-              backgroundColor: schedule.color,
+              backgroundColor: "yellow",
             }}
           >
             {schedule.title}
