@@ -6,9 +6,9 @@ const API_ENDPOINT = "http://localhost:3000";
 
 type useJournalProps = {
   baseDate: Date;
-}
+};
 
-export default function useJournal({baseDate}: useJournalProps) {
+export default function useJournal({ baseDate }: useJournalProps) {
   const [journals, setJournals] = useState<Journal[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -16,7 +16,9 @@ export default function useJournal({baseDate}: useJournalProps) {
   const fetchJournals = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    const startUnixTime = Math.floor(add(baseDate, { days: -4 }).getTime() / 1000);
+    const startUnixTime = Math.floor(
+      add(baseDate, { days: -4 }).getTime() / 1000,
+    );
     const endUnixTime = Math.floor(add(baseDate, { days: 4 }).getTime() / 1000);
 
     try {

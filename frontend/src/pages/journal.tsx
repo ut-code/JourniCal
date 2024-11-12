@@ -31,12 +31,12 @@ function Journal() {
   );
   const search = useLocation().search;
   const query = new URLSearchParams(search);
-  const baseEventId = query.get('baseEventId');
+  const baseEventId = query.get("baseEventId");
   useEffect(() => {
     (async () => {
-      if(baseEventId != null){
+      if (baseEventId != null) {
         const baseEvent = await fetchScheduleByEventId(baseEventId);
-        if (baseEvent&& baseEvent.start) {
+        if (baseEvent && baseEvent.start) {
           setBaseDate(baseEvent.start);
         }
       }
@@ -48,7 +48,7 @@ function Journal() {
     error,
     fetchMoreJournalsAfter,
     fetchMoreJournalsBefore,
-  } = useJournal({baseDate});
+  } = useJournal({ baseDate });
 
   const topTargetRef = useRef<HTMLDivElement>(null);
   const bottomTargetRef = useRef<HTMLDivElement>(null);
