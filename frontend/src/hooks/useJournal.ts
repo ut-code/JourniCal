@@ -4,17 +4,20 @@ import { add } from "date-fns";
 
 const API_ENDPOINT = "http://localhost:3000";
 
-export default function useJournal() {
+type useJournalProps = {
+  baseDate: Date;
+}
+
+export default function useJournal({baseDate}: useJournalProps) {
   const [journals, setJournals] = useState<Journal[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchJournals = useCallback(async () => {
-    const today = new Date(new Date("2024-09-17").toDateString());
     setIsLoading(true);
     setError(null);
-    const startUnixTime = Math.floor(add(today, { days: -4 }).getTime() / 1000);
-    const endUnixTime = Math.floor(add(today, { days: 4 }).getTime() / 1000);
+    const startUnixTime = Math.floor(add(baseDate, { days: -4 }).getTime() / 1000);
+    const endUnixTime = Math.floor(add(baseDate, { days: 4 }).getTime() / 1000);
 
     try {
       const response = await fetch(
@@ -37,7 +40,7 @@ export default function useJournal() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [baseDate]);
 
   const createJournal = useCallback(async (journal: Omit<Journal, "id">) => {
     try {
