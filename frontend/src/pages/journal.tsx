@@ -15,15 +15,10 @@ import JournalEntry from "../components/JournalEntry";
 import useJournal from "../hooks/useJournal";
 import { add } from "date-fns";
 import TopBar from "../components/TopBar";
+import { useLocation } from "react-router-dom";
+import { fetchScheduleByEventId } from "../api/calendar";
 
 function Journal() {
-  const {
-    journals,
-    isLoading,
-    error,
-    fetchMoreJournalsAfter,
-    fetchMoreJournalsBefore,
-  } = useJournal();
   const [open, setOpen] = useState(false);
   const [journalTitle, setJournalTitle] = useState("");
   const [journalContent, setJournalContent] = useState("");
@@ -34,6 +29,29 @@ function Journal() {
   const [bottomDate, setBottomDate] = useState<Date>(
     new Date(new Date("2024-09-17").toDateString()),
   );
+  const search = useLocation().search;
+  const query = new URLSearchParams(search);
+  const baseEventId = query.get("baseEventId");
+  useEffect(() => {
+    (async () => {
+      if (baseEventId != null) {
+        const baseEvent = await fetchScheduleByEventId(baseEventId);
+        if (baseEvent && baseEvent.start) {
+          setBaseDate(baseEvent.start);
+          setTopDate(add(baseEvent.start, { days: -4 }));
+          setBottomDate(add(baseEvent.start, { days: 4 }));
+        }
+      }
+    })();
+  }, [baseEventId]);
+  const {
+    journals,
+    isLoading,
+    error,
+    fetchMoreJournalsAfter,
+    fetchMoreJournalsBefore,
+  } = useJournal({ baseDate });
+
   const topTargetRef = useRef<HTMLDivElement>(null);
   const bottomTargetRef = useRef<HTMLDivElement>(null);
 
