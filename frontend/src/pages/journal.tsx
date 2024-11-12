@@ -38,6 +38,8 @@ function Journal() {
         const baseEvent = await fetchScheduleByEventId(baseEventId);
         if (baseEvent && baseEvent.start) {
           setBaseDate(baseEvent.start);
+          setTopDate(add(baseEvent.start, {days: -4}));
+          setBottomDate(add(baseEvent.start, {days: 4}));
         }
       }
     })();

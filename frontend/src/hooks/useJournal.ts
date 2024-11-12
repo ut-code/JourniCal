@@ -29,10 +29,13 @@ export default function useJournal({ baseDate }: useJournalProps) {
         throw new Error("Failed to fetch journal entries");
       }
       const data: Journal[] = await response.json();
-      const sortedData = data.sort(
-        (data1, data2) =>
-          new Date(data1.date).getTime() - new Date(data2.date).getTime(),
-      );
+      const sortedData =
+        data != null && data.length > 0
+          ? data.sort(
+              (data1, data2) =>
+                new Date(data1.date).getTime() - new Date(data2.date).getTime(),
+            )
+          : [];
       setJournals(sortedData);
     } catch (error) {
       if (error instanceof Error) {
@@ -116,12 +119,13 @@ export default function useJournal({ baseDate }: useJournalProps) {
         throw new Error("Failed to fetch journal entries");
       }
       const data: Journal[] = await response.json();
-      const sortedData = data
-        ? data.sort(
-            (data1, data2) =>
-              new Date(data1.date).getTime() - new Date(data2.date).getTime(),
-          )
-        : null;
+      const sortedData =
+        data != null && data.length > 0
+          ? data.sort(
+              (data1, data2) =>
+                new Date(data1.date).getTime() - new Date(data2.date).getTime(),
+            )
+          : [];
       setJournals((prev) =>
         prev === null
           ? sortedData
@@ -151,12 +155,13 @@ export default function useJournal({ baseDate }: useJournalProps) {
         throw new Error("Failed to fetch journal entries");
       }
       const data: Journal[] = await response.json();
-      const sortedData = data
-        ? data.sort(
-            (data1, data2) =>
-              new Date(data1.date).getTime() - new Date(data2.date).getTime(),
-          )
-        : null;
+      const sortedData =
+        data != null && data.length > 0
+          ? data.sort(
+              (data1, data2) =>
+                new Date(data1.date).getTime() - new Date(data2.date).getTime(),
+            )
+          : [];
       setJournals((prev) =>
         prev === null
           ? sortedData
